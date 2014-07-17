@@ -1,4 +1,4 @@
-import magick.*;
+import magick.*; 
 
 
 /*
