@@ -1,6 +1,7 @@
-import java.awt.Rectangle;
+import java.awt.Color;
 
-import magick.*;
+import magick.MagickImage;
+import util.MagickUtility;
 
 /*
  * test
@@ -11,23 +12,18 @@ public class MainSicurezza {
 
 		String path = "/home/giovanni/Immagini/";
 		
-	    String inputfileName = path + "Immagine2.jpg";
-	    ImageInfo info = new ImageInfo(inputfileName);
-	    MagickImage mk = new MagickImage(info);
-	     
-	    MagickImage cropped = mk.cropImage(new Rectangle(10, 10, 100, 100));
-	    
-	    cropped.setFileName(path + "magick_img.jpg");
-	    cropped.writeImage(info);
-	    
-	    mk.compositeImage(CompositeOperator.AtopCompositeOp, cropped, 150, 200);
-	    
-	    DrawInfo dinfo = new DrawInfo(info);
-	    dinfo.setGeometry("0,0+50+50");
-	    mk.colorFloodfillImage(dinfo, PixelPacket.queryColorDatabase("yellow"), 30, 20, PaintMethod.ReplaceMethod);
-	    
-	    mk.setFileName(path + "magick_draw.jpg");
-	    mk.writeImage(info);
+		MagickImage img = MagickUtility.getImage(path + "Immagine2.jpg");
+		MagickImage cropped = MagickUtility.cropImage(img, 10, 50, 400, 200);
+		MagickImage covered = MagickUtility.coverWithImage(img, cropped, 400, 400);
+		MagickUtility.saveImage(covered, path + "covered.jpg");
+		
+		MagickImage rect = MagickUtility.createRectangleImage(new Color(255, 0, 0), 100, 100);
+		MagickImage rectText = MagickUtility.createRectangleImageWithText(new Color(255,0,0), "BELLA X TE!!", new Color(255,255,255), 12.0, 45, 45, 400, 400);
+		MagickImage covered2 = MagickUtility.coverWithImage(img, rect, 30, 30);
+		MagickImage covered3 = MagickUtility.coverWithImage(covered2, rectText, 60, 60);
+		MagickUtility.saveImage(covered2, path + "covered2.jpg");
+		MagickUtility.saveImage(covered3, path + "covered3.jpg");
+				
 	     
 		/*javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
