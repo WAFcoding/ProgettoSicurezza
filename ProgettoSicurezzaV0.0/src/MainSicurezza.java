@@ -1,5 +1,6 @@
 import java.awt.Color;
 
+import Layout.LayoutControl;
 import magick.MagickImage;
 import util.MagickUtility;
 
@@ -9,7 +10,7 @@ import util.MagickUtility;
 public class MainSicurezza {
 
 	public static void main(String[] args) throws Exception {
-
+/*
 		String path = "/home/giovanni/Immagini/";
 		
 		MagickImage img = MagickUtility.getImage(path + "Immagine2.jpg");
@@ -23,7 +24,7 @@ public class MainSicurezza {
 		MagickImage covered3 = MagickUtility.coverWithImage(covered2, rectText, 60, 60);
 		MagickUtility.saveImage(covered2, path + "covered2.jpg");
 		MagickUtility.saveImage(covered3, path + "covered3.jpg");
-				
+				*/
 	     
 		/*javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -31,6 +32,9 @@ public class MainSicurezza {
 				p.createAndShowGUI();
 			}
 		});*/
+		
+		LayoutControl l= new LayoutControl();
+		l.createLayout();
 		
 	}
 }
