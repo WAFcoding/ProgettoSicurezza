@@ -92,40 +92,13 @@ public class LayoutControl {
 	
 	public void drawImage(String path){
 
-		//mainFrame.removeAll();
-		viewImage v_img= new viewImage(getPrimaryChoose());
-		//mainFrame.setSize(v_img.getImage().getWidth(), v_img.getImage().getHeight());
-		mainFrame.add(v_img);
-		
-		JFrame frame= new JFrame("IMMAGINE");
+		/*JFrame frame= new JFrame("IMMAGINE");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(v_img.getImage().getWidth(), v_img.getImage().getHeight());
-		//viewImage v_img= new viewImage(getPrimaryChoose());
-		frame.add(v_img);
-		frame.setVisible(true);
-		
-	}
-	
-	private class viewImage extends Component{
-		
-		private BufferedImage img;
-		
-		public viewImage(String path){
-
-			try {
-				img= ImageIO.read(new File(getPrimaryChoose()));
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		
-		public void paint(Graphics g){
-			g.drawImage(img, 0, 0, null);
-		}
-		
-		public BufferedImage getImage(){
-			return this.img;
-		}
+		frame.setVisible(true);*/
+		ViewImage v_img= new ViewImage(getPrimaryChoose());
+		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane());
+		img_layout.setV_img(v_img);
+		img_layout.addComponentsToPane();
+		mainFrame.pack();
 	}
 }

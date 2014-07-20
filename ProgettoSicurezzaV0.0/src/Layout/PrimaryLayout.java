@@ -63,26 +63,16 @@ public class PrimaryLayout implements GeneralLayout{
 		c.insets= new Insets(10, 10, 10, 10);
 
 		button = new JButton("OPEN");
-		
-		c.weightx = 0.5;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = 0;
-		c.gridy = 0;
+		c.gridx = 0;c.gridy = 0;c.weightx = 0.5;
 		button.addActionListener(new OpenAction());
 		pane.add(button, c);
 	
 		button = new JButton("SAVE");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
-		c.gridx = 1;
-		c.gridy = 0;
+		c.gridx = 1;c.gridy = 0;c.weightx = 0.5;
 		pane.add(button, c);
 	
 		button = new JButton("ENCODE");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
-		c.gridx = 0;
-		c.gridy = 1;
+		c.gridx = 0;c.gridy = 1;c.weightx = 0.5;
 		button.addActionListener(new ActionListener() {
 			
 			@Override
@@ -95,18 +85,11 @@ public class PrimaryLayout implements GeneralLayout{
 		pane.add(button, c);
 	
 		button = new JButton("DECODE");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
-		c.gridx = 1;
-		c.gridy = 1;
+		c.gridx = 1;c.gridy = 1;c.weightx = 0.5;
 		pane.add(button, c);
 	
 		button = new JButton("SETTINGS");
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 0.5;
-		c.gridx = 0;
-		c.gridy = 2;
-		c.gridwidth= 2;
+		c.gridx = 0;c.gridy = 2;c.weightx = 0.5;c.gridwidth= 2;
 		button.addActionListener(new ActionListener() {
 			
 			@Override

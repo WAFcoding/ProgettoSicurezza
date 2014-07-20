@@ -19,6 +19,10 @@ import javax.imageio.ImageIO;
  */
 public class ViewImage extends Component{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private BufferedImage img;
 	/**
 	 * @param img
@@ -30,6 +34,8 @@ public class ViewImage extends Component{
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+		
+		super.setSize(getImg().getWidth(), getImg().getHeight());
 	}
 
 	public BufferedImage getImg() {

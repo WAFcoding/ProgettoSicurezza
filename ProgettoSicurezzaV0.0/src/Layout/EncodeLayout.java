@@ -16,7 +16,6 @@ import javax.swing.JButton;
  *
  */
 public class EncodeLayout implements GeneralLayout{
-    private final static boolean RIGHT_TO_LEFT = false;
     private Container pane;
     private LayoutControl control;
     
@@ -38,15 +37,11 @@ public class EncodeLayout implements GeneralLayout{
 		c.insets= new Insets(10, 10, 10, 10);
 
 		button = new JButton("ENCODE");
-		c.weightx = 0.5;
-		c.gridx = 0;
-		c.gridy = 0;
+		c.gridx = 0;c.gridy = 0;c.weightx = 0.5;
 		pane.add(button, c);
 		
 		button= new JButton("BACK");
-		c.weightx = 0.5;
-		c.gridx = 0;
-		c.gridy = 1;
+		c.gridx = 0;c.gridy = 1;c.weightx = 0.5;
 		button.addActionListener(new ActionListener() {
 			
 			@Override
