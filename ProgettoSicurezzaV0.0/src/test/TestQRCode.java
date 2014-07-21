@@ -1,35 +1,42 @@
 package test;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import magick.MagickImage;
+import util.MagickUtility;
+import util.QRCode;
 
-import util.QRCodeUtility;
-
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.NotFoundException;
-import com.google.zxing.WriterException;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 public class TestQRCode {
 
 	/**
 	 * @param args
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws WriterException, IOException,
-	NotFoundException {
-		String path = "/home/giovanni/";
-		String qrCodeData = "hello world";
-		String filePath = path + "QRCode.png";
-		String charset = "UTF-8"; // or "ISO-8859-1"
-		Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
-		hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+	public static void main(String[] args) throws Exception {
+		String user = "giovanni";
+		String path = "/home/" + user + "/Immagini/";
+		String filename = "TEST.jpg";
+		String filenameMagick = "TEST_MAGICK.jpg";
 		
-		QRCodeUtility.createQRCode(qrCodeData, filePath, charset, hintMap, 200, 200);
-		System.out.println("QR Code image created successfully!");
-
-		System.out.println("Data read from QR Code: "
-				+ QRCodeUtility.readQRCode(filePath, charset, hintMap));
+		QRCode qr = new QRCode();
+		qr.writeQRCode("bellaaaa!", QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
+		qr.saveQRCodeToFile(path + filename);
+		System.out.println("QRCode Scritto in:" + path + filename);
+		
+		QRCode qrRead = QRCode.readQRCodeFromFile(path + filename);
+		String data = qrRead.readQRCode().getText();
+		System.out.println("Letto:" + data);
+		
+		MagickImage qrmagick = qr.getQRMagick();
+		MagickUtility.saveImage(qrmagick, path + filenameMagick);
+		System.out.println("QRCode Scritto in:" + path + filenameMagick);
+		
+		MagickImage qrreadmagick = MagickUtility.getImage(path + filenameMagick);
+		QRCode qrdmagick = QRCode.getQRCodeFromMagick(qrreadmagick);
+		data = qrdmagick.readQRCode().getText();
+		System.out.println("Letto:" + data);
+		
+		qrmagick.destroyImages();
+		qrreadmagick.destroyImages();
 	}
 
 }
