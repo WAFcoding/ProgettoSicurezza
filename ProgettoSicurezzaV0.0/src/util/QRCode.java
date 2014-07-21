@@ -65,6 +65,7 @@ public class QRCode {
 	}
 	
 	public MagickImage getQRMagick() {
+		//TODO
 		return null;
 	}
 
