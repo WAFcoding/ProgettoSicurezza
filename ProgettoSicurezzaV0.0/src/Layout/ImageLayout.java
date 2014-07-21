@@ -4,6 +4,7 @@
 package Layout;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -41,15 +42,18 @@ public class ImageLayout implements GeneralLayout{
 	public void addComponentsToPane() {
 		
 		JButton button;
+		
 		pane.removeAll();
 		pane.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
+		
 		c.anchor= GridBagConstraints.CENTER;
 		c.insets= new Insets(10, 10, 10, 10);
 		
 		c.gridx=0;c.gridy=0;c.gridwidth=5;
 		//c.ipady=v_img.getHeight();c.ipadx=v_img.getWidth();
-		c.ipady= viewer.getMinimumSize().height;c.ipadx=viewer.getMinimumSize().width;
+		c.ipady= 5;c.ipadx=5;
+		//c.fill= GridBagConstraints.VERTICAL;
 		pane.add(viewer, c);
 		//pane.add(v_img, c);
 		
@@ -147,14 +151,23 @@ public class ImageLayout implements GeneralLayout{
 		try {
 			MagickImage img= MagickUtility.getImage(path);
 			viewer.setImage(img);
-			viewer.setMinimumSize(img.getDimension());
-			viewer.setMaximumSize(img.getDimension());
+			int tmp_w= img.getDimension().width;
+			int tmp_h= img.getDimension().height;
+			if(tmp_w >= 800 || tmp_h >= 600)
+				viewer.setSize(new Dimension(800, 600));
+			else
+				viewer.setSize(new Dimension(tmp_w, tmp_h));
 		} catch (MagickException e) { 
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 
+	public int getImgWidth(){
+		return this.viewer.getSize().width;
+	}
+	
+	public int getImgHeight(){
+		return this.viewer.getSize().height;
+	}
 	
 }

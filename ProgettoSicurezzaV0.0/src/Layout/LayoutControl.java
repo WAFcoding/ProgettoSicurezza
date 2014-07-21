@@ -1,7 +1,10 @@
 package Layout;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +25,9 @@ import util.MagickUtility;
 
 public class LayoutControl {
 	
+	private final static int WIDTH= 400;
+	private final static int HEIGHT= 400;
+	
 	private JFrame mainFrame;
 	private SettingsLayout s_layout;
 	private PrimaryLayout p_layout;
@@ -31,7 +37,8 @@ public class LayoutControl {
 		
 		mainFrame= new JFrame("Progetto SII");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setSize(480, 320);
+		mainFrame.setSize(WIDTH, HEIGHT);
+		mainFrame.setBackground(Color.ORANGE);
 		mainFrame.setVisible(true);
 		setLayout(0);
 	}
@@ -53,7 +60,9 @@ public class LayoutControl {
 			SettingsLayout();
 		}
 		
-		mainFrame.pack();
+		//mainFrame.pack();
+		mainFrame.repaint();
+		mainFrame.validate();
 	}
 
 	public void PrimaryLayout(){
@@ -86,6 +95,10 @@ public class LayoutControl {
 		}
 	}
 	//============================================================================
+	/**
+	 * 
+	 * @return la scelta effettuata nel menu principale
+	 */
 	public String getPrimaryChoose(){
 		
 		if(p_layout != null){
@@ -94,17 +107,26 @@ public class LayoutControl {
 		
 		return null;
 	}
-	
+	/**
+	 * Disegna l'immagine scelta nella finestra dell'applicazione
+	 * @param path String il percorso dell'imagine da disegnare
+	 */
 	public void drawImage(String path){
-		/*
-		ViewImage v_img= new ViewImage(getPrimaryChoose());
-		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane());
-		img_layout.setV_img(v_img);
-		img_layout.addComponentsToPane();*/
 
 		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane());
 		img_layout.setViewer(path);
 		img_layout.addComponentsToPane();
-		mainFrame.pack();
+		
+		if(img_layout.getImgWidth() >= 800 || img_layout.getImgHeight() >= 600){
+			mainFrame.setSize(new Dimension(1000, 700));
+			mainFrame.repaint();
+			mainFrame.validate();
+		}
+		else{
+			mainFrame.setSize(new Dimension(img_layout.getImgWidth()+100, img_layout.getImgHeight()+50));
+			mainFrame.repaint();
+			mainFrame.validate();
+		}
+			//mainFrame.pack();
 	}
 }
