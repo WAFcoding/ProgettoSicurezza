@@ -8,6 +8,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -32,15 +33,20 @@ public class LayoutControl {
 	private SettingsLayout s_layout;
 	private PrimaryLayout p_layout;
 	private EncodeLayout e_layout;
+	private ArrayList<String> choosed_file;
 	
-	public void createLayout(){
+	public LayoutControl(){
 		
+		choosed_file= new ArrayList<String>();
 		mainFrame= new JFrame("Progetto SII");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(WIDTH, HEIGHT);
-		mainFrame.setBackground(Color.ORANGE);
+		//mainFrame.setBackground(Color.ORANGE);
 		mainFrame.setVisible(true);
 		setLayout(0);
+	}
+	
+	public void createLayout(){
 	}
 	
 	//=========================================================================
@@ -77,7 +83,7 @@ public class LayoutControl {
 	
 	public void EncodeLayout(){
 		if(e_layout == null){
-			e_layout= new EncodeLayout(this, mainFrame.getContentPane());
+			e_layout= new EncodeLayout(this, mainFrame.getContentPane(), this.choosed_file);
 			e_layout.addComponentsToPane();
 		}
 		else{
@@ -106,6 +112,10 @@ public class LayoutControl {
 		}
 		
 		return null;
+	}
+	
+	public void addChoice(String path){
+		this.choosed_file.add(path);
 	}
 	/**
 	 * Disegna l'immagine scelta nella finestra dell'applicazione

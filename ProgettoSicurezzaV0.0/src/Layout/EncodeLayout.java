@@ -2,11 +2,13 @@ package Layout;
 
 import java.awt.ComponentOrientation;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -28,13 +30,16 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
     private JList<String> list;
     private DefaultListModel<String> list_model;
     private JScrollPane scroll_pane;
+    private ArrayList<String> list_item;
     
-    public EncodeLayout(LayoutControl control, Container pane){
+    public EncodeLayout(LayoutControl control, Container pane, ArrayList<String> items){
     	setPane(pane);
     	setControl(control);
+        this.list_item= items;
+        
     	list= new JList<String>();
         list_model= new DefaultListModel<String>();
-        list_model.addElement("prova1");
+        /*list_model.addElement("prova1");
         list_model.addElement("prova2");
         list_model.addElement("prova3");
         list_model.addElement("prova4");
@@ -47,13 +52,12 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
         list_model.addElement("prova5");
         list_model.addElement("prova6");
         list_model.addElement("prova7");
-        list_model.addElement("prova8");
+        list_model.addElement("prova8");*/
         
         list.setModel(list_model);
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         //list.setSelectedIndex(0);
         list.addListSelectionListener(this);
-        scroll_pane= new JScrollPane(list);
     }
     
     @Override
@@ -61,7 +65,13 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
     	//inizializzazione
         JButton button;
         JLabel label;
+        scroll_pane= new JScrollPane(list);
         
+        list_model.clear();
+        for(String s : list_item){
+        	list_model.addElement(s);
+        }
+        //scroll_pane.setSize(new Dimension(200, 200));
         
         //inserimento pulsanti
         pane.removeAll();
@@ -69,15 +79,23 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor= GridBagConstraints.CENTER;
-		c.ipady= 40;
+		//c.ipady= 40;
 		c.insets= new Insets(10, 10, 10, 10);
 
+		c.gridx=0;c.gridy=0;
+		label= new JLabel("File aggiunti");
+		pane.add(label, c);
+		
+		c.gridx=0;c.gridy=1;c.gridheight=2;c.ipadx=10;
+		pane.add(scroll_pane, c);
+
+		c.fill = GridBagConstraints.NONE;
 		button = new JButton("ENCODE");
-		c.gridx = 0;c.gridy = 0;c.weightx = 0.5;
+		c.gridx = 1;c.gridy = 1;c.weightx = 0.5;c.gridheight=1;c.ipadx=0;
 		pane.add(button, c);
 		
 		button= new JButton("BACK");
-		c.gridx = 0;c.gridy = 1;c.weightx = 0.5;
+		c.gridx = 1;c.gridy = 2;c.weightx = 0.5;
 		button.addActionListener(new ActionListener() {
 			
 			@Override
@@ -86,13 +104,6 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 			}
 		});
 		pane.add(button, c);
-
-		c.gridx=1;c.gridy=0;c.gridheight=2;
-		label= new JLabel("File aggiunti");
-		pane.add(label, c);
-		
-		c.gridx=1;c.gridy=1;c.gridheight=2;
-		pane.add(scroll_pane, c);
 		
     }
 
@@ -116,5 +127,13 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 	public void valueChanged(ListSelectionEvent e) {
 		if(!e.getValueIsAdjusting())
 			System.out.println("selezionato " + list.getSelectedValue());
+	}
+
+	public ArrayList<String> getList_item() {
+		return list_item;
+	}
+
+	public void setList_item(ArrayList<String> list_item) {
+		this.list_item = list_item;
 	}
 }
