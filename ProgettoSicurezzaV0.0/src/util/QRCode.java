@@ -12,15 +12,24 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Paths;
 
+import javax.imageio.ImageIO;
+
+import magick.MagickException;
 import magick.MagickImage;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.DecoderResult;
 import com.google.zxing.common.DetectorResult;
@@ -29,24 +38,60 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.Decoder;
 import com.google.zxing.qrcode.detector.Detector;
 
+/**
+ * Classe wrapper per l'utilizzo dei QR Code.
+ * 
+ * @author Giovanni Rossi
+ *
+ */
 public class QRCode {
 
+	/**
+	 * I dati binari del QR Code.
+	 */
 	private BitMatrix bitData;
+	
+	/**
+	 * Larghezza di default.
+	 */
 	public static final int DEFAULT_WIDTH = 200;
+	
+	/**
+	 * Altezza di default.
+	 */
 	public static final int DEFAULT_HEIGHT = 200;
 
+	/**
+	 * Genera un QR Code vuoto con la risoluzione desiderata.
+	 * @param width		La larghezza del QR Code.
+	 * @param height	L'altezza del QR Code.
+	 */
 	public QRCode(int width, int height) {
 		this.bitData = new BitMatrix(width, height);
 	}
 
+	/**
+	 * Genera un QR Code vuoto con la risoluzione di default.
+	 */
 	public QRCode() {
 		this.bitData = new BitMatrix(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	}
 
+	/**
+	 * Genera un QR Code a partire da dati binari.
+	 * @param data	I dati binari del QR Code.
+	 */
 	public QRCode(BitMatrix data) {
 		this.bitData = data;
 	}
 
+	/**
+	 * Genera un istanza a partire da un immagine della libreria ImageMagick contenente un QR Code.
+	 * @param img	L'immagine in cui cercare il QR Code.
+	 * 
+	 * @return	Un istanza del QR Code.
+	 * @throws Exception
+	 */
 	public static QRCode getQRCodeFromMagick(MagickImage img) throws Exception {
 		BufferedImage bufimg = magickImageToBufferedImage(img);
 		BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(new BufferedImageLuminanceSource(bufimg)));
@@ -54,21 +99,108 @@ public class QRCode {
 		return new QRCode(res.getBits());
 	}
 
+	/**
+	 * Legge i dati contenuti nel QR Code.
+	 * 
+	 * @return L'insieme delle informazioni lette dal QR Code (basta eseguire <code>DecoderResult.getText()</code> per ottenere i dati.
+	 * @see {@link DecoderResult#getText() }
+	 * @throws ChecksumException
+	 * @throws FormatException
+	 */
 	public DecoderResult readQRCode() throws ChecksumException, FormatException {
 		if (this.bitData == null)
 			return null;
 		return new Decoder().decode(this.bitData);
 	}
 
+	/**
+	 * Scrive i dati dentro il QR Code.
+	 * @param qrCodeData	I dati del QR Code.
+	 * @param qrWidth		La larghezza del QR Code.
+	 * @param qrHeight		L'altezza del QR Code.
+	 * 
+	 * @throws WriterException
+	 */
 	public void writeQRCode(String qrCodeData, int qrWidth, int qrHeight) throws WriterException {
 		this.bitData = new QRCodeWriter().encode(qrCodeData, BarcodeFormat.QR_CODE, qrWidth, qrHeight);
 	}
 	
-	public MagickImage getQRMagick() {
-		//TODO
-		return null;
+	/**
+	 * Ottiene un'immagine di Image Magick a partire da questo QR Code.
+	 * 
+	 * @return	L'istanza di MagickImage.
+	 * 
+	 * @throws MagickException
+	 */
+	public MagickImage getQRMagick() throws MagickException {
+		if(this.bitData==null)
+			return null;
+		
+		int height = this.bitData.getHeight();
+		int width = this.bitData.getWidth();
+		
+		byte[] qrData = new byte[height * width * 3];
+		for(int i = 0; i < height ; i++) {
+			for(int j = 0; j < width; j++) {
+				
+				boolean color = this.bitData.get(i, j);
+				
+				//se true è NERO
+				byte value = color ? (byte)0 : (byte)255;
+				
+				int indexheight = width * i;
+				
+				qrData[3*(indexheight + j)] = value;
+				qrData[3*(indexheight + j) + 1] = value;
+				qrData[3*(indexheight + j) + 2] = value;
+			}
+		}
+		
+		MagickImage qr = new MagickImage();	    
+		qr.constituteImage(this.bitData.getWidth(),this.bitData.getHeight() , "RGB", qrData);
+		
+		return qr;
+	}
+	
+	/**
+	 * Salva questo QR Code su file.
+	 * @param filePath	Il percorso del file in cui salvare.
+	 * 
+	 * @throws WriterException
+	 * @throws IOException
+	 */
+	public void saveQRCodeToFile(String filePath) throws WriterException, IOException {
+		MatrixToImageWriter.writeToPath(this.bitData , filePath.substring(filePath.lastIndexOf('.') + 1), Paths.get(filePath));
+	}
+	
+	/**
+	 * Legge un QR Code da file.
+	 * @param filePath	Il percorso del file.
+	 * 
+	 * @return	Un istanza del QR Code.
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws NotFoundException
+	 * @throws FormatException
+	 */
+	public static QRCode readQRCodeFromFile(String filePath)
+			throws FileNotFoundException, IOException, NotFoundException, FormatException {
+		BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(
+				new BufferedImageLuminanceSource(
+						ImageIO.read(new FileInputStream(filePath)))));
+		DetectorResult res = new Detector(binaryBitmap.getBlackMatrix()).detect();
+		return new QRCode(res.getBits());
 	}
 
+	/**
+	 * Converte un'immagine MagickImage in BufferedImage.
+	 * @param magickImage	L'immagine da convertire.
+	 * 
+	 * @return	L'immagine convertita.
+	 * 
+	 * @throws Exception
+	 */
 	private static BufferedImage magickImageToBufferedImage(
 			MagickImage magickImage) throws Exception {
 		Dimension dim = magickImage.getDimension();
@@ -92,6 +224,14 @@ public class QRCode {
 
 	}
 
+	/**
+	 * Crea una BufferedImage a partire dai dati grezzi RGB.
+	 * @param imageWidth	La larghezza dell'immagine.
+	 * @param imageHeight	L'altezza dell'immagine.
+	 * @param data			I dati grezzi dell'immagine.
+	 * 
+	 * @return Un istanza della BufferedImage.
+	 */
 	private static BufferedImage createInterleavedRGBImage(int imageWidth,
 			int imageHeight, byte data[]) {
 		int[] numBits = new int[3];
