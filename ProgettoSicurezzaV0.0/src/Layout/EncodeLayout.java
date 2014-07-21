@@ -94,7 +94,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 		
     }
 
-	public Container getPane() {
+	public Container getPane() { 
 		return pane;
 	}
 
