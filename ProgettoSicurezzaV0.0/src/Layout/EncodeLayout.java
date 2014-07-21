@@ -26,19 +26,14 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
     private Container pane;
     private LayoutControl control;
     private JList<String> list;
+    private DefaultListModel<String> list_model;
+    private JScrollPane scroll_pane;
     
     public EncodeLayout(LayoutControl control, Container pane){
     	setPane(pane);
     	setControl(control);
     	list= new JList<String>();
-    }
-    
-    @Override
-    public void addComponentsToPane() {
-    	//inizializzazione
-        JButton button;
-        JLabel label;
-        DefaultListModel<String> list_model= new DefaultListModel<String>();
+        list_model= new DefaultListModel<String>();
         list_model.addElement("prova1");
         list_model.addElement("prova2");
         list_model.addElement("prova3");
@@ -58,7 +53,14 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         //list.setSelectedIndex(0);
         list.addListSelectionListener(this);
-        JScrollPane scroll_pane= new JScrollPane(list);
+        scroll_pane= new JScrollPane(list);
+    }
+    
+    @Override
+    public void addComponentsToPane() {
+    	//inizializzazione
+        JButton button;
+        JLabel label;
         
         
         //inserimento pulsanti
@@ -112,6 +114,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		System.out.println("selezionato " + list.getSelectedValue());
+		if(!e.getValueIsAdjusting())
+			System.out.println("selezionato " + list.getSelectedValue());
 	}
 }
