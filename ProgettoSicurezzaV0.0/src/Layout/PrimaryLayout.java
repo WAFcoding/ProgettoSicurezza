@@ -161,6 +161,5 @@ public class PrimaryLayout implements GeneralLayout{
 				control.drawImage(getFile_choosed());
 			}
 		}
-    	
     }	
 }

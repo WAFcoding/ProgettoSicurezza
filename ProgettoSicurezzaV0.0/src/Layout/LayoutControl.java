@@ -9,6 +9,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import magick.MagickException;
+import magick.MagickImage;
+import magick.util.MagickViewer;
+import util.MagickUtility;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -91,13 +96,14 @@ public class LayoutControl {
 	}
 	
 	public void drawImage(String path){
-
-		/*JFrame frame= new JFrame("IMMAGINE");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setVisible(true);*/
+		/*
 		ViewImage v_img= new ViewImage(getPrimaryChoose());
 		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane());
 		img_layout.setV_img(v_img);
+		img_layout.addComponentsToPane();*/
+
+		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane());
+		img_layout.setViewer(path);
 		img_layout.addComponentsToPane();
 		mainFrame.pack();
 	}
