@@ -149,7 +149,7 @@ public class ImageLayout implements GeneralLayout{
 			viewer.setImage(img);
 			viewer.setMinimumSize(img.getDimension());
 			viewer.setMaximumSize(img.getDimension());
-		} catch (MagickException e) {
+		} catch (MagickException e) { 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
