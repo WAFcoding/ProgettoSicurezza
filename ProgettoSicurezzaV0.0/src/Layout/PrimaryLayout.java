@@ -1,4 +1,5 @@
 package Layout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
@@ -53,7 +54,10 @@ public class PrimaryLayout implements GeneralLayout{
 
         JButton button;
         pane.removeAll();
-		pane.setLayout(new GridBagLayout());
+        GridBagLayout layout= new GridBagLayout();
+        
+		pane.setLayout(layout);
+		pane.setBackground(Color.ORANGE);
 		GridBagConstraints c = new GridBagConstraints();
 		
 		//natural height, maximum width
@@ -61,16 +65,20 @@ public class PrimaryLayout implements GeneralLayout{
 		c.anchor= GridBagConstraints.CENTER;
 		c.ipady= 40;
 		c.insets= new Insets(10, 10, 10, 10);
-
+		//0.0 - OPEN
 		button = new JButton("OPEN");
 		c.gridx = 0;c.gridy = 0;c.weightx = 0.5;
 		button.addActionListener(new OpenAction());
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		pane.add(button, c);
-	
+		//1.0 - SAVE
 		button = new JButton("SAVE");
 		c.gridx = 1;c.gridy = 0;c.weightx = 0.5;
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		pane.add(button, c);
-	
+		//0.1 - ENCODE
 		button = new JButton("ENCODE");
 		c.gridx = 0;c.gridy = 1;c.weightx = 0.5;
 		button.addActionListener(new ActionListener() {
@@ -82,12 +90,16 @@ public class PrimaryLayout implements GeneralLayout{
 				System.out.println("ENCODE");		
 			}
 		});
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		pane.add(button, c);
-	
+		//1.1 - DECODE
 		button = new JButton("DECODE");
 		c.gridx = 1;c.gridy = 1;c.weightx = 0.5;
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		pane.add(button, c);
-	
+		//0.2 - SETTINGS
 		button = new JButton("SETTINGS");
 		c.gridx = 0;c.gridy = 2;c.weightx = 0.5;c.gridwidth= 2;
 		button.addActionListener(new ActionListener() {
@@ -99,6 +111,8 @@ public class PrimaryLayout implements GeneralLayout{
 				System.out.println("SETTINGS");		
 			}
 		});
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		pane.add(button, c);
 	
 		/*button = new JButton("Long-Named Button 4");

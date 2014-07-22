@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.ViewportLayout;
 
 import magick.MagickException;
 import magick.MagickImage;
 import magick.util.MagickViewer;
+import sun.awt.X11.Screen;
 import util.MagickUtility;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
@@ -41,8 +43,8 @@ public class LayoutControl {
 		mainFrame= new JFrame("Progetto SII");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(WIDTH, HEIGHT);
-		//mainFrame.setBackground(Color.ORANGE);
 		mainFrame.setVisible(true);
+		mainFrame.setLocation(150, 100);
 		setLayout(0);
 	}
 	
@@ -58,6 +60,7 @@ public class LayoutControl {
 	public void setLayout(int layout){
 		if(layout == 0){
 			PrimaryLayout();
+			mainFrame.setSize(WIDTH, HEIGHT);
 		}
 		else if(layout == 1){
 			EncodeLayout();
