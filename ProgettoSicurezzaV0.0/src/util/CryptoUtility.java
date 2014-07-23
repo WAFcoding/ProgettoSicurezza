@@ -403,17 +403,26 @@ public class CryptoUtility {
 
 	/**
 	 * Genera un certificato X.509 con i parametri inseriti dall'utente.
-	 * @param kp			La coppia di chiavi.
-	 * @param name			Il nome dell'utente.
-	 * @param surname		Il cognome dell'utente.
-	 * @param country_code	Il codice del Paese.
-	 * @param organization	L'organizzazione.
-	 * @param locality		La località.
-	 * @param state			Il nome del paese per esteso.
-	 * @param email			L'email.
 	 * 
-	 * @return	Un certificato X.509 valido.
-	 *  
+	 * @param kp
+	 *            La coppia di chiavi.
+	 * @param name
+	 *            Il nome dell'utente.
+	 * @param surname
+	 *            Il cognome dell'utente.
+	 * @param country_code
+	 *            Il codice del Paese.
+	 * @param organization
+	 *            L'organizzazione.
+	 * @param locality
+	 *            La località.
+	 * @param state
+	 *            Il nome del paese per esteso.
+	 * @param email
+	 *            L'email.
+	 * 
+	 * @return Un certificato X.509 valido.
+	 * 
 	 * @throws InvalidKeyException
 	 * @throws SecurityException
 	 * @throws SignatureException
@@ -422,11 +431,14 @@ public class CryptoUtility {
 	 * @throws NoSuchProviderException
 	 */
 	@SuppressWarnings("deprecation")
-	public static Certificate createX509Certificate(KeyPair kp,
-			String name, String surname, String country_code, String organization, String locality,
-			String state, String email) throws InvalidKeyException, SecurityException, SignatureException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException {
+	public static Certificate createX509Certificate(KeyPair kp, String name,
+			String surname, String country_code, String organization,
+			String locality, String state, String email)
+			throws InvalidKeyException, SecurityException, SignatureException,
+			CertificateException, NoSuchAlgorithmException,
+			NoSuchProviderException {
 		Security.addProvider(new BouncyCastleProvider());
-		
+
 		PublicKey pubKey = kp.getPublic();
 		PrivateKey privKey = kp.getPrivate();
 
@@ -436,21 +448,40 @@ public class CryptoUtility {
 		Hashtable<ASN1ObjectIdentifier, String> attrs = new Hashtable<ASN1ObjectIdentifier, String>();
 		Vector<ASN1ObjectIdentifier> order = new Vector<ASN1ObjectIdentifier>();
 
-		attrs.put(X509Principal.NAME, name);
-		attrs.put(X509Principal.SURNAME, surname);
-		attrs.put(X509Principal.C, country_code);
-		attrs.put(X509Principal.O, organization);
-		attrs.put(X509Principal.L, locality);
-		attrs.put(X509Principal.ST, state);
-		attrs.put(X509Principal.E, email);
+		if (name != null && !name.isEmpty()) {
+			attrs.put(X509Principal.NAME, name);
+			order.addElement(X509Principal.NAME);
+		}
 
-		order.addElement(X509Principal.NAME);
-		order.addElement(X509Principal.SURNAME);
-		order.addElement(X509Principal.C);
-		order.addElement(X509Principal.O);
-		order.addElement(X509Principal.L);
-		order.addElement(X509Principal.ST);
-		order.addElement(X509Principal.E);
+		if (surname != null && !surname.isEmpty()) {
+			attrs.put(X509Principal.SURNAME, surname);
+			order.addElement(X509Principal.SURNAME);
+		}
+
+		if (country_code != null && !country_code.isEmpty()) {
+			attrs.put(X509Principal.C, country_code);
+			order.addElement(X509Principal.C);
+		}
+
+		if (organization != null && !organization.isEmpty()) {
+			attrs.put(X509Principal.O, organization);
+			order.addElement(X509Principal.O);
+		}
+
+		if (locality != null && !locality.isEmpty()) {
+			attrs.put(X509Principal.L, locality);
+			order.addElement(X509Principal.L);
+		}
+
+		if (state != null && !state.isEmpty()) {
+			attrs.put(X509Principal.ST, state);
+			order.addElement(X509Principal.ST);
+		}
+
+		if (email != null && !email.isEmpty()) {
+			attrs.put(X509Principal.E, email);
+			order.addElement(X509Principal.E);
+		}
 
 		//
 		// create the certificate - version 3
@@ -472,7 +503,8 @@ public class CryptoUtility {
 		cert.verify(pubKey);
 
 		ByteArrayInputStream bIn = new ByteArrayInputStream(cert.getEncoded());
-		CertificateFactory fact = CertificateFactory.getInstance("X.509", BouncyProvider);
+		CertificateFactory fact = CertificateFactory.getInstance("X.509",
+				BouncyProvider);
 
 		cert = (X509Certificate) fact.generateCertificate(bIn);
 

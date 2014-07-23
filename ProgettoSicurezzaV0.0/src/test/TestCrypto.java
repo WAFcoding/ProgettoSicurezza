@@ -55,7 +55,7 @@ public class TestCrypto {
 		keystore.saveChanges();
 		
 		keystore.savePrivateKey(keyps.getPrivate(), CryptoUtility.createX509Certificate(keyps, "Giovanni", "Rossi", "IT", "VeRo Co.", "Rome", "Italy", "gio@mail.com"));
-		System.out.println(new String(keystore.getPrivateKey().getEncoded()));
+		System.out.println(CryptoUtility.toBase64(keystore.getPrivateKey().getEncoded()));
 		System.out.println(keystore.getKey("giovanni"));
 		keystore.saveChanges();
 		
