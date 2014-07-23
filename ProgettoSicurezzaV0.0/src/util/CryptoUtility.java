@@ -1,5 +1,6 @@
 package util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -14,10 +15,20 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.generators.DSAKeyPairGenerator;
 import org.bouncycastle.crypto.generators.DSAParametersGenerator;
@@ -26,8 +37,10 @@ import org.bouncycastle.crypto.params.DSAKeyGenerationParameters;
 import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.params.ParametersWithRandom;
 import org.bouncycastle.crypto.signers.DSASigner;
+import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Arrays;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -36,12 +49,12 @@ import sun.misc.BASE64Encoder;
  * Classe di utilità per l'utilizzo degli algoritmi di crittografia.
  * 
  * @author Giovanni Rossi
- *
+ * 
  */
 public class CryptoUtility {
 
 	/**
-	 *	Provide per la libreria Bouncy Castle. 
+	 * Provide per la libreria Bouncy Castle.
 	 */
 	private static final String BouncyProvider = "BC";
 
@@ -61,9 +74,11 @@ public class CryptoUtility {
 
 	/**
 	 * Converte i dati in input in Base64.
-	 * @param data	I dati da convertire.
 	 * 
-	 * @return I dati in formato Base64.	
+	 * @param data
+	 *            I dati da convertire.
+	 * 
+	 * @return I dati in formato Base64.
 	 */
 	public static String toBase64(byte[] data) {
 		return new BASE64Encoder().encode(data);
@@ -71,9 +86,11 @@ public class CryptoUtility {
 
 	/**
 	 * Decodifica i dati dal Base64.
-	 * @param data	I dati da decodificare.
 	 * 
-	 * @return	I dati decodificati.
+	 * @param data
+	 *            I dati da decodificare.
+	 * 
+	 * @return I dati decodificati.
 	 * 
 	 * @throws IOException
 	 */
@@ -83,9 +100,11 @@ public class CryptoUtility {
 
 	/**
 	 * Restituisce la stringa con il tipo di algoritmo di cifratura da usare.
-	 * @param algo	Il tipo di algoritmo.
 	 * 
-	 * @return	La stringa corrispondente al tipo di algoritmo da usare.
+	 * @param algo
+	 *            Il tipo di algoritmo.
+	 * 
+	 * @return La stringa corrispondente al tipo di algoritmo da usare.
 	 */
 	private static String getCipher(CRYPTO_ALGO algo) {
 		switch (algo) {
@@ -100,9 +119,11 @@ public class CryptoUtility {
 
 	/**
 	 * Restituisce la stringa con il tipo di algoritmo di hashing da usare.
-	 * @param algo	Il tipo di algoritmo.
 	 * 
-	 * @return	La stringa corrispondente al tipo di algoritmo da usare.
+	 * @param algo
+	 *            Il tipo di algoritmo.
+	 * 
+	 * @return La stringa corrispondente al tipo di algoritmo da usare.
 	 */
 	private static String getHash(HASH_ALGO algo) {
 		switch (algo) {
@@ -121,8 +142,11 @@ public class CryptoUtility {
 
 	/**
 	 * Pre processa la chiave in input per adattarla all'algoritmo scelto.
-	 * @param algo	L'algoritmo di cifratura scelto.
-	 * @param key	La chiave da manipolare.
+	 * 
+	 * @param algo
+	 *            L'algoritmo di cifratura scelto.
+	 * @param key
+	 *            La chiave da manipolare.
 	 * 
 	 * @return La chiave processata.
 	 */
@@ -139,7 +163,9 @@ public class CryptoUtility {
 
 	/**
 	 * Converte i byte in ingresso in una stringa esadecimale.
-	 * @param b		I byte da convertire.
+	 * 
+	 * @param b
+	 *            I byte da convertire.
 	 * 
 	 * @return La stringa convertita in formato esadecimale.
 	 */
@@ -156,9 +182,13 @@ public class CryptoUtility {
 
 	/**
 	 * Cifra la stringa in input con la chiave e l'algoritmo scelto.
-	 * @param algo	L'algoritmo di cifratura.
-	 * @param data	La stringa da cifrare.
-	 * @param key	La chiave da usare nel processo.
+	 * 
+	 * @param algo
+	 *            L'algoritmo di cifratura.
+	 * @param data
+	 *            La stringa da cifrare.
+	 * @param key
+	 *            La chiave da usare nel processo.
 	 * 
 	 * @return I dati cifrati.
 	 * 
@@ -171,9 +201,13 @@ public class CryptoUtility {
 
 	/**
 	 * Cifra i dati in input con la chiave e l'algoritmo scelto.
-	 * @param algo	L'algoritmo di cifratura.
-	 * @param data	I dati da cifrare.
-	 * @param key	La chiave da usare nel processo.
+	 * 
+	 * @param algo
+	 *            L'algoritmo di cifratura.
+	 * @param data
+	 *            I dati da cifrare.
+	 * @param key
+	 *            La chiave da usare nel processo.
 	 * 
 	 * @return I dati cifrati.
 	 * 
@@ -186,9 +220,13 @@ public class CryptoUtility {
 
 	/**
 	 * Cifra i dati in input con la chiave e l'algoritmo scelto.
-	 * @param algo	L'algoritmo di cifratura.
-	 * @param data	I dati da cifrare.
-	 * @param key	La chiave da usare nel processo.
+	 * 
+	 * @param algo
+	 *            L'algoritmo di cifratura.
+	 * @param data
+	 *            I dati da cifrare.
+	 * @param key
+	 *            La chiave da usare nel processo.
 	 * 
 	 * @return I dati cifrati.
 	 * 
@@ -209,9 +247,13 @@ public class CryptoUtility {
 
 	/**
 	 * Decifra i dati in input con la chiave e l'algoritmo scelto.
-	 * @param algo	L'algoritmo di decifratura.
-	 * @param data	I dati da decifrare.
-	 * @param key	La chiave da usare nel processo.
+	 * 
+	 * @param algo
+	 *            L'algoritmo di decifratura.
+	 * @param data
+	 *            I dati da decifrare.
+	 * @param key
+	 *            La chiave da usare nel processo.
 	 * 
 	 * @return I dati decifrati.
 	 * 
@@ -232,9 +274,13 @@ public class CryptoUtility {
 
 	/**
 	 * Decifra i dati in input con la chiave e l'algoritmo scelto.
-	 * @param algo	L'algoritmo di decifratura.
-	 * @param data	I dati da decifrare.
-	 * @param key	La chiave da usare nel processo.
+	 * 
+	 * @param algo
+	 *            L'algoritmo di decifratura.
+	 * @param data
+	 *            I dati da decifrare.
+	 * @param key
+	 *            La chiave da usare nel processo.
 	 * 
 	 * @return I dati decifrati.
 	 * 
@@ -247,8 +293,11 @@ public class CryptoUtility {
 
 	/**
 	 * Calcola l'hash della stringa in input seguendo l'algoritmo indicato.
-	 * @param algo	L'algoritmo di hashing da usare.
-	 * @param data	La stringa di cui calcolare l'hash.
+	 * 
+	 * @param algo
+	 *            L'algoritmo di hashing da usare.
+	 * @param data
+	 *            La stringa di cui calcolare l'hash.
 	 * 
 	 * @return La stringa rappresentante l'hash in formato esadecimale.
 	 * 
@@ -260,8 +309,11 @@ public class CryptoUtility {
 
 	/**
 	 * Calcola l'hash dei dati in input seguendo l'algoritmo indicato.
-	 * @param algo	L'algoritmo di hashing da usare.
-	 * @param data	I dati di cui calcolare l'hash.
+	 * 
+	 * @param algo
+	 *            L'algoritmo di hashing da usare.
+	 * @param data
+	 *            I dati di cui calcolare l'hash.
 	 * 
 	 * @return La stringa rappresentante l'hash in formato esadecimale.
 	 * 
@@ -288,17 +340,21 @@ public class CryptoUtility {
 			NoSuchProviderException {
 		Security.addProvider(new BouncyCastleProvider());
 
-		KeyPairGenerator g = KeyPairGenerator.getInstance("RSA", BouncyProvider);
+		KeyPairGenerator g = KeyPairGenerator
+				.getInstance("RSA", BouncyProvider);
 
 		g.initialize(1024, new SecureRandom());
 
 		return g.generateKeyPair();
 	}
-	
+
 	/**
 	 * Firma i dati passati in input usando l'algoritmo RSA ("SHA1withRSA").
-	 * @param pkey	La chiave privata.
-	 * @param data	I dati da firmare.
+	 * 
+	 * @param pkey
+	 *            La chiave privata.
+	 * @param data
+	 *            I dati da firmare.
 	 * 
 	 * @return I dati firmati con la chiave privata.
 	 * 
@@ -307,33 +363,120 @@ public class CryptoUtility {
 	 * @throws InvalidKeyException
 	 * @throws SignatureException
 	 */
-	public static byte[] signRSA(PrivateKey pkey, String data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
+	public static byte[] signRSA(PrivateKey pkey, String data)
+			throws NoSuchAlgorithmException, NoSuchProviderException,
+			InvalidKeyException, SignatureException {
 		Security.addProvider(new BouncyCastleProvider());
 		Signature sign = Signature.getInstance("SHA1withRSA", BouncyProvider);
 		sign.initSign(pkey, new SecureRandom());
 		sign.update(data.getBytes());
 		return sign.sign();
 	}
-	
+
 	/**
 	 * Verifica la firma usando RSA ("SHA1withRSA").
-	 * @param pkey		La chiave pubblica.
-	 * @param data		I dati firmati.
-	 * @param message	Il messaggio da verificare.
 	 * 
-	 * @return true se la stringa non ha subito manipolazione e false altrimenti.
+	 * @param pkey
+	 *            La chiave pubblica.
+	 * @param data
+	 *            I dati firmati.
+	 * @param message
+	 *            Il messaggio da verificare.
+	 * 
+	 * @return true se la stringa non ha subito manipolazione e false
+	 *         altrimenti.
 	 * 
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchProviderException
 	 * @throws InvalidKeyException
 	 * @throws SignatureException
 	 */
-	public static boolean verifyRSA(PublicKey pkey, byte[] data, String message) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
+	public static boolean verifyRSA(PublicKey pkey, byte[] data, String message)
+			throws NoSuchAlgorithmException, NoSuchProviderException,
+			InvalidKeyException, SignatureException {
 		Security.addProvider(new BouncyCastleProvider());
 		Signature sign = Signature.getInstance("SHA1withRSA", BouncyProvider);
 		sign.initVerify(pkey);
 		sign.update(message.getBytes());
 		return sign.verify(data);
+	}
+
+	/**
+	 * Genera un certificato X.509 con i parametri inseriti dall'utente.
+	 * @param kp			La coppia di chiavi.
+	 * @param name			Il nome dell'utente.
+	 * @param surname		Il cognome dell'utente.
+	 * @param country_code	Il codice del Paese.
+	 * @param organization	L'organizzazione.
+	 * @param locality		La località.
+	 * @param state			Il nome del paese per esteso.
+	 * @param email			L'email.
+	 * 
+	 * @return	Un certificato X.509 valido.
+	 *  
+	 * @throws InvalidKeyException
+	 * @throws SecurityException
+	 * @throws SignatureException
+	 * @throws CertificateException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 */
+	@SuppressWarnings("deprecation")
+	public static Certificate createX509Certificate(KeyPair kp,
+			String name, String surname, String country_code, String organization, String locality,
+			String state, String email) throws InvalidKeyException, SecurityException, SignatureException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException {
+		Security.addProvider(new BouncyCastleProvider());
+		
+		PublicKey pubKey = kp.getPublic();
+		PrivateKey privKey = kp.getPrivate();
+
+		//
+		// distinguished name table.
+		//
+		Hashtable<ASN1ObjectIdentifier, String> attrs = new Hashtable<ASN1ObjectIdentifier, String>();
+		Vector<ASN1ObjectIdentifier> order = new Vector<ASN1ObjectIdentifier>();
+
+		attrs.put(X509Principal.NAME, name);
+		attrs.put(X509Principal.SURNAME, surname);
+		attrs.put(X509Principal.C, country_code);
+		attrs.put(X509Principal.O, organization);
+		attrs.put(X509Principal.L, locality);
+		attrs.put(X509Principal.ST, state);
+		attrs.put(X509Principal.E, email);
+
+		order.addElement(X509Principal.NAME);
+		order.addElement(X509Principal.SURNAME);
+		order.addElement(X509Principal.C);
+		order.addElement(X509Principal.O);
+		order.addElement(X509Principal.L);
+		order.addElement(X509Principal.ST);
+		order.addElement(X509Principal.E);
+
+		//
+		// create the certificate - version 3
+		//
+		X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
+
+		certGen.setSerialNumber(BigInteger.valueOf(1));
+		certGen.setIssuerDN(new X509Principal(order, attrs));
+		certGen.setNotBefore(new Date(System.currentTimeMillis() - 50000));
+		certGen.setNotAfter(new Date(System.currentTimeMillis() + 50000));
+		certGen.setSubjectDN(new X509Principal(order, attrs));
+		certGen.setPublicKey(pubKey);
+		certGen.setSignatureAlgorithm("SHA1withRSA");
+
+		X509Certificate cert = certGen.generateX509Certificate(privKey);
+
+		cert.checkValidity(new Date());
+
+		cert.verify(pubKey);
+
+		ByteArrayInputStream bIn = new ByteArrayInputStream(cert.getEncoded());
+		CertificateFactory fact = CertificateFactory.getInstance("X.509", BouncyProvider);
+
+		cert = (X509Certificate) fact.generateCertificate(bIn);
+
+		return cert;
 	}
 
 	/**
@@ -359,10 +502,13 @@ public class CryptoUtility {
 
 	/**
 	 * Firma il messaggio in input con DSA.
-	 * @param privateKey	La chiave privata.
-	 * @param message		Il messaggio da firmare.
 	 * 
-	 * @return	La firma dei dati.
+	 * @param privateKey
+	 *            La chiave privata.
+	 * @param message
+	 *            Il messaggio da firmare.
+	 * 
+	 * @return La firma dei dati.
 	 * 
 	 * @throws Exception
 	 */
@@ -381,11 +527,16 @@ public class CryptoUtility {
 
 	/**
 	 * Verifica la firma del messaggio in input usando DSA.
-	 * @param publicKey		La chiave pubblica.
-	 * @param signature		La firma del messaggio.
-	 * @param message		Il messaggio da verificare.
 	 * 
-	 * @return true se il messaggio non ha subito manipolazioni e false altrimenti.
+	 * @param publicKey
+	 *            La chiave pubblica.
+	 * @param signature
+	 *            La firma del messaggio.
+	 * @param message
+	 *            Il messaggio da verificare.
+	 * 
+	 * @return true se il messaggio non ha subito manipolazioni e false
+	 *         altrimenti.
 	 * @throws Exception
 	 */
 	public static boolean verifyDSA(AsymmetricKeyParameter publicKey,

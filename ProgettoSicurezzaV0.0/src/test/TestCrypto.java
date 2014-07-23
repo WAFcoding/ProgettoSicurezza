@@ -54,9 +54,9 @@ public class TestCrypto {
 		System.out.println(keystore.getKey("giovanni"));
 		keystore.saveChanges();
 		
-		//FIXME
-		keystore.savePrivateKey("giovanni", keyps.getPrivate());
-		System.out.println(keystore.getPrivateKey("giovanni").toString());
+		keystore.savePrivateKey(keyps.getPrivate(), CryptoUtility.createX509Certificate(keyps, "Giovanni", "Rossi", "IT", "VeRo Co.", "Rome", "Italy", "gio@mail.com"));
+		System.out.println(new String(keystore.getPrivateKey().getEncoded()));
+		System.out.println(keystore.getKey("giovanni"));
 		keystore.saveChanges();
 		
 	}

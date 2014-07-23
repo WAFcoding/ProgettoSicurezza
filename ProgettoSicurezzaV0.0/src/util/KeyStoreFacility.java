@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
 import javax.crypto.SecretKey;
@@ -103,14 +104,16 @@ public class KeyStoreFacility {
 	}
 
 	/**
-	 * FIXME
-	 * @param user
-	 * @param privateKey
+	 * Salva la chiave privata dell'utente.
+	 * @param privateKey	La chiave privata da salvare.
+	 * @param cert			Il certificato relativo alla chiave.
+	 * 
 	 * @throws KeyStoreException
 	 */
-	public synchronized void savePrivateKey(String user, PrivateKey privateKey) throws KeyStoreException {
-		KeyStore.PrivateKeyEntry pkEntry = new KeyStore.PrivateKeyEntry(privateKey, null);
-		this.keymap.setEntry(user, pkEntry, new KeyStore.PasswordProtection(keyStorePassword.toCharArray()));
+	public synchronized void savePrivateKey(PrivateKey privateKey, Certificate cert) throws KeyStoreException {
+		Certificate[] certs = {cert};
+		KeyStore.PrivateKeyEntry pkEntry = new KeyStore.PrivateKeyEntry(privateKey, certs);
+		this.keymap.setEntry("private", pkEntry, new KeyStore.PasswordProtection(keyStorePassword.toCharArray()));
 		this.changes = true;
 	}
 
@@ -131,17 +134,18 @@ public class KeyStoreFacility {
 	}
 	
 	/**
-	 * FIXME
-	 * @param user
-	 * @return
+	 * Recupera la chiave privata dell'utente.
+	 * 
+	 * @return La chiave privata dell'utente.
+	 * 
 	 * @throws UnrecoverableKeyException
 	 * @throws KeyStoreException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public synchronized PrivateKey getPrivateKey(String user)
+	public synchronized PrivateKey getPrivateKey()
 			throws UnrecoverableKeyException, KeyStoreException,
 			NoSuchAlgorithmException {
-		return (PrivateKey) this.keymap.getKey(user, keyStorePassword.toCharArray());
+		return (PrivateKey) this.keymap.getKey("private", keyStorePassword.toCharArray());
 	}
 
 	/**
