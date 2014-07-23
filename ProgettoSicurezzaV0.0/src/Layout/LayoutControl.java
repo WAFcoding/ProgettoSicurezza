@@ -36,6 +36,7 @@ public class LayoutControl {
 	private PrimaryLayout p_layout;
 	private EncodeLayout e_layout;
 	private ArrayList<String> choosed_file;
+	private String[] types= {"gif", "jpg", "png", "bmp"};
 	
 	public LayoutControl(){
 		
@@ -118,7 +119,40 @@ public class LayoutControl {
 	}
 	
 	public void addChoice(String path){
-		this.choosed_file.add(path);
+		if(!this.choosed_file.contains(path)){
+			if(isAnImage(path))
+				this.choosed_file.add(path);
+			else
+				System.out.println("file non compatibile");
+		}
+		else{
+			System.out.println("percorso gia presente");
+		}
+		
+		if(e_layout != null)
+			e_layout.updateList();
+	}
+	
+	public void removeItem(int pos){
+		this.choosed_file.remove(pos);
+		
+		if(e_layout != null)
+			e_layout.updateList();
+	}
+	
+	/**
+	 * controlla che il file passato sia un tipo immagine nota
+	 * @param path String il percorso del file
+	 * @return false se non è un'immagine
+	 */
+	public boolean isAnImage(String path){
+		for(String s : types){
+			if(path.endsWith(s)){
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	/**
 	 * Disegna l'immagine scelta nella finestra dell'applicazione
@@ -140,6 +174,7 @@ public class LayoutControl {
 			mainFrame.repaint();
 			mainFrame.validate();
 		}
-			//mainFrame.pack();
 	}
+	
+	
 }

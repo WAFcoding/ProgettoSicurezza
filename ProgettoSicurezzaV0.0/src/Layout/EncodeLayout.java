@@ -1,5 +1,6 @@
 package Layout;
 
+import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -16,10 +17,16 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import exceptions.MagickImageNullException;
+import magick.MagickException;
+import magick.MagickImage;
+import util.MagickUtility;
 /**
  * Questa classe rappresenta il layout della finestra per codificare l'immagine
  * 
@@ -34,6 +41,9 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
     private JScrollPane scroll_pane;
     private ArrayList<String> list_item;
     private String list_selected;
+    private int pos_list_selected;
+    
+    private static final String OUTPUT_FOLDER="/home/pasquale/ProgettoSicurezza/";
     
     public EncodeLayout(LayoutControl control, Container pane, ArrayList<String> items){
     	setPane(pane);
@@ -46,6 +56,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
         list.setModel(list_model);
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         list.addListSelectionListener(this);
+        list.setSelectedIndex(-1);
     }
     
     @Override
@@ -84,18 +95,25 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 		button = new JButton("ENCODE");
 		c.gridx = posx;c.gridy= posy;c.weightx = 0.5;c.weighty= 0;c.gridheight=1;c.ipadx=0;c.ipady= 0;
 		c.fill= GridBagConstraints.HORIZONTAL;
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		button.addActionListener(new EncodeAction());
 		pane.add(button, c);
 		//1.2 - AGGIUNGI
 		posy++;
 		button = new JButton("AGGIUNGI");
 		c.gridx = posx;c.gridy=posy;c.weightx = 0;c.gridheight=1;c.ipadx=0;
 		button.addActionListener(new AddAction());
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		pane.add(button, c);
 		//1.3 - ELIMINA
 		posy++;
 		button= new JButton("ELIMINA");
 		c.gridx = posx;c.gridy = posy;c.weightx = 0.5;c.weighty=0;c.gridheight=1;c.ipadx=0;
-		//button.addActionListener(new RemoveAction());
+		button.addActionListener(new RemoveAction());
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		pane.add(button, c);
 		//1.4 - BACK
 		posy++;
@@ -108,6 +126,8 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 				getControl().setLayout(0);
 			}
 		});
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		pane.add(button, c);
 		
     }
@@ -139,8 +159,13 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 				}
 			}
 			else{
-				setList_selected(list.getSelectedValue());
-				System.out.println("selezionato " + list.getSelectedValue());
+				String selected= list.getSelectedValue();
+				int pos_selected= list.getSelectedIndex();
+				if(selected != null && pos_selected != -1){
+					setList_selected(selected);
+					setPos_list_selected(pos_selected);
+					System.out.println("selezionato " + selected + ", posizione " + pos_selected);
+				}
 			}
 		}
 	}
@@ -169,11 +194,43 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 	public void setList_selected(String list_selected) {
 		this.list_selected = list_selected;
 	}
+	public int getPos_list_selected() {
+		return pos_list_selected;
+	}
+
+	public void setPos_list_selected(int pos_list_selected) {
+		this.pos_list_selected = pos_list_selected;
+	}
 	//l'azione da compiere alla pressione encode
 	private class EncodeAction implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			try {
+				if(getList_selected() != null){
+					control.drawImage(getList_selected());
+					MagickImage img= MagickUtility.getImage(getList_selected());
+					MagickImage cropped = MagickUtility.cropImage(img, 10, 50, 400, 200);
+					MagickImage covered = MagickUtility.coverWithImage(img, cropped, 400, 400);
+					MagickUtility.saveImage(covered, OUTPUT_FOLDER + "covered.jpg");
+					MagickUtility.saveImage(cropped, OUTPUT_FOLDER + "cropped.jpg");
+					
+					MagickImage rect = MagickUtility.createRectangleImage(new Color(255, 0, 0), 100, 100);
+					MagickImage rectText = MagickUtility.createRectangleImageWithText(new Color(255,0,0), "BELLA X TE!!", new Color(255,255,255), 12.0, 45, 45, 400, 400);
+					MagickImage covered2 = MagickUtility.coverWithImage(img, rect, 30, 30);
+					MagickImage covered3 = MagickUtility.coverWithImage(covered2, rectText, 60, 60);
+					MagickUtility.saveImage(covered2, OUTPUT_FOLDER + "covered2.jpg");
+					MagickUtility.saveImage(covered3, OUTPUT_FOLDER + "covered3.jpg");
+				}
+				else{
+					JOptionPane.showMessageDialog(getPane(), "You must select a path");
+				}
+			} catch (MagickException e1) {
+				System.out.println("ERRORE: EncodeAction");
+				e1.printStackTrace();
+			} catch (MagickImageNullException e1) {
+				e1.printStackTrace();
+			}
 			
 		}
 		
@@ -189,8 +246,18 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 			if(choose == JFileChooser.APPROVE_OPTION){
 				File file= file_chooser.getSelectedFile();
 				control.addChoice(file.getAbsolutePath());
-				updateList();
+				//updateList();
 			}
 		}
-    }	
+	}
+	//l'azione da compiere alla pressione di elimina
+	private class RemoveAction implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			control.removeItem(getPos_list_selected());
+			System.out.println("rimosso elemento in posizione " + getPos_list_selected());
+		}
+	}
+	
 }

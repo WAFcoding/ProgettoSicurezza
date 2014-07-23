@@ -2,9 +2,9 @@ package util;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.io.File;
 
 import exceptions.MagickImageNullException;
-
 import magick.CompositeOperator;
 import magick.DrawInfo;
 import magick.ImageInfo;
@@ -195,6 +195,9 @@ public class MagickUtility {
 	 * @throws MagickException
 	 */
 	public static void saveImage(MagickImage img, String path) throws MagickImageNullException, MagickException {
+		File f= new File(path);
+		if(f.exists())
+			f.delete();
 		if(img==null)
 			throw new MagickImageNullException("Invalid Arguments:null");
 		ImageInfo info = new ImageInfo(path);

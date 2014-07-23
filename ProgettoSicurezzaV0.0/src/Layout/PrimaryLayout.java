@@ -37,7 +37,6 @@ import com.sun.media.sound.Toolkit;
  */
 
 public class PrimaryLayout implements GeneralLayout{
-    private final boolean RIGHT_TO_LEFT = false;
     private String file_choosed;
     private Container pane;
     private LayoutControl control;
@@ -65,15 +64,15 @@ public class PrimaryLayout implements GeneralLayout{
 		c.anchor= GridBagConstraints.CENTER;
 		c.ipady= 40;
 		c.insets= new Insets(10, 10, 10, 10);
-		//0.0 - OPEN
-		button = new JButton("OPEN");
+		//0.0 - APRI DA FILE
+		button = new JButton("APRI DA FILE");
 		c.gridx = 0;c.gridy = 0;c.weightx = 0.5;
 		button.addActionListener(new OpenAction());
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
-		//1.0 - SAVE
-		button = new JButton("SAVE");
+		//1.0 - ACQUISISCI
+		button = new JButton("ACQUISISCI");
 		c.gridx = 1;c.gridy = 0;c.weightx = 0.5;
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);

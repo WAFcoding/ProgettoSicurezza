@@ -14,7 +14,7 @@ public class TestCrypto {
 	 */
 	public static void main(String[] args) throws Exception {
 		String testData = "tanto era tanto antico";
-		String key = "pasqualino";
+		String key = "pasqualino";//lol
 		
 		System.out.println("===TEST Crypto-Utility===\nDati:" + testData + "\nChiave:" + key);
 		
