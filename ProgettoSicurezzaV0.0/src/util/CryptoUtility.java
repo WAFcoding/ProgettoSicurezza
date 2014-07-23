@@ -1,12 +1,22 @@
 package util;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.security.Security;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.generators.DSAKeyPairGenerator;
+import org.bouncycastle.crypto.generators.DSAParametersGenerator;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.params.DSAKeyGenerationParameters;
+import org.bouncycastle.crypto.params.DSAParameters;
+import org.bouncycastle.crypto.params.ParametersWithRandom;
+import org.bouncycastle.crypto.signers.DSASigner;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Arrays;
 
@@ -133,6 +143,37 @@ public class CryptoUtility {
 		MessageDigest md = MessageDigest.getInstance(algoHash, BouncyProvider);
 
 		return bytesToHex(md.digest(data));
+	}
+
+	public static AsymmetricCipherKeyPair getKeyPair() {
+		SecureRandom    random = new SecureRandom();
+
+        DSAParametersGenerator  pGen = new DSAParametersGenerator();
+        pGen.init(512, 80, random);
+
+        DSAParameters params = pGen.generateParameters();
+		DSAKeyPairGenerator dsaKeyGen = new DSAKeyPairGenerator();
+		DSAKeyGenerationParameters genParam = new DSAKeyGenerationParameters(random, params);
+
+		dsaKeyGen.init(genParam);
+
+		return dsaKeyGen.generateKeyPair();
+	}
+	
+	public static BigInteger[] sign(AsymmetricKeyParameter privateKey, String message) throws Exception {
+		SecureRandom    random = new SecureRandom();
+		DSASigner signer = new DSASigner();
+		
+		ParametersWithRandom param = new ParametersWithRandom(privateKey, random);
+
+		signer.init(true, param);
+		return signer.generateSignature(hash(HASH_ALGO.SHA1,message).getBytes());
+	}
+	
+	public static boolean verify(AsymmetricKeyParameter publicKey, BigInteger[] signature, String message) throws Exception {
+		DSASigner signer = new DSASigner();
+		signer.init(false, publicKey);
+		return signer.verifySignature(hash(HASH_ALGO.SHA1,message).getBytes(), signature[0], signature[1]);
 	}
 
 }

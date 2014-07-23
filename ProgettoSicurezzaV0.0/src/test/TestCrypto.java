@@ -1,5 +1,9 @@
 package test;
 
+import java.math.BigInteger;
+
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+
 import util.CryptoUtility;
 
 
@@ -29,6 +33,13 @@ public class TestCrypto {
 		System.out.println(CryptoUtility.hash(CryptoUtility.HASH_ALGO.SHA1, testData));
 		System.out.println(CryptoUtility.hash(CryptoUtility.HASH_ALGO.SHA256, testData));
 		System.out.println(CryptoUtility.hash(CryptoUtility.HASH_ALGO.SHA512, testData));
+		
+		System.out.println("\nGENERAZIONE COPPIA CHIAVI");
+		AsymmetricCipherKeyPair keys = CryptoUtility.getKeyPair();
+		BigInteger[] signature = CryptoUtility.sign(keys.getPrivate(), testData);
+		System.out.println("Verifica Firma TESTO CORRETTO:" + CryptoUtility.verify(keys.getPublic(), signature, testData));
+		System.out.println("Verifica Firma TESTO SABOTATO:" + CryptoUtility.verify(keys.getPublic(), signature, testData + "x"));
+		
 	}
 
 }
