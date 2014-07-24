@@ -27,6 +27,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.bouncycastle.util.Arrays;
+
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Decompressor;
 import net.jpountz.lz4.LZ4Factory;
@@ -62,7 +64,8 @@ public class ImageLayout implements GeneralLayout{
     private MagickImage m_img;
     private int backLayout;
     
-    private static final String OUTPUT= "/home/pasquale/ProgettoSicurezza/covered/";
+    //private static final String OUTPUT= "/home/pasquale/ProgettoSicurezza/covered/";
+    private static final String OUTPUT= "/home/giovanni/Immagini/";
     private static final int MAX_CRIPTO_SIZE= 1000;
 
 	public ImageLayout(LayoutControl control, Container pane, int backTo){
@@ -391,7 +394,7 @@ public class ImageLayout implements GeneralLayout{
 				    System.out.println("decompressed= " + new String(restored));*/
 					QRCode qr= new QRCode();
 					try {
-						qr.writeQRCode(new String(compressed), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_WIDTH);
+						qr.writeQRCode(new String(Arrays.copyOf(compressed,compressedLength<1000?compressedLength:1000)), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_WIDTH);
 						qr.saveQRCodeToFile(OUTPUT + "/" + tmp + "/" + tmp + "_qrcode.jpg" );
 					} catch (WriterException e1) {
 						// TODO Auto-generated catch block

@@ -16,6 +16,8 @@ package test;
 
 import java.io.UnsupportedEncodingException;
 
+import org.bouncycastle.util.Arrays;
+
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
@@ -39,8 +41,11 @@ public class TestLz4 {
     byte[] compressed = new byte[maxCompressedLength];
     int compressedLength = compressor.compress(data, 0, decompressedLength, compressed, 0, maxCompressedLength);
 
-    System.out.println(new String(data));
-    System.out.println(new String(compressed));
+    System.out.println(maxCompressedLength);
+    System.out.println(compressed.length);
+    System.out.println(new String(data) + "\nl_noncompressa="+data.length);
+    compressed = Arrays.copyOf(compressed, compressedLength);
+    System.out.println(new String(compressed) +"\nl_compressa="+ compressed.length);
     // decompress data
     // - method 1: when the decompressed length is known
     LZ4FastDecompressor decompressor = factory.fastDecompressor();
