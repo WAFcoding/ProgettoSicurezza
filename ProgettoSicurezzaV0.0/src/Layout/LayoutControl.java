@@ -61,7 +61,6 @@ public class LayoutControl {
 	public void setLayout(int layout){
 		if(layout == 0){
 			PrimaryLayout();
-			mainFrame.setSize(WIDTH, HEIGHT);
 		}
 		else if(layout == 1){
 			EncodeLayout();
@@ -71,6 +70,7 @@ public class LayoutControl {
 		}
 		
 		//mainFrame.pack();
+		mainFrame.setSize(WIDTH, HEIGHT);
 		mainFrame.repaint();
 		mainFrame.validate();
 	}
@@ -158,10 +158,15 @@ public class LayoutControl {
 	 * Disegna l'immagine scelta nella finestra dell'applicazione
 	 * @param path String il percorso dell'imagine da disegnare
 	 */
-	public void drawImage(String path){
+	public void drawImage(String path, int backTo){
 
-		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane());
-		img_layout.setViewer(path);
+		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane(), backTo);
+		try {
+			img_layout.setViewer(path);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		img_layout.addComponentsToPane();
 		
 		if(img_layout.getImgWidth() >= 800 || img_layout.getImgHeight() >= 600){
