@@ -201,7 +201,7 @@ public class QRCode {
 	 * 
 	 * @throws Exception
 	 */
-	private static BufferedImage magickImageToBufferedImage(
+	public static BufferedImage magickImageToBufferedImage(
 			MagickImage magickImage) throws Exception {
 		Dimension dim = magickImage.getDimension();
 		int size = dim.width * dim.height;
