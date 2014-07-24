@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
@@ -17,26 +18,19 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.generators.DSAKeyPairGenerator;
-import org.bouncycastle.crypto.generators.DSAParametersGenerator;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.params.DSAKeyGenerationParameters;
-import org.bouncycastle.crypto.params.DSAParameters;
-import org.bouncycastle.crypto.params.ParametersWithRandom;
-import org.bouncycastle.crypto.signers.DSASigner;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Arrays;
@@ -51,6 +45,7 @@ import sun.misc.BASE64Encoder;
  * @author Giovanni Rossi
  * 
  */
+@SuppressWarnings("deprecation")
 public class CryptoUtility {
 
 	/**
@@ -70,6 +65,10 @@ public class CryptoUtility {
 	 */
 	public enum HASH_ALGO {
 		MD5, SHA1, SHA256, SHA512
+	};
+	
+	public enum ASYMMCRYPTO_ALGO {
+		RSA
 	};
 
 	/**
@@ -137,6 +136,23 @@ public class CryptoUtility {
 			return "SHA-512";
 		default:
 			return "SHA-1";
+		}
+	}
+	
+	/**
+	 * Restituisce la stringa con il tipo di algoritmo di cifratura asimmetrica da usare.
+	 * 
+	 * @param algo
+	 *            Il tipo di algoritmo.
+	 * 
+	 * @return La stringa corrispondente al tipo di algoritmo da usare.
+	 */
+	private static String getAsymmCipher(ASYMMCRYPTO_ALGO algo) {
+		switch (algo) {
+		case RSA:
+			return "RSA";
+		default:
+			return "RSA";
 		}
 	}
 
@@ -241,6 +257,60 @@ public class CryptoUtility {
 
 		Cipher c = Cipher.getInstance(algoType, BouncyProvider);
 		c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, algoType));
+		
+
+		return c.doFinal(data);
+	}
+	
+	/**
+	 * Cripta/Firma i dati in input usando un cifrario asimmetrico.
+	 * @param algo	L'algoritmo a chiave asimmetrica da usare.
+	 * @param data	I dati da cifrare o firmare.
+	 * @param key	La chiave pubblica(cifratura) / privata(firma) da usare.
+	 * 
+	 * @return	I dati cifrati/firmati.
+	 * 
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws NoSuchPaddingException
+	 */
+	public static byte[] asymm_encrypt(ASYMMCRYPTO_ALGO algo, byte[] data, Key key) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
+		Security.addProvider(new BouncyCastleProvider());
+
+		String algoType = getAsymmCipher(algo);
+
+		Cipher c = Cipher.getInstance(algoType, BouncyProvider);
+		c.init(Cipher.ENCRYPT_MODE, key);
+		
+
+		return c.doFinal(data);
+	}
+	
+	/**
+	 * Decripta i dati in input usando un cifrario asimmetrico.
+	 * @param algo	L'algoritmo a chiave asimmetrica da usare.
+	 * @param data	I dati da decifrare.
+	 * @param key	La chiave pubblica(verifica) / privata(decifratura) da usare.
+	 * 
+	 * @return	I dati decifrati.
+	 * 
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws NoSuchPaddingException
+	 */
+	public static byte[] asymm_decrypt(ASYMMCRYPTO_ALGO algo, byte[] data, Key key) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException {
+		Security.addProvider(new BouncyCastleProvider());
+
+		String algoType = getAsymmCipher(algo);
+
+		Cipher c = Cipher.getInstance(algoType, BouncyProvider);
+		c.init(Cipher.DECRYPT_MODE, key);
 
 		return c.doFinal(data);
 	}
@@ -430,7 +500,6 @@ public class CryptoUtility {
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchProviderException
 	 */
-	@SuppressWarnings("deprecation")
 	public static Certificate createX509Certificate(KeyPair kp, String name,
 			String surname, String country_code, String organization,
 			String locality, String state, String email)
@@ -515,46 +584,38 @@ public class CryptoUtility {
 	 * Genera una coppia di chiavi DSA (Digital Signature Algorithm).
 	 * 
 	 * @return La coppia di chiavi.
+	 * @throws NoSuchProviderException
+	 * @throws NoSuchAlgorithmException
 	 */
-	public static AsymmetricCipherKeyPair genDSAKeyPair() {
-		SecureRandom random = new SecureRandom();
+	public static KeyPair genDSAKeyPair() throws NoSuchAlgorithmException,
+			NoSuchProviderException {
+		Security.addProvider(new BouncyCastleProvider());
 
-		DSAParametersGenerator pGen = new DSAParametersGenerator();
-		pGen.init(512, 80, random);
+		KeyPairGenerator g = KeyPairGenerator
+				.getInstance("DSA", BouncyProvider);
 
-		DSAParameters params = pGen.generateParameters();
-		DSAKeyPairGenerator dsaKeyGen = new DSAKeyPairGenerator();
-		DSAKeyGenerationParameters genParam = new DSAKeyGenerationParameters(
-				random, params);
+		g.initialize(1024, new SecureRandom());
 
-		dsaKeyGen.init(genParam);
-
-		return dsaKeyGen.generateKeyPair();
+		return g.generateKeyPair();
 	}
 
 	/**
 	 * Firma il messaggio in input con DSA.
 	 * 
-	 * @param privateKey
+	 * @param key
 	 *            La chiave privata.
-	 * @param message
+	 * @param data
 	 *            Il messaggio da firmare.
 	 * 
 	 * @return La firma dei dati.
 	 * 
 	 * @throws Exception
 	 */
-	public static BigInteger[] signDSA(AsymmetricKeyParameter privateKey,
-			String message) throws Exception {
-		SecureRandom random = new SecureRandom();
-		DSASigner signer = new DSASigner();
-
-		ParametersWithRandom param = new ParametersWithRandom(privateKey,
-				random);
-
-		signer.init(true, param);
-		return signer.generateSignature(hash(HASH_ALGO.SHA1, message)
-				.getBytes());
+	public static byte[] signDSA(PrivateKey key, String data) throws Exception {
+		Signature signer = Signature.getInstance("SHA1withDSA");
+		signer.initSign(key);
+		signer.update(data.getBytes());
+		return (signer.sign());
 	}
 
 	/**
@@ -562,7 +623,7 @@ public class CryptoUtility {
 	 * 
 	 * @param publicKey
 	 *            La chiave pubblica.
-	 * @param signature
+	 * @param signed
 	 *            La firma del messaggio.
 	 * @param message
 	 *            Il messaggio da verificare.
@@ -571,12 +632,11 @@ public class CryptoUtility {
 	 *         altrimenti.
 	 * @throws Exception
 	 */
-	public static boolean verifyDSA(AsymmetricKeyParameter publicKey,
-			BigInteger[] signature, String message) throws Exception {
-		DSASigner signer = new DSASigner();
-		signer.init(false, publicKey);
-		return signer.verifySignature(hash(HASH_ALGO.SHA1, message).getBytes(),
-				signature[0], signature[1]);
+	public static boolean verifyDSA(PublicKey publicKey, byte[] signed,
+			String message) throws Exception {
+		Signature signer = Signature.getInstance("SHA1withDSA");
+		signer.initVerify(publicKey);
+		signer.update(message.getBytes());
+		return (signer.verify(signed));
 	}
-
 }

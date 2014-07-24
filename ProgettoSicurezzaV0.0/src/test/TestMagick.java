@@ -6,6 +6,7 @@ import exceptions.MagickImageNullException;
 
 import magick.MagickException;
 import magick.MagickImage;
+import util.CryptoUtility;
 import util.MagickUtility;
 
 /**
@@ -35,6 +36,9 @@ public class TestMagick {
 		MagickImage covered3 = MagickUtility.coverWithImage(covered2, rectText, 60, 60);
 		MagickUtility.saveImage(covered2, path + "covered2.jpg");
 		MagickUtility.saveImage(covered3, path + "covered3.jpg");
+		
+		byte[] bytes = MagickUtility.getMagickBytes(covered3);
+		System.out.println("BYTES:\n" + CryptoUtility.toBase64(bytes));
 	}
 
 }

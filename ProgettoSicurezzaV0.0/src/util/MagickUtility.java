@@ -206,4 +206,21 @@ public class MagickUtility {
 			System.err.println("Unable to save image \"" + path + "\"");
 		}
 	}
+	
+	/**
+	 * Recupera i byte di un immagine in formato MagickImage.
+	 * @param img	L'immagine da cui ottenere i byte.
+	 * 
+	 * @return I byte dell'immagine.
+	 * 
+	 * @throws MagickImageNullException
+	 * @throws MagickException
+	 */
+	public static byte[] getMagickBytes(MagickImage img) throws MagickImageNullException, MagickException {
+		if(img==null)
+			throw new MagickImageNullException("Invalid Arguments:null");
+		ImageInfo info = new ImageInfo(img.getFileName());
+		info.setMagick(img.getMagick());
+		return img.imageToBlob(info);
+	}
 }
