@@ -37,6 +37,12 @@ public class ViewImage extends Component{
 		
 		super.setSize(getImg().getWidth(), getImg().getHeight());
 	}
+	
+	public ViewImage(BufferedImage img){
+		
+		setImg(img);
+		super.setSize(getImg().getWidth(), getImg().getHeight());
+	}
 
 	public BufferedImage getImg() {
 		return img;

@@ -206,34 +206,26 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			try {
-				if(getList_selected() != null){
-					control.drawImage(getList_selected());
-					MagickImage img= MagickUtility.getImage(getList_selected());
-					MagickImage cropped = MagickUtility.cropImage(img, 10, 50, 400, 200);
-					MagickImage covered = MagickUtility.coverWithImage(img, cropped, 400, 400);
-					MagickUtility.saveImage(covered, OUTPUT_FOLDER + "covered.jpg");
-					MagickUtility.saveImage(cropped, OUTPUT_FOLDER + "cropped.jpg");
-					
-					MagickImage rect = MagickUtility.createRectangleImage(new Color(255, 0, 0), 100, 100);
-					MagickImage rectText = MagickUtility.createRectangleImageWithText(new Color(255,0,0), "BELLA X TE!!", new Color(255,255,255), 12.0, 45, 45, 400, 400);
-					MagickImage covered2 = MagickUtility.coverWithImage(img, rect, 30, 30);
-					MagickImage covered3 = MagickUtility.coverWithImage(covered2, rectText, 60, 60);
-					MagickUtility.saveImage(covered2, OUTPUT_FOLDER + "covered2.jpg");
-					MagickUtility.saveImage(covered3, OUTPUT_FOLDER + "covered3.jpg");
-				}
-				else{
-					JOptionPane.showMessageDialog(getPane(), "You must select a path");
-				}
-			} catch (MagickException e1) {
-				System.out.println("ERRORE: EncodeAction");
-				e1.printStackTrace();
-			} catch (MagickImageNullException e1) {
-				e1.printStackTrace();
+	
+			if(getList_selected() != null){
+				control.drawImage(getList_selected(), 1);
+				/*MagickImage img= MagickUtility.getImage(getList_selected());
+				MagickImage cropped = MagickUtility.cropImage(img, 10, 50, 400, 200);
+				MagickImage covered = MagickUtility.coverWithImage(img, cropped, 400, 400);
+				MagickUtility.saveImage(covered, OUTPUT_FOLDER + "covered.jpg");
+				MagickUtility.saveImage(cropped, OUTPUT_FOLDER + "cropped.jpg");
+				
+				MagickImage rect = MagickUtility.createRectangleImage(new Color(255, 0, 0), 100, 100);
+				MagickImage rectText = MagickUtility.createRectangleImageWithText(new Color(255,0,0), "BELLA X TE!!", new Color(255,255,255), 12.0, 45, 45, 400, 400);
+				MagickImage covered2 = MagickUtility.coverWithImage(img, rect, 30, 30);
+				MagickImage covered3 = MagickUtility.coverWithImage(covered2, rectText, 60, 60);
+				MagickUtility.saveImage(covered2, OUTPUT_FOLDER + "covered2.jpg");
+				MagickUtility.saveImage(covered3, OUTPUT_FOLDER + "covered3.jpg");*/
 			}
-			
+			else{
+				JOptionPane.showMessageDialog(getPane(), "You must select a path");
+			}
 		}
-		
 	}
 	//l'azione da compiere alla pressione di aggiungi
 	private class AddAction implements ActionListener{
@@ -259,5 +251,4 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 			System.out.println("rimosso elemento in posizione " + getPos_list_selected());
 		}
 	}
-	
 }

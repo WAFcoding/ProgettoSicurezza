@@ -170,9 +170,9 @@ public class PrimaryLayout implements GeneralLayout{
 				File file= file_chooser.getSelectedFile();
 				setFile_choosed(file.getAbsolutePath());
 				System.out.println("Il file scelto è: " + getFile_choosed());
-				
-				control.drawImage(getFile_choosed());
+
 				control.addChoice(getFile_choosed());
+				control.drawImage(getFile_choosed(), 0);
 			}
 		}
     }	
