@@ -27,6 +27,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Decompressor;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.lz4.LZ4FastDecompressor;
+
 import com.google.zxing.WriterException;
 
 import exceptions.MagickImageNullException;
@@ -58,6 +63,7 @@ public class ImageLayout implements GeneralLayout{
     private int backLayout;
     
     private static final String OUTPUT= "/home/pasquale/ProgettoSicurezza/covered/";
+    private static final int MAX_CRIPTO_SIZE= 1000;
 
 	public ImageLayout(LayoutControl control, Container pane, int backTo){
     	setControl(control);
@@ -362,19 +368,39 @@ public class ImageLayout implements GeneralLayout{
 				
 				byte[] byte_img= MagickUtility.getMagickBytes(cropped);
 				String str_byte= CryptoUtility.toBase64(byte_img);
-				System.out.println("byte_img = " + str_byte);
-				
-				QRCode qr= new QRCode();
-				try {
-					qr.writeQRCode(str_byte, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
-					qr.saveQRCodeToFile(OUTPUT + "/" + tmp + "/" + tmp + "_qrcode.jpg" );
-				} catch (WriterException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				//System.out.println("byte_img = " + str_byte);
+				//max data in qrcode 2953
+				/*if(byte_img.length > MAX_CRIPTO_SIZE){
+					System.out.println("Dimensione in byte dell'immagine troppo grande = " + byte_img.length);
 				}
+				else{*/
+					//compression
+					final int decompressedLength = byte_img.length;
+					System.out.println("Dimensione in byte dell'immagine = " + decompressedLength);
+					LZ4Compressor compressor= LZ4Factory.fastestInstance().highCompressor();
+				    int maxCompressedLength = compressor.maxCompressedLength(decompressedLength);
+				    byte[] compressed = new byte[maxCompressedLength];
+				    int compressedLength = compressor.compress(byte_img, 0, decompressedLength, compressed, 0, maxCompressedLength);
+					//System.out.println("compressed= " + new String(compressed));
+					System.out.println("dimensione compressed= " + compressedLength);
+				    //decompression
+				  /*  LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+				    byte[] restored = new byte[decompressedLength];
+				    int compressedLength2 = decompressor.decompress(compressed, 0, restored, 0, decompressedLength);
+				    // compressedLength == compressedLength2
+				    System.out.println("decompressed= " + new String(restored));*/
+					QRCode qr= new QRCode();
+					try {
+						qr.writeQRCode(new String(compressed), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_WIDTH);
+						qr.saveQRCodeToFile(OUTPUT + "/" + tmp + "/" + tmp + "_qrcode.jpg" );
+					} catch (WriterException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				//}
 				
 			} catch (MagickException | MagickImageNullException e1) {
 				
