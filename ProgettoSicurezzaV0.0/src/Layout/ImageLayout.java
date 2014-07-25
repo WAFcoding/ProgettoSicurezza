@@ -21,6 +21,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -64,8 +65,8 @@ public class ImageLayout implements GeneralLayout{
     private MagickImage m_img;
     private int backLayout;
     
-    //private static final String OUTPUT= "/home/pasquale/ProgettoSicurezza/covered/";
-    private static final String OUTPUT= "/home/giovanni/Immagini/";
+    private static final String OUTPUT= "/home/pasquale/ProgettoSicurezza/covered/";
+    //private static final String OUTPUT= "/home/giovanni/Immagini/";
     private static final int MAX_CRIPTO_SIZE= 1000;
 
 	public ImageLayout(LayoutControl control, Container pane, int backTo){
@@ -348,6 +349,76 @@ public class ImageLayout implements GeneralLayout{
 		}
 	}
 	
+	public  ArrayList<MagickImage> cropAgain(MagickImage cropped){
+
+		ArrayList<MagickImage> toReturn= new ArrayList<MagickImage>();
+		
+		try {
+			if(MagickUtility.getMagickBytes(cropped).length > 2000){
+				System.out.println("dimensione di cropped > 2000");
+				System.out.println("dimensione di cropped = " +cropped.getDimension().width + "x" + cropped.getDimension().height);
+				
+				MagickImage tmp_crop1= new MagickImage();
+				MagickImage tmp_crop2= new MagickImage();
+			
+				Rectangle first_half= new Rectangle(0, 
+													0, 
+													new Double(cropped.getDimension().getWidth()).intValue()/2, 
+													new Double(cropped.getDimension().getHeight()).intValue());
+				
+				Rectangle second_half= new Rectangle(new Double(cropped.getDimension().getWidth()).intValue()/2+1, 
+													0, 
+													new Double(cropped.getDimension().getWidth()).intValue()/2, 
+													new Double(cropped.getDimension().getHeight()).intValue());
+				System.out.println("dimensione di first_half = " + first_half.width + 
+															"x" + first_half.height);
+				System.out.println("dimensione di second_half = " + second_half.width + 
+															"x" + second_half.height);
+				
+				
+				tmp_crop1= MagickUtility.cropImage(cropped, first_half);
+				tmp_crop2= MagickUtility.cropImage(cropped, second_half);
+
+				byte[] first_byte= MagickUtility.getMagickBytes(tmp_crop1);
+				byte[] second_byte= MagickUtility.getMagickBytes(tmp_crop2);
+				
+				if(first_byte.length > 2000){
+					System.out.println("dimensione di tmp_crop1 > 2000, size= " + tmp_crop1.getDimension().getWidth() + "x" + tmp_crop1.getDimension().getHeight());
+					for(MagickImage m : cropAgain(tmp_crop1)){ 
+						toReturn.add(m);
+					}
+				}
+				else{
+					System.out.println("dimensione di tmp_crop1 <= 2000 = " + first_byte.length + ", size= " + tmp_crop2.getDimension().getWidth() + "x" + tmp_crop2.getDimension().getHeight());					toReturn.add(tmp_crop1);
+				}
+				
+				if(second_byte.length > 2000){
+					System.out.println("dimensione di tmp_crop2 > 2000, size= " + tmp_crop2.getDimension().getWidth() + "x" + tmp_crop2.getDimension().getHeight());
+					for(MagickImage m : cropAgain(tmp_crop2)){
+						toReturn.add(m);
+					}
+				}
+				else{
+					System.out.println("dimensione di tmp_crop2 <= 2000 = " + second_byte.length +", size= " + tmp_crop2.getDimension().getWidth() + "x" + tmp_crop2.getDimension().getHeight());
+					toReturn.add(tmp_crop2);
+				}
+			}
+			else{
+				System.out.println("dimensione di cropped <= 2000");
+				toReturn.add(cropped);
+			}
+			
+		} catch (MagickException e) {
+			e.printStackTrace();
+		} catch (MagickImageNullException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return toReturn;
+	}
+	
 	public class encodeAction implements ActionListener{
 		
 		public void actionPerformed(ActionEvent e) {
@@ -359,55 +430,79 @@ public class ImageLayout implements GeneralLayout{
 				MagickImage rect = MagickUtility.createRectangleImage(Color.BLACK, width, height);
 				MagickImage cropped= MagickUtility.cropImage(m_img, captureRectangle);
 				MagickImage covered = MagickUtility.coverWithImage(m_img, rect, pos_x, pos_y);
-				//System.out.println(m_img.getFileName());
+				/*
+				 * controllo che l'immagine non superi i 2000byte, in quel caso la croppo di nuovo
+				 * in due metà e calcolo che nessuna delle due superi i 2000byte
+				 */
+				byte[] byte_img= MagickUtility.getMagickBytes(cropped);
+				final int decompressedLength = byte_img.length;
+				System.out.println("Dimensione in byte dell'immagine = " + decompressedLength);
+				
+				ArrayList<MagickImage> rip_crop= cropAgain(cropped);
 				String path= m_img.getFileName();
 				String tmp= path.substring(path.lastIndexOf("/"), path.lastIndexOf("."));
 				File f= new File(OUTPUT + tmp);
 				f.mkdir();
+				int rip_crop_size= rip_crop.size();
+				if(rip_crop_size > 1){
+					System.out.println("dimensione rip_crop > 1 = " + rip_crop_size);
+					int i=0;
+					for(MagickImage m : rip_crop){
+						MagickUtility.saveImage(m, OUTPUT + "/" + tmp + "/" + tmp + "_cropped" + i + ".jpg");
+						i++;
+					}
+				}
+				else{
+					System.out.println("dimensione rip_crop == 1 " + rip_crop_size);
+					MagickUtility.saveImage(rip_crop.get(0), OUTPUT + "/" + tmp + "/" + tmp + "_cropped.jpg");
+				}
+				
+				//System.out.println(m_img.getFileName());
 				MagickUtility.saveImage(cropped, OUTPUT + "/" + tmp + "/" + tmp + "_cropped.jpg");
 				MagickUtility.saveImage(covered, OUTPUT + "/" + tmp + "/" + tmp + "_covered.jpg");
 				//System.out.println(m_img.getFileName());
 				control.drawImage(m_img.getFileName(), getBackLayout());
 				
-				byte[] byte_img= MagickUtility.getMagickBytes(cropped);
-				String str_byte= CryptoUtility.toBase64(byte_img);
-				//System.out.println("byte_img = " + str_byte);
+				//String str_byte= CryptoUtility.toBase64(byte_img);
 				//max data in qrcode 2953
-				/*if(byte_img.length > MAX_CRIPTO_SIZE){
-					System.out.println("Dimensione in byte dell'immagine troppo grande = " + byte_img.length);
-				}
-				else{*/
-					//compression
-					final int decompressedLength = byte_img.length;
-					System.out.println("Dimensione in byte dell'immagine = " + decompressedLength);
-					LZ4Compressor compressor= LZ4Factory.fastestInstance().highCompressor();
-				    int maxCompressedLength = compressor.maxCompressedLength(decompressedLength);
-				    byte[] compressed = new byte[maxCompressedLength];
-				    int compressedLength = compressor.compress(byte_img, 0, decompressedLength, compressed, 0, maxCompressedLength);
-					//System.out.println("compressed= " + new String(compressed));
-					System.out.println("dimensione compressed= " + compressedLength);
-				    //decompression
-				  /*  LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
-				    byte[] restored = new byte[decompressedLength];
-				    int compressedLength2 = decompressor.decompress(compressed, 0, restored, 0, decompressedLength);
-				    // compressedLength == compressedLength2
-				    System.out.println("decompressed= " + new String(restored));*/
-					QRCode qr= new QRCode();
-					try {
-						qr.writeQRCode(new String(Arrays.copyOf(compressed,compressedLength<1000?compressedLength:1000)), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_WIDTH);
-						qr.saveQRCodeToFile(OUTPUT + "/" + tmp + "/" + tmp + "_qrcode.jpg" );
-					} catch (WriterException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				//}
+				
+				//compression
+				System.out.println("Dimensione in byte dell'immagine = " + decompressedLength);
+				LZ4Compressor compressor= LZ4Factory.fastestInstance().highCompressor();
+			    int maxCompressedLength = compressor.maxCompressedLength(decompressedLength);
+			    byte[] compressed = new byte[maxCompressedLength];
+			    int compressedLength = compressor.compress(byte_img, 0, decompressedLength, compressed, 0, maxCompressedLength);
+				//System.out.println("compressed= " + new String(compressed));
+				System.out.println("dimensione compressed= " + compressedLength);
+				byte[] encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, compressed, new String("pillamatonna"));
+				int encripted_length= encripted.length;
+				System.out.println("dimensione encripted= " + encripted_length);
+				//decompression
+			  /*LZ4FastDecompressor decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+			    byte[] restored = new byte[decompressedLength];
+			    int compressedLength2 = decompressor.decompress(compressed, 0, restored, 0, decompressedLength);
+			    // compressedLength == compressedLength2
+			    System.out.println("decompressed= " + new String(restored));*/
+				/*
+				QRCode qr= new QRCode();
+				try {
+					//qr.writeQRCode(new String(Arrays.copyOf(compressed,compressedLength<1000?compressedLength:1000)), 
+							//QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_WIDTH);
+					//qr.writeQRCode(new String(byte_img), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_WIDTH);
+					qr.writeQRCode(new String(encripted), 500, 500);
+					qr.saveQRCodeToFile(OUTPUT + "/" + tmp + "/" + tmp + "_qrcode.jpg" );
+				} catch (WriterException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}*/
 				
 			} catch (MagickException | MagickImageNullException e1) {
 				
 				e1.printStackTrace();
+			} catch (Exception e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
 			}
 		}
 		
