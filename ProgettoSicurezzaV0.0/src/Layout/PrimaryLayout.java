@@ -1,24 +1,15 @@
 package Layout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Container;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.applet.Applet;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 
 import magick.DrawInfo;
 import magick.ImageInfo;
@@ -71,11 +62,19 @@ public class PrimaryLayout implements GeneralLayout{
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
-		//1.0 - ACQUISISCI
-		button = new JButton("ACQUISISCI");
+		//1.0 - SCRIVI
+		button = new JButton("SCRIVI");
 		c.gridx = 1;c.gridy = 0;c.weightx = 0.5;
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
+		button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("SCRIVI");
+				control.setLayout(3);
+			}
+		});
 		pane.add(button, c);
 		//0.1 - ENCODE
 		button = new JButton("ENCODE");
@@ -170,9 +169,9 @@ public class PrimaryLayout implements GeneralLayout{
 				File file= file_chooser.getSelectedFile();
 				setFile_choosed(file.getAbsolutePath());
 				System.out.println("Il file scelto è: " + getFile_choosed());
-
-				control.addChoice(getFile_choosed());
-				control.drawImage(getFile_choosed(), 0);
+				
+				//control.addImageChoice(getFile_choosed());
+				control.draw(getFile_choosed(), 0);
 			}
 		}
     }	

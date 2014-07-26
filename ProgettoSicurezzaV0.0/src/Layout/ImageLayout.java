@@ -20,20 +20,15 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 
-import org.bouncycastle.util.Arrays;
 
 import net.jpountz.lz4.LZ4Compressor;
-import net.jpountz.lz4.LZ4Decompressor;
 import net.jpountz.lz4.LZ4Factory;
-import net.jpountz.lz4.LZ4FastDecompressor;
 
 import com.google.zxing.WriterException;
 
@@ -95,7 +90,6 @@ public class ImageLayout implements GeneralLayout{
 		viewer.addMouseMotionListener(new actionMouse());
 		
 		viewer.setBackground(Color.black);
-		//System.out.println("il viewer si trova in posizione " + viewer.getLocation().getX() + " - " + viewer.getLocation().getY());
 		pane.add(viewer, c);
 		
 		c.gridwidth=1;c.ipady=0;c.ipadx=0;c.fill = GridBagConstraints.HORIZONTAL;
@@ -205,8 +199,6 @@ public class ImageLayout implements GeneralLayout{
 			viewer.setImage(m_img);
 			screen= QRCode.magickImageToBufferedImage(m_img);
 			
-			//ViewImage view_img= new ViewImage(QRCode.magickImageToBufferedImage(img));
-			//setV_img(view_img);
 			if(screen != null){
 				screenCopy= new BufferedImage(screen.getWidth(), screen.getHeight(), BufferedImage.TYPE_INT_RGB);
 				screenLabel= new JLabel(new ImageIcon(screenCopy));
@@ -343,7 +335,6 @@ public class ImageLayout implements GeneralLayout{
 			if(isSelect()){
 	            start = me.getPoint();
 	            repaint(screen, screenCopy);
-	            //System.out.println("Start Point: " + start);
 	            screenLabel.repaint();
 			}
 		}
@@ -411,7 +402,6 @@ public class ImageLayout implements GeneralLayout{
 		} catch (MagickException e) {
 			e.printStackTrace();
 		} catch (MagickImageNullException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -461,9 +451,9 @@ public class ImageLayout implements GeneralLayout{
 				MagickUtility.saveImage(cropped, OUTPUT + "/" + tmp + "/" + tmp + "_cropped.jpg");
 				MagickUtility.saveImage(covered, OUTPUT + "/" + tmp + "/" + tmp + "_covered.jpg");
 				//System.out.println(m_img.getFileName());
-				control.drawImage(m_img.getFileName(), getBackLayout());
+				//control.drawImage(m_img.getFileName(), getBackLayout());
+				control.draw(m_img.getFileName(), getBackLayout());
 				
-				//String str_byte= CryptoUtility.toBase64(byte_img);
 				//max data in qrcode 2953
 				
 				//compression
@@ -498,10 +488,8 @@ public class ImageLayout implements GeneralLayout{
 				}*/
 				
 			} catch (MagickException | MagickImageNullException e1) {
-				
 				e1.printStackTrace();
 			} catch (Exception e2) {
-				// TODO Auto-generated catch block
 				e2.printStackTrace();
 			}
 		}

@@ -1,25 +1,14 @@
 package Layout;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GraphicsConfiguration;
-import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.ViewportLayout;
-
-import magick.MagickException;
-import magick.MagickImage;
-import magick.util.MagickViewer;
-import sun.awt.X11.Screen;
-import util.MagickUtility;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -35,12 +24,17 @@ public class LayoutControl {
 	private SettingsLayout s_layout;
 	private PrimaryLayout p_layout;
 	private EncodeLayout e_layout;
-	private ArrayList<String> choosed_file;
-	private String[] types= {"gif", "jpg", "png", "bmp"};
+	private WriteLayout w_layout;
+	private ArrayList<String> choosed_images;
+
+	private ArrayList<String> choosed_files;
+	private String[] image_types= {"gif", "jpg", "png", "bmp"};
+	private String[] text_types= {"txt"};
 	
 	public LayoutControl(){
 		
-		choosed_file= new ArrayList<String>();
+		choosed_images= new ArrayList<String>();
+		choosed_files= new ArrayList<String>();
 		mainFrame= new JFrame("Progetto SII");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(WIDTH, HEIGHT);
@@ -61,16 +55,22 @@ public class LayoutControl {
 	public void setLayout(int layout){
 		if(layout == 0){
 			PrimaryLayout();
+			mainFrame.setSize(WIDTH, HEIGHT);
 		}
 		else if(layout == 1){
 			EncodeLayout();
+			mainFrame.setSize(500, 500);
 		}
 		else if(layout == 2){
 			SettingsLayout();
+			mainFrame.setSize(WIDTH, HEIGHT);
+		}
+		else if(layout == 3){
+			WriteLayout();
+			mainFrame.setSize(800, 600);
 		}
 		
 		//mainFrame.pack();
-		mainFrame.setSize(WIDTH, HEIGHT);
 		mainFrame.repaint();
 		mainFrame.validate();
 	}
@@ -87,7 +87,7 @@ public class LayoutControl {
 	
 	public void EncodeLayout(){
 		if(e_layout == null){
-			e_layout= new EncodeLayout(this, mainFrame.getContentPane(), this.choosed_file);
+			e_layout= new EncodeLayout(this, mainFrame.getContentPane(), this.choosed_files);
 			e_layout.addComponentsToPane();
 		}
 		else{
@@ -95,6 +95,33 @@ public class LayoutControl {
 		}
 	}
 	
+	/**
+	 * @return the choosed_files
+	 */
+	public ArrayList<String> getChoosed_files() {
+		return choosed_files;
+	}
+
+	/**
+	 * @param choosed_files the choosed_files to set
+	 */
+	public void setChoosed_files(ArrayList<String> choosed_files) {
+		this.choosed_files = choosed_files;
+	}
+	/**
+	 * @return the choosed_images
+	 */
+	public ArrayList<String> getChoosed_images() {
+		return choosed_images;
+	}
+
+	/**
+	 * @param choosed_images the choosed_images to set
+	 */
+	public void setChoosed_images(ArrayList<String> choosed_images) {
+		this.choosed_images = choosed_images;
+	}
+
 	public void SettingsLayout(){
 		if(s_layout == null){
 			s_layout= new SettingsLayout(this, mainFrame.getContentPane());
@@ -102,6 +129,16 @@ public class LayoutControl {
 		}
 		else{
 			s_layout.addComponentsToPane();
+		}
+	}
+	
+	public void WriteLayout(){
+		if(w_layout == null){
+			w_layout= new WriteLayout(this, mainFrame.getContentPane());
+			w_layout.addComponentsToPane();
+		}
+		else{
+			w_layout.addComponentsToPane();
 		}
 	}
 	//============================================================================
@@ -118,15 +155,24 @@ public class LayoutControl {
 		return null;
 	}
 	
-	public void addChoice(String path){
-		if(!this.choosed_file.contains(path)){
-			if(isAnImage(path))
-				this.choosed_file.add(path);
-			else
-				System.out.println("file non compatibile");
+	public void addImageChoice(String path){
+		if(!this.choosed_images.contains(path) && isImage(path)){
+			this.choosed_images.add(path);
 		}
 		else{
-			System.out.println("percorso gia presente");
+			System.out.println("immagine gia presente e/o non supportata");
+		}
+		
+		if(e_layout != null)
+			e_layout.updateList();
+	}
+	
+	public void addFileChoice(String path){
+		if(!this.choosed_files.contains(path) && isText(path)){
+			this.choosed_files.add(path);
+		}
+		else{
+			System.out.println("file gia presente e/o non supportato");
 		}
 		
 		if(e_layout != null)
@@ -134,7 +180,7 @@ public class LayoutControl {
 	}
 	
 	public void removeItem(int pos){
-		this.choosed_file.remove(pos);
+		this.choosed_images.remove(pos);
 		
 		if(e_layout != null)
 			e_layout.updateList();
@@ -145,26 +191,45 @@ public class LayoutControl {
 	 * @param path String il percorso del file
 	 * @return false se non è un'immagine
 	 */
-	public boolean isAnImage(String path){
-		for(String s : types){
-			if(path.endsWith(s)){
+	public boolean isImage(String path){
+		return isImage(new File(path));
+	}
+	
+	public boolean isImage(File f){
+		for(String s : image_types){
+			if(f.getAbsolutePath().endsWith(s)){
 				return true;
 			}
 		}
-		
+		return false;
+	}
+	/**
+	 * controlla che il file selezionato sia un tipo di testo noto
+	 * @param path String il percorso del file
+	 * @return false se non è un file di testo
+	 */
+	public boolean isText(String path){
+		return isText(new File(path));
+	}
+	
+	public boolean isText(File f){
+		for(String s : text_types){
+			if(f.getAbsolutePath().endsWith(s)){
+				return true;
+			}
+		}
 		return false;
 	}
 	/**
 	 * Disegna l'immagine scelta nella finestra dell'applicazione
 	 * @param path String il percorso dell'imagine da disegnare
 	 */
-	public void drawImage(String path, int backTo){
+	public void drawImage(File f, int backTo){
 
 		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane(), backTo);
 		try {
-			img_layout.setViewer(path);
+			img_layout.setViewer(f.getAbsolutePath());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		img_layout.addComponentsToPane();
@@ -181,5 +246,47 @@ public class LayoutControl {
 		}
 	}
 	
+	public void drawFile(File f){
+
+		if(w_layout == null){
+			w_layout= new WriteLayout(this, mainFrame.getContentPane());
+			w_layout.addComponentsToPane();
+		}
+		else{
+			w_layout.addComponentsToPane();
+		}
+
+		mainFrame.setSize(800, 600);
+		
+		try {
+			BufferedReader buff= new BufferedReader(new FileReader(f.getAbsolutePath()));
+			String tmp= buff.readLine();
+			String text= "";
+			while(tmp != null){
+				text= text + tmp;
+				tmp= buff.readLine();
+				//System.out.println(text);
+			}
+			w_layout.setAreaText(text);
+			buff.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
+	public void draw(String path, int backTo){
+		
+		File f = new File(path);
+		if(isImage(f)){
+			addImageChoice(path);
+			drawImage(f, backTo);
+		}
+		else if(isText(f)){
+			addFileChoice(path);
+			drawFile(f);
+		}
+	}	
 }

@@ -1,7 +1,6 @@
 package Layout;
 
 import java.awt.Color;
-import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -42,6 +41,8 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
     private ArrayList<String> list_item;
     private String list_selected;
     private int pos_list_selected;
+    private JButton btn_image, btn_file;
+    private boolean img_selected, file_selected;
     
     private static final String OUTPUT_FOLDER="/home/pasquale/ProgettoSicurezza/";
     
@@ -57,6 +58,9 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         list.addListSelectionListener(this);
         list.setSelectedIndex(-1);
+        
+        setImg_selected(false);
+        setFile_selected(true);
     }
     
     @Override
@@ -65,7 +69,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
         JButton button;
         JLabel label;
         scroll_pane= new JScrollPane(list);
-        scroll_pane.setPreferredSize(new Dimension(200, 200));
+        scroll_pane.setPreferredSize(new Dimension(300, 300));
         
         
         updateList();
@@ -73,52 +77,65 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
         //inserimento pulsanti
         pane.removeAll();
 		pane.setLayout(new GridBagLayout());
+		//pane.setSize(800, 600);
 		
 		int posx= 0, posy= 0;
 		
 		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		c.anchor= GridBagConstraints.CENTER;
+		c.anchor= GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.NONE;
 		c.insets= new Insets(10, 10, 10, 10);
 		
-		//0.0 - LABEL
+		//0.0 - IMMAGINI
 		c.gridx=posx;c.gridy=posy;
-		label= new JLabel("File aggiunti");
-		pane.add(label, c);
-		//0.1 -SCROLL PANE
-		posy++;
-		c.gridx=posx;c.gridy=posy;c.gridheight=6;c.weighty= 1;
-		c.ipadx=scroll_pane.getSize().width;c.ipady= scroll_pane.getSize().height;
-		pane.add(scroll_pane, c);
-		//1.1 - ENCODE
+		btn_image= new JButton("IMMAGINI");
+		btn_image.setForeground(Color.white);
+		btn_image.setBackground(Color.black);
+		btn_image.addActionListener(new ImageAction());
+		pane.add(btn_image, c);
+		//1.0 - FILE
 		posx++;
+		c.gridx=posx;c.gridy=posy;
+		btn_file= new JButton("FILE");
+		btn_file.setForeground(Color.white);
+		btn_file.setBackground(Color.blue);
+		btn_file.addActionListener(new FileAction());
+		pane.add(btn_file, c);
+		//0.1 -SCROLL PANE
+		posx=0;posy++;
+		c.gridx=posx;c.gridy=posy;c.gridheight=6;c.gridwidth=2;c.weighty= 1;c.weightx=1;
+		c.fill = GridBagConstraints.BOTH;
+		//c.ipadx=scroll_pane.getSize().width;c.ipady= scroll_pane.getSize().height;
+		pane.add(scroll_pane, c);
+		//2.1 - ENCODE
+		posx=2;
 		button = new JButton("ENCODE");
-		c.gridx = posx;c.gridy= posy;c.weightx = 0.5;c.weighty= 0;c.gridheight=1;c.ipadx=0;c.ipady= 0;
-		c.fill= GridBagConstraints.HORIZONTAL;
+		c.gridx = posx;c.gridy= posy;c.gridheight=1;c.gridwidth=1;c.ipadx=0;c.ipady= 0;
+		c.fill= GridBagConstraints.HORIZONTAL;c.weighty= 0;c.weightx=0;
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		button.addActionListener(new EncodeAction());
 		pane.add(button, c);
-		//1.2 - AGGIUNGI
+		//2.2 - AGGIUNGI
 		posy++;
 		button = new JButton("AGGIUNGI");
-		c.gridx = posx;c.gridy=posy;c.weightx = 0;c.gridheight=1;c.ipadx=0;
+		c.gridx = posx;c.gridy=posy;c.gridheight=1;c.ipadx=0;
 		button.addActionListener(new AddAction());
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
-		//1.3 - ELIMINA
+		//2.3 - ELIMINA
 		posy++;
 		button= new JButton("ELIMINA");
-		c.gridx = posx;c.gridy = posy;c.weightx = 0.5;c.weighty=0;c.gridheight=1;c.ipadx=0;
+		c.gridx = posx;c.gridy = posy;c.gridheight=1;c.ipadx=0;
 		button.addActionListener(new RemoveAction());
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
-		//1.4 - BACK
+		//2.4 - BACK
 		posy++;
 		button= new JButton("BACK");
-		c.gridx = posx;c.gridy = posy;c.weightx = 0.5;c.weighty=0;c.gridheight=1;c.ipadx=0;
+		c.gridx = posx;c.gridy = posy;c.gridheight=1;c.ipadx=0;
 		button.addActionListener(new ActionListener() {
 			
 			@Override
@@ -201,6 +218,20 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 	public void setPos_list_selected(int pos_list_selected) {
 		this.pos_list_selected = pos_list_selected;
 	}
+	public boolean isImg_selected() {
+		return img_selected;
+	}
+
+	public void setImg_selected(boolean img_selected) {
+		this.img_selected = img_selected;
+	}
+	public boolean isFile_selected() {
+		return file_selected;
+	}
+
+	public void setFile_selected(boolean file_selected) {
+		this.file_selected = file_selected;
+	}
 	//l'azione da compiere alla pressione encode
 	private class EncodeAction implements ActionListener{
 
@@ -208,7 +239,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 		public void actionPerformed(ActionEvent e) {
 	
 			if(getList_selected() != null){
-				control.drawImage(getList_selected(), 1);
+				control.draw(getList_selected(), 1);
 				/*MagickImage img= MagickUtility.getImage(getList_selected());
 				MagickImage cropped = MagickUtility.cropImage(img, 10, 50, 400, 200);
 				MagickImage covered = MagickUtility.coverWithImage(img, cropped, 400, 400);
@@ -237,7 +268,11 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 			
 			if(choose == JFileChooser.APPROVE_OPTION){
 				File file= file_chooser.getSelectedFile();
-				control.addChoice(file.getAbsolutePath());
+				
+				if(isFile_selected())
+					control.addFileChoice(file.getAbsolutePath());
+				else if(isImg_selected())
+					control.addImageChoice(file.getAbsolutePath());
 				//updateList();
 			}
 		}
@@ -250,5 +285,34 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 			control.removeItem(getPos_list_selected());
 			System.out.println("rimosso elemento in posizione " + getPos_list_selected());
 		}
+	}
+
+	private class FileAction implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setFile_selected(true);
+			setImg_selected(false);
+			btn_file.setBackground(Color.blue);
+			btn_image.setBackground(Color.black);
+			
+			setList_item(control.getChoosed_files());
+			updateList();
+		}
+	}
+	
+	private class ImageAction implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setImg_selected(true);
+			setFile_selected(false);
+			btn_image.setBackground(Color.blue);
+			btn_file.setBackground(Color.black);
+			
+			setList_item(control.getChoosed_images());
+			updateList();
+		}
+		
 	}
 }
