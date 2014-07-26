@@ -234,8 +234,18 @@ public class LayoutControl {
 		}
 		img_layout.addComponentsToPane();
 		
+		mainFrame.setSize(new Dimension(900, 600));
+		mainFrame.repaint();
+		mainFrame.validate();
+		/*
 		if(img_layout.getImgWidth() >= 800 || img_layout.getImgHeight() >= 600){
 			mainFrame.setSize(new Dimension(1000, 700));
+			mainFrame.repaint();
+			mainFrame.validate();
+		}
+		else if(img_layout.getImgWidth() <= 400 || img_layout.getImgHeight() <= 400){
+
+			mainFrame.setSize(new Dimension(500, 400));
 			mainFrame.repaint();
 			mainFrame.validate();
 		}
@@ -243,7 +253,7 @@ public class LayoutControl {
 			mainFrame.setSize(new Dimension(img_layout.getImgWidth()+100, img_layout.getImgHeight()+50));
 			mainFrame.repaint();
 			mainFrame.validate();
-		}
+		}*/
 	}
 	
 	public void drawFile(File f){

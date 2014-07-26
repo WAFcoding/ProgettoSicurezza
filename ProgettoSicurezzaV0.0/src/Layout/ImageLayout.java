@@ -89,7 +89,7 @@ public class ImageLayout implements GeneralLayout{
 		viewer.addMouseListener(new trackMouse());
 		viewer.addMouseMotionListener(new actionMouse());
 		
-		viewer.setBackground(Color.black);
+		viewer.setBackground(Color.orange);
 		pane.add(viewer, c);
 		
 		c.gridwidth=1;c.ipady=0;c.ipadx=0;c.fill = GridBagConstraints.HORIZONTAL;
@@ -215,10 +215,11 @@ public class ImageLayout implements GeneralLayout{
 			
 			int tmp_w= m_img.getDimension().width;
 			int tmp_h= m_img.getDimension().height;
-			if(tmp_w >= 800 || tmp_h >= 600)
+			viewer.setSize(new Dimension(800, 500));
+			/*if(tmp_w >= 800 || tmp_h >= 600)
 				viewer.setSize(new Dimension(800, 600));
 			else
-				viewer.setSize(new Dimension(tmp_w, tmp_h));
+				viewer.setSize(new Dimension(tmp_w, tmp_h));*/
 		} catch (MagickException e) { 
 			e.printStackTrace();
 		}

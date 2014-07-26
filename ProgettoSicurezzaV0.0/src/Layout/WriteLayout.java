@@ -6,6 +6,7 @@ package Layout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,6 +17,9 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+
+import util.CryptoUtility;
+import util.QRCode;
 
 /**
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -89,7 +93,7 @@ public class WriteLayout implements GeneralLayout{
 		});
 		pane.add(button, c);
 		//7.1 - SELEZIONA
-		button= new JButton("SELEZIONA");
+		button= new JButton("CRIPTA");
 		posy++;
 		c.fill = GridBagConstraints.NONE;
 		c.gridx= posx;c.gridy= posy;
@@ -100,7 +104,46 @@ public class WriteLayout implements GeneralLayout{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println(area.getSelectedText());
+				String selected_text= area.getSelectedText();
+				System.out.println(selected_text);
+				if(selected_text != null){
+					int start= area.getSelectionStart();
+					int end= area.getSelectionEnd();
+					String txt= area.getText();
+					String left_part= txt.substring(0, start);
+					String right_part= txt.substring(end);
+					String middle_part= "##########";
+					
+					//FIXME va criptata anche la posizione del testo e poi mandata al qr code altrimenti
+					//non si può associare il qr code alla giusta posizione
+						
+					setAreaText(left_part + middle_part + right_part); 
+					
+					try {
+						byte[] encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, selected_text, "giovannino");
+						String enc= new String(encripted);
+						System.out.println("Selezione criptata: " + enc);
+						
+						QRCode qr = new QRCode();
+						qr.writeQRCode(enc, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
+						String path= "/home/pasquale/ProgettoSicurezza/qrcode.jpg";
+						qr.saveQRCodeToFile(path);
+						
+						EventQueue.invokeLater(new Runnable() {
+							
+							@Override
+							public void run() {
+								LayoutControl new_control= new LayoutControl();
+								new_control.draw("/home/pasquale/ProgettoSicurezza/qrcode.jpg", 0);
+								
+							}
+						});
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				//area.cut();
 			}
 		});
 		pane.add(button, c);
