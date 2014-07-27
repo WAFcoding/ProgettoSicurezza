@@ -277,7 +277,10 @@ public class LayoutControl {
 				tmp= buff.readLine();
 				//System.out.println(text);
 			}
-			w_layout.setAreaText(text);
+			w_layout.setCurrentFile(f);
+			/*w_layout.setAreaText(text);
+			String path= f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf("/")+1);
+			w_layout.setOutput_folder(path);*/
 			buff.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -291,11 +294,11 @@ public class LayoutControl {
 		
 		File f = new File(path);
 		if(isImage(f)){
-			addImageChoice(path);
+			//addImageChoice(path);
 			drawImage(f, backTo);
 		}
 		else if(isText(f)){
-			addFileChoice(path);
+			//addFileChoice(path);
 			drawFile(f);
 		}
 	}	

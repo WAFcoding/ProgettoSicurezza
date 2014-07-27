@@ -254,7 +254,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 				MagickUtility.saveImage(covered3, OUTPUT_FOLDER + "covered3.jpg");*/
 			}
 			else{
-				JOptionPane.showMessageDialog(getPane(), "You must select a path");
+				JOptionPane.showMessageDialog(getPane(), "devi selezionare un file");
 			}
 		}
 	}

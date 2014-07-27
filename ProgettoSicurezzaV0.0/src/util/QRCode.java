@@ -12,12 +12,16 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 
 import magick.MagickException;
 import magick.MagickImage;
@@ -170,6 +174,7 @@ public class QRCode {
 	 * @throws IOException
 	 */
 	public void saveQRCodeToFile(String filePath) throws WriterException, IOException {
+		System.out.println("QRCode salvato in: " + filePath);
 		MatrixToImageWriter.writeToPath(this.bitData , filePath.substring(filePath.lastIndexOf('.') + 1), Paths.get(filePath));
 	}
 	
@@ -255,5 +260,22 @@ public class QRCode {
 		DataBuffer dataBuf = new DataBufferByte(data, imageWidth * imageHeight * 3);
 		WritableRaster wr = Raster.createWritableRaster(csm, dataBuf, new Point(0, 0));
 		return new BufferedImage(ccm, wr, false, null);
+	}
+	/**
+	 * Salva su file il testo passato
+	 * @param path String il percorso dove salvare il file
+	 * @param text String il testo da scrivere nel file
+	 */
+	public static void saveFile(String path, String text){
+		File f= new File(path);
+		FileWriter fw;
+		try {
+			fw = new FileWriter(f);
+			fw.write(text);
+			fw.flush();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

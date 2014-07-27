@@ -12,8 +12,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
@@ -32,7 +35,11 @@ public class WriteLayout implements GeneralLayout{
 
 	private JTextArea area;
 	private String text;
-	
+	private String output_folder;
+	private String name_file;
+	private File currentFile;
+	private boolean isAlreadyConfigured;
+
 	public WriteLayout(LayoutControl control, Container pane){
 		setControl(control);
 		setPane(pane);
@@ -43,6 +50,7 @@ public class WriteLayout implements GeneralLayout{
 "Morbi dictum aliquam lobortis. Suspendisse scelerisque quam sit amet sem gravida malesuada. Phasellus eu enim sagittis, adipiscing magna a, condimentum risus. Quisque vitae mi sed turpis ultricies fringilla. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer placerat dui ut facilisis rutrum. Donec a nibh vitae ipsum eleifend cursus in pellentesque nunc. Integer placerat ipsum vel risus facilisis rhoncus. Duis augue dolor, imperdiet sed sollicitudin quis, feugiat tempor nulla. Integer commodo auctor elit, nec consequat est auctor vel. Ut a ante mi.";
 		area= new JTextArea(text);
 		area.setVisible(true);
+		this.isAlreadyConfigured= false;
 	}
 	
 	@Override
@@ -72,7 +80,7 @@ public class WriteLayout implements GeneralLayout{
 		c.anchor= GridBagConstraints.WEST;
 		c.insets= new Insets(10, 10, 10, 10);
 		// 0.0 - text area
-		c.gridx= posx;c.gridy= posy;c.gridheight= 4;c.gridwidth= 6;c.weightx= 1;c.weighty=1;
+		c.gridx= posx;c.gridy= posy;c.gridheight= 8;c.gridwidth= 6;c.weightx= 1;c.weighty=1;
 		c.fill = GridBagConstraints.BOTH;
 		pane.add(scroll_pane, c);
 		//7.0 - BACK
@@ -92,7 +100,7 @@ public class WriteLayout implements GeneralLayout{
 			}
 		});
 		pane.add(button, c);
-		//7.1 - SELEZIONA
+		//7.1 - CRIPTA
 		button= new JButton("CRIPTA");
 		posy++;
 		c.fill = GridBagConstraints.NONE;
@@ -126,24 +134,108 @@ public class WriteLayout implements GeneralLayout{
 						
 						QRCode qr = new QRCode();
 						qr.writeQRCode(enc, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
-						String path= "/home/pasquale/ProgettoSicurezza/qrcode.jpg";
-						qr.saveQRCodeToFile(path);
-						
+						//---------------------------------------------------------------
+						/*if(!isAlreadyConfigured()){
+							System.out.println("output folder= " + getOutput_folder());
+							System.out.println("output file name= " + getNameFile());
+							setOutput_folder(getOutput_folder() + getNameFile() + "/");
+							System.out.println("output folder= " + getOutput_folder());
+							File f= new File(getOutput_folder());
+							if(!f.exists()){
+								f.mkdir();
+							}
+							setAlreadyConfigured(true);
+						}*/
+						configurePath();
+						//--------------------------------------------------------------
+						//TODO il controllo se c'è gia un qrcode e quindi crearne un altro
+						String qrcode_file= getOutput_folder()+"/"+getNameFile()+".jpg";
+						int i=1;
+						while(checkExists(qrcode_file)){
+							qrcode_file= qrcode_file.substring(0, qrcode_file.lastIndexOf("_")+1);
+							qrcode_file= qrcode_file + i + ".jpg";
+							i++;
+						}
+						qr.saveQRCodeToFile(qrcode_file);
+						/*
 						EventQueue.invokeLater(new Runnable() {
 							
 							@Override
 							public void run() {
 								LayoutControl new_control= new LayoutControl();
-								new_control.draw("/home/pasquale/ProgettoSicurezza/qrcode.jpg", 0);
+								new_control.draw(get, 0);
 								
 							}
-						});
+						});*/
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 				//area.cut();
+			}
+		});
+		pane.add(button, c);
+		//7.2 - NUOVO
+		button= new JButton("NUOVO");
+		posy++;
+		c.gridx= posx;c.gridy= posy;
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				area.setText("");
+				System.out.println("cancellato contenuto JTextArea");
+
+				JFileChooser file_chooser= new JFileChooser();
+				file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int choose= file_chooser.showDialog(null, "SELEZIONA");
+				if(choose == JFileChooser.APPROVE_OPTION){
+					String name_file= JOptionPane.showInputDialog(getPane(), "inserisci il nome del file\nsenza estensione");
+					setOutput_folder(file_chooser.getSelectedFile().getAbsolutePath()+"/");
+					setNameFile(name_file+"_0");
+					System.out.println("Il percorso scelto è: " + getOutput_folder());
+					
+				}
+				else if(choose == JFileChooser.CANCEL_OPTION){
+					System.out.println("annullato");
+				}
+			}
+		});
+		pane.add(button, c);
+		//7.3 - SALVA
+		button= new JButton("SALVA");
+		posy++;
+		c.gridx= posx;c.gridy= posy;
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				JFileChooser file_chooser= new JFileChooser(getOutput_folder());
+				file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int choose= file_chooser.showDialog(null, "SELEZIONA");
+				String path="";
+				if(choose == JFileChooser.APPROVE_OPTION){
+					//path= file_chooser.getSelectedFile().getAbsolutePath();
+					String name_file= JOptionPane.showInputDialog(getPane(), "inserisci il nome del file\nsenza estensione", getNameFile());
+					//path+= "/" + name_file + "/";
+					setOutput_folder(file_chooser.getSelectedFile().getAbsolutePath() +  "/");
+					File f= new File(path);
+					f.mkdir();
+					path= getOutput_folder() + name_file +  ".txt";
+					System.out.println("Il percorso scelto è: " + path);
+					QRCode.saveFile(path, area.getText());//funzione di utilità sta in QRCode solo per comodità
+					System.out.println("File salvato in: " + path);
+					
+				}
+				else if(choose == JFileChooser.CANCEL_OPTION){
+					System.out.println("annullato");
+				}
 			}
 		});
 		pane.add(button, c);
@@ -196,5 +288,72 @@ public class WriteLayout implements GeneralLayout{
 		setText(text);
 		area.setText(text);
 	}
+
+	public String getOutput_folder() {
+		return output_folder;
+	}
+
+	public void setOutput_folder(String output_folder) {
+		this.output_folder = output_folder;
+	}
 	
+	public String getNameFile(){
+		return this.name_file;
+	}
+	
+	public void setNameFile(String name){
+		this.name_file= name;
+	}
+
+	public File getCurrentFile() {
+		return currentFile;
+	}
+
+	public void setCurrentFile(File currentFile) {
+		this.currentFile = currentFile;
+		String path= this.currentFile.getAbsolutePath();
+		String name= path.substring(path.lastIndexOf("/")+1, path.lastIndexOf("."))+"_0";
+		path= path.substring(0, path.lastIndexOf("/"));
+		path= path.substring(0, path.lastIndexOf("/"));
+		path+= "/ProgettoSicurezza/";
+		File f= new File(path);
+		if(!f.exists()){
+			f.mkdir();
+		}
+		setNameFile(name);
+		setOutput_folder(path);
+	}
+	
+	/**
+	 * @return the isAlreadyConfigured
+	 */
+	public boolean isAlreadyConfigured() {
+		return isAlreadyConfigured;
+	}
+
+	/**
+	 * @param isAlreadyConfigured the isAlreadyConfigured to set
+	 */
+	public void setAlreadyConfigured(boolean isAlreadyConfigured) {
+		this.isAlreadyConfigured = isAlreadyConfigured;
+	}
+	
+	public boolean checkExists(String path){
+		return new File(path).exists();
+	}
+	
+	public void configurePath(){
+
+		if(!isAlreadyConfigured()){
+			System.out.println("output folder= " + getOutput_folder());
+			System.out.println("output file name= " + getNameFile());
+			setOutput_folder(getOutput_folder() + getNameFile() + "/");
+			System.out.println("output folder= " + getOutput_folder());
+			File f= new File(getOutput_folder());
+			if(!f.exists()){
+				f.mkdir();
+			}
+			setAlreadyConfigured(true);
+		}
+	}
 }
