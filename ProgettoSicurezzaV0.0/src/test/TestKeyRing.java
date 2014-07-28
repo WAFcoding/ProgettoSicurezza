@@ -28,6 +28,14 @@ public class TestKeyRing {
 		
 		System.out.println("Salvataggio file");
 		keyRing.saveToFile();
+		
+		System.out.println("Lettura");
+		System.out.println("giovanni:\t" + CryptoUtility.toBase64(keyRing.getPublicKey("giovanni").getEncoded()) + "\n===");
+		System.out.println("pasquale:\t" + CryptoUtility.toBase64(keyRing.getPublicKey("pasquale").getEncoded()) + "\n===");
+		System.out.println("marco:\t" + CryptoUtility.toBase64(keyRing.getPublicKey("marco").getEncoded()) + "\n===");
+		System.out.println("stefano:\t" + CryptoUtility.toBase64(keyRing.getPublicKey("stefano").getEncoded()) + "\n===");
+		System.out.println("luca:\t" + CryptoUtility.toBase64(keyRing.getPublicKey("luca").getEncoded()) + "\n===");
+		
 	}
 
 }

@@ -40,8 +40,10 @@ public class PublicKeyRing {
 	 */
 	private PublicKeyRing() {
 		recoverPublicKeyRing();
-		if(this.pKeyMap==null)
+		if(this.pKeyMap==null) {
 			this.pKeyMap = new ConcurrentHashMap<String, PublicKey>();
+			System.err.println("File non esistente-Creo nuovo");
+		}
 		updated.set(true);
 	}
 
