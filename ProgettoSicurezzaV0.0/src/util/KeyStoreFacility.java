@@ -9,6 +9,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -132,7 +133,7 @@ public class KeyStoreFacility {
 			NoSuchAlgorithmException {
 		return new String(this.keymap.getKey(user,keyStorePassword.toCharArray()).getEncoded());
 	}
-	
+
 	/**
 	 * Recupera la chiave privata dell'utente.
 	 * 
