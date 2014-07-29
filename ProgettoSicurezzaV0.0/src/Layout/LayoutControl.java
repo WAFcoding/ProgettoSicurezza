@@ -278,8 +278,8 @@ public class LayoutControl {
 				//System.out.println(text);
 			}
 			w_layout.setCurrentFile(f);
-			/*w_layout.setAreaText(text);
-			String path= f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf("/")+1);
+			w_layout.setAreaText(text);
+			/*String path= f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf("/")+1);
 			w_layout.setOutput_folder(path);*/
 			buff.close();
 		} catch (FileNotFoundException e) {
