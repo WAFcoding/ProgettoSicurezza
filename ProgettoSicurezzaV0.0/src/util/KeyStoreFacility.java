@@ -35,13 +35,13 @@ public class KeyStoreFacility {
 	/**
 	 * Nome del file del keystore predefinito.
 	 */
-	private static String keyStoreFileName = "keydb.store";
+	private static String keyStoreFileName = "keydb.store";//FIXME il nome sarà hash(nome_utente+nonce).db
 	
 	/**
 	 * Password del keystore.
 	 * TODO: da gestire meglio.
 	 */
-	private static String keyStorePassword = "pasqualino";// FIXME: :-)
+	private static String keyStorePassword = "pasqualino";// FIXME: :-) fare l'hash della pwd
 
 	private KeyStore keymap;
 	private boolean changes;

@@ -13,6 +13,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -21,7 +22,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+
 import util.CryptoUtility;
+import util.PDFUtil;
 import util.QRCode;
 
 /**
@@ -56,10 +61,6 @@ public class WriteLayout implements GeneralLayout{
 	@Override
 	public void addComponentsToPane() {
 		
-		
-		//area.setPreferredSize(new Dimension(300, 200));
-		//area.setMaximumSize(new Dimension(600, 400));
-		//area.setAutoscrolls(true);
 		area.setMargin(new Insets(5, 5, 5, 5));
 		area.setWrapStyleWord(true);
 		area.setLineWrap(true);
@@ -113,7 +114,12 @@ public class WriteLayout implements GeneralLayout{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String selected_text= area.getSelectedText();
+				int cursor_position= area.getCaretPosition() - selected_text.length();
 				System.out.println(selected_text);
+				selected_text= cursor_position + "_" + selected_text;
+				System.out.println(selected_text);
+				System.out.println("La posizione del cursore nel testo è: " + cursor_position);
+				selected_text= cursor_position + "_" + selected_text;
 				if(selected_text != null){
 					int start= area.getSelectionStart();
 					int end= area.getSelectionEnd();
@@ -121,9 +127,6 @@ public class WriteLayout implements GeneralLayout{
 					String left_part= txt.substring(0, start);
 					String right_part= txt.substring(end);
 					String middle_part= "##########";
-					
-					//FIXME va criptata anche la posizione del testo e poi mandata al qr code altrimenti
-					//non si può associare il qr code alla giusta posizione
 						
 					setAreaText(left_part + middle_part + right_part); 
 					
@@ -134,21 +137,8 @@ public class WriteLayout implements GeneralLayout{
 						
 						QRCode qr = new QRCode();
 						qr.writeQRCode(enc, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
-						//---------------------------------------------------------------
-						/*if(!isAlreadyConfigured()){
-							System.out.println("output folder= " + getOutput_folder());
-							System.out.println("output file name= " + getNameFile());
-							setOutput_folder(getOutput_folder() + getNameFile() + "/");
-							System.out.println("output folder= " + getOutput_folder());
-							File f= new File(getOutput_folder());
-							if(!f.exists()){
-								f.mkdir();
-							}
-							setAlreadyConfigured(true);
-						}*/
 						configurePath();
 						//--------------------------------------------------------------
-						//TODO il controllo se c'è gia un qrcode e quindi crearne un altro
 						String qrcode_file= getOutput_folder()+"/"+getNameFile()+".jpg";
 						int i=1;
 						while(checkExists(qrcode_file)){
@@ -157,22 +147,10 @@ public class WriteLayout implements GeneralLayout{
 							i++;
 						}
 						qr.saveQRCodeToFile(qrcode_file);
-						/*
-						EventQueue.invokeLater(new Runnable() {
-							
-							@Override
-							public void run() {
-								LayoutControl new_control= new LayoutControl();
-								new_control.draw(get, 0);
-								
-							}
-						});*/
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				//area.cut();
 			}
 		});
 		pane.add(button, c);
@@ -221,15 +199,25 @@ public class WriteLayout implements GeneralLayout{
 				int choose= file_chooser.showDialog(null, "SELEZIONA");
 				String path="";
 				if(choose == JFileChooser.APPROVE_OPTION){
-					//path= file_chooser.getSelectedFile().getAbsolutePath();
 					String name_file= JOptionPane.showInputDialog(getPane(), "inserisci il nome del file\nsenza estensione", getNameFile());
-					//path+= "/" + name_file + "/";
 					setOutput_folder(file_chooser.getSelectedFile().getAbsolutePath() +  "/");
 					File f= new File(path);
 					f.mkdir();
 					path= getOutput_folder() + name_file +  ".txt";
 					System.out.println("Il percorso scelto è: " + path);
 					QRCode.saveFile(path, area.getText());//funzione di utilità sta in QRCode solo per comodità
+					try {
+						String pat_pdf= getOutput_folder() + name_file + ".pdf";
+						Document doc= PDFUtil.create(pat_pdf);
+						if(PDFUtil.open(doc)){
+							PDFUtil.addText(doc, area.getText());
+							PDFUtil.close(doc);
+						}
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (DocumentException e) {
+						e.printStackTrace();
+					}
 					System.out.println("File salvato in: " + path);
 					
 				}
