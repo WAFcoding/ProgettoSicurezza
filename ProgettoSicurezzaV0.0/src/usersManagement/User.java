@@ -8,7 +8,7 @@ package usersManagement;
  *
  */
 public class User {
-	//chiave privata
+	//chiave privata 
 	//le chiavi di livello
 	//le chiavi pubbliche
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package Layout;
+package layout;
 
 import java.awt.Component;
 import java.awt.Graphics;

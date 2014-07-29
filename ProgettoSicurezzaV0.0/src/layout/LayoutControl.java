@@ -1,4 +1,4 @@
-package Layout;
+package layout;
 
 import java.awt.Dimension;
 import java.io.BufferedReader;

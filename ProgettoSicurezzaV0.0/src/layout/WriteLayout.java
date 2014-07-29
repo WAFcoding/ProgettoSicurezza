@@ -1,7 +1,7 @@
 /**
  * 
  */
-package Layout;
+package layout;
 
 import java.awt.Color;
 import java.awt.Container;
