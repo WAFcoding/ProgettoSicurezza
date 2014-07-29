@@ -1,44 +1,65 @@
 package test;
 
+/**
+ * SslSocketClient.java
+ * Copyright (c) 2005 by Dr. Herong Yang
+ */
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 public class TestClient {
-
 	public static void main(String[] args) {
+		System.setProperty("javax.net.ssl.trustStore", "/home/giovanni/Dropbox/SII/workspaceSII/ProgettoSicurezza/Server/public.jks");
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		PrintStream out = System.out;
+		SSLSocketFactory f = (SSLSocketFactory) SSLSocketFactory.getDefault();
 
 		try {
-
-			SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-			SSLSocket sslSock = (SSLSocket) factory.createSocket("mail.google.com", 443);
-
-			// send HTTP get request
-			BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(
-					sslSock.getOutputStream(), "UTF8"));
-			wr.write("GET /mail HTTP/1.1\r\nhost: mail.google.com\r\n\r\n");
-			wr.flush();
-
-			// read response
-			BufferedReader rd = new BufferedReader(new InputStreamReader(sslSock.getInputStream()));
-			String string = null;
-
-			while ((string = rd.readLine()) != null) {
-				System.out.println(string);
-				System.out.flush();
+			SSLSocket c = (SSLSocket) f.createSocket("localhost", 8888);
+			printSocketInfo(c);
+			c.startHandshake();
+			BufferedWriter w = new BufferedWriter(new OutputStreamWriter(
+					c.getOutputStream()));
+			BufferedReader r = new BufferedReader(new InputStreamReader(
+					c.getInputStream()));
+			String m = null;
+			while ((m = r.readLine()) != null) {
+				out.println(m);
+				m = in.readLine();
+				w.write(m, 0, m.length());
+				w.newLine();
+				w.flush();
 			}
-
-			rd.close();
-			wr.close();
-			// Close connection.
-			sslSock.close();
-
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
+			w.close();
+			r.close();
+			c.close();
+		} catch (IOException e) {
+			System.err.println(e.toString());
 		}
+	}
+
+	private static void printSocketInfo(SSLSocket s) {
+		System.out.println("Socket class: " + s.getClass());
+		System.out.println("   Remote address = "
+				+ s.getInetAddress().toString());
+		System.out.println("   Remote port = " + s.getPort());
+		System.out.println("   Local socket address = "
+				+ s.getLocalSocketAddress().toString());
+		System.out.println("   Local address = "
+				+ s.getLocalAddress().toString());
+		System.out.println("   Local port = " + s.getLocalPort());
+		System.out.println("   Need client authentication = "
+				+ s.getNeedClientAuth());
+		SSLSession ss = s.getSession();
+		System.out.println("   Cipher suite = " + ss.getCipherSuite());
+		System.out.println("   Protocol = " + ss.getProtocol());
 	}
 }
