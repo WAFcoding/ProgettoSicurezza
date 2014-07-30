@@ -3,10 +3,22 @@ import java.io.IOException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 
-
+/**
+ * Definisce il thread principale del server.
+ * 
+ * @author Giovanni Rossi
+ */
 public class ServerThread extends Thread implements Runnable {
 
+	/**
+	 * La socket utilizzata dal server per accettare le connessioni.
+	 */
 	private SSLServerSocket socket;
+	
+	/**
+	 * Costruttore principale del thread.
+	 * @param s		La socket su cui accettare le connessioni.
+	 */
 	public ServerThread(SSLServerSocket s) {
 		if(s==null)
 			throw new NullPointerException("Invalid SSL Server Socket");
@@ -14,6 +26,9 @@ public class ServerThread extends Thread implements Runnable {
 		printServerSocketInfo(this.socket);
 	}
 
+	/**
+	 * Attende connessioni e genera nuovi thread per gestirle al loro arrivo.
+	 */
 	@Override
 	public void run() {
 		WorkerThread work = null;
@@ -30,6 +45,10 @@ public class ServerThread extends Thread implements Runnable {
 		}
 	}
 
+	/**
+	 * Stampa le informazioni essenziali della socket su cui è in ascolto il server.
+	 * @param s		La socket su cui il server è in ascolto.
+	 */
 	private static void printServerSocketInfo(SSLServerSocket s) {
 		System.out.println("Server socket class: " + s.getClass());
 		System.out.println("\tSocker address = " + s.getInetAddress().toString());

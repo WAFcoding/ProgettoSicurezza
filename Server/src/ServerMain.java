@@ -6,10 +6,16 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
+/**
+ * Classe principale per il server SSL.
+ * 
+ * @author Giovanni Rossi
+ */
 public class ServerMain {
 
 	/**
-	 * @param args
+	 * Avvia il server e richiede le credenziali del keystore.
+	 * @param args	Non usati.
 	 */
 	public static void main(String[] args) {
 
