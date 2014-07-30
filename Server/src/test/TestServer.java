@@ -20,7 +20,7 @@ import javax.net.ssl.SSLSocket;
 
 public class TestServer {
 	public static void main(String[] args) {
-		String ksName = "herong.jks";
+		String ksName = "srv_keystore.jks";
 		char ksPass[] = "pasqualino".toCharArray();
 		char ctPass[] = "pasqualino".toCharArray();
 		try {

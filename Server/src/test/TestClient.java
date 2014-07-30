@@ -6,21 +6,42 @@ package test;
  */
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.net.SocketException;
+import java.security.KeyStore;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 public class TestClient {
-	public static void main(String[] args) {
-		System.setProperty("javax.net.ssl.trustStore", "/home/giovanni/Dropbox/SII/workspaceSII/ProgettoSicurezza/Server/public.jks");
+	
+	private static final String path = "/home/giovanni/Dropbox/SII/workspaceSII/ProgettoSicurezza/Server/client1.jks";
+	
+	public static void main(String[] args) throws Exception{
+		System.setProperty("javax.net.ssl.trustStore",path);
+		System.setProperty("javax.net.ssl.trustStorePassword", "pasqualino");
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		PrintStream out = System.out;
-		SSLSocketFactory f = (SSLSocketFactory) SSLSocketFactory.getDefault();
+
+		SSLContext sc = SSLContext.getInstance("TLS");
+		
+		// Open the keystore, retrieve the private key, and certificate chain
+		KeyStore ks = KeyStore.getInstance("jks");
+		ks.load(new FileInputStream(path), null);
+		
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+		kmf.init(ks, "pasqualino".toCharArray());
+		
+		sc.init(kmf.getKeyManagers(), null, null);
+
+		SSLSocketFactory f = (SSLSocketFactory) sc.getSocketFactory();
 
 		try {
 			SSLSocket c = (SSLSocket) f.createSocket("localhost", 8888);
@@ -43,7 +64,7 @@ public class TestClient {
 			c.close();
 		} catch (IOException e) {
 			System.err.println(e.toString());
-		}
+		} 
 	}
 
 	private static void printSocketInfo(SSLSocket s) {

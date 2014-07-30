@@ -1,0 +1,41 @@
+import java.io.IOException;
+
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocket;
+
+
+public class ServerThread extends Thread implements Runnable {
+
+	private SSLServerSocket socket;
+	public ServerThread(SSLServerSocket s) {
+		if(s==null)
+			throw new NullPointerException("Invalid SSL Server Socket");
+		this.socket = s;
+		printServerSocketInfo(this.socket);
+	}
+
+	@Override
+	public void run() {
+		WorkerThread work = null;
+		while(true) {
+			try {
+				SSLSocket sock = (SSLSocket)socket.accept();
+				work = new WorkerThread(sock);
+				work.setDaemon(true);
+				work.setName("Worker-"+System.currentTimeMillis());
+				work.start();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private static void printServerSocketInfo(SSLServerSocket s) {
+		System.out.println("Server socket class: " + s.getClass());
+		System.out.println("\tSocker address = " + s.getInetAddress().toString());
+		System.out.println("\tSocker port = " + s.getLocalPort());
+		System.out.println("\tNeed client authentication = " + s.getNeedClientAuth());
+		System.out.println("\tWant client authentication = " + s.getWantClientAuth());
+		System.out.println("\tUse client mode = " + s.getUseClientMode());
+	}
+}
