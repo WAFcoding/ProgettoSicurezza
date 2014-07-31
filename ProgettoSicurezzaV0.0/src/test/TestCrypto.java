@@ -48,6 +48,7 @@ public class TestCrypto {
 		
 		System.out.println("\nASYMM-TEST");
 		System.out.println("RSA");
+		System.out.println("Chiave pubblica:"+CryptoUtility.toBase64(keyps.getPublic().getEncoded()));
 		enc = CryptoUtility.asymm_encrypt(ASYMMCRYPTO_ALGO.RSA, testData.getBytes(), keyps.getPublic());
 		System.out.println("cifrato:" + new String(CryptoUtility.toBase64(enc)));
 		System.out.println(new String(CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, enc, keyps.getPrivate())));
