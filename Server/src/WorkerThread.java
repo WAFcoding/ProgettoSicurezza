@@ -86,7 +86,6 @@ public class WorkerThread extends Thread implements Runnable{
 				
 				w.write(new String(data), 0, data.length);
 				w.newLine();
-				w.newLine();
 				w.flush();
 			}
 			w.close();
