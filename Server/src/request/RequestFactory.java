@@ -45,9 +45,9 @@ public abstract class RequestFactory {
 			String reqType = tok.nextToken();
 			String body = tok.nextToken();
 			
-			if(reqType.equals(GETPUBLIC))
+			if(reqType.equalsIgnoreCase(GETPUBLIC))
 				return new RequestGetPublicKey(body);
-			if(reqType.equals(GETLEVELX))
+			if(reqType.equalsIgnoreCase(GETLEVELX))
 				return new RequestGetLevelX(Integer.valueOf(body).intValue(), trustedUser);
 		}
 		

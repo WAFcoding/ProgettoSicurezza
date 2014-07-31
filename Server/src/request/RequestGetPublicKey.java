@@ -28,6 +28,9 @@ public class RequestGetPublicKey extends Request {
 		User user = (User) queryResult;
 		tx.commit();		
 
+		if(user==null)
+			return new ResultGetPublicKey("PK not found for " + this.user);
+		
 		System.out.println(user.toString());
 		return new ResultGetPublicKey(user.getPublicKey());
 	}
