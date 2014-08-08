@@ -1,3 +1,4 @@
+package servermain;
 import java.io.Console;
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -29,10 +30,11 @@ public class ServerMain {
 					"Password:");
 			cs.flush();
 			pwd = cs.readPassword();
+			ServerMasterKey.passphrase = pwd;
 		}
 		
 		try {
-			new ServerController(new String(pwd)).startServer();
+			new ServerController().startServer();
 		} catch (UnrecoverableKeyException | KeyManagementException
 				| KeyStoreException | NoSuchAlgorithmException
 				| CertificateException | IOException e) {

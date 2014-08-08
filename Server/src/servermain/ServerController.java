@@ -1,3 +1,5 @@
+package servermain;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -59,19 +61,22 @@ public class ServerController {
 	 * @throws UnrecoverableKeyException	Se la password non è corretta.
 	 * @throws KeyManagementException
 	 */
-	public ServerController(String password) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException, UnrecoverableKeyException, KeyManagementException {
+	public ServerController() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException, UnrecoverableKeyException, KeyManagementException {
 		
-		this.serverPassword = (password==null || password.isEmpty()) ? this.serverPassword : password;
+		//TODO: rimuovi su versione release
+		if(ServerMasterKey.passphrase==null)  {
+			ServerMasterKey.passphrase = this.serverPassword.toCharArray();
+		}
 		
 		System.setProperty("javax.net.ssl.trustStore", SERVER_KEYSTORE);
 		System.setProperty("javax.net.ssl.trustStorePassword", serverPassword);
 		
 		//recupero keystore
 		KeyStore ks = KeyStore.getInstance("JKS");
-		ks.load(new FileInputStream(SERVER_KEYSTORE), serverPassword.toCharArray());
+		ks.load(new FileInputStream(SERVER_KEYSTORE), ServerMasterKey.passphrase);
 		
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(ks, serverPassword.toCharArray());
+		kmf.init(ks, ServerMasterKey.passphrase);
 		
 		//inizializzo contesto SSL
 		SSLContext sc = SSLContext.getInstance("TLS");

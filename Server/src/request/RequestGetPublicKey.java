@@ -17,7 +17,7 @@ public class RequestGetPublicKey extends Request {
 
 	@Override
 	public Result doAndGetResult() {
-		Session session = DbHibernateUtils.getHibernateSession();
+		Session session = DbHibernateUtils.getTrustedUserDbSession();
 		Transaction tx = session.beginTransaction();
 		
 		String queryString = "from User where username = :username";
