@@ -96,6 +96,20 @@ public class CryptoUtility {
 	public static byte[] fromBase64(String data) throws IOException {
 		return new BASE64Decoder().decodeBuffer(data);
 	}
+	
+	/**
+	 * Decodifica i dati dal Base64.
+	 * 
+	 * @param data
+	 *            I dati da decodificare.
+	 * 
+	 * @return I dati decodificati.
+	 * 
+	 * @throws IOException
+	 */
+	public static byte[] fromBase64(byte[] data) throws IOException {
+		return new BASE64Decoder().decodeBuffer(new String(data));
+	}
 
 	/**
 	 * Restituisce la stringa con il tipo di algoritmo di cifratura da usare.
@@ -108,11 +122,11 @@ public class CryptoUtility {
 	private static String getCipher(CRYPTO_ALGO algo) {
 		switch (algo) {
 		case AES:
-			return "AES";
+			return "AES/ECB/PKCS5Padding";
 		case DES:
-			return "DES";
+			return "DES/ECB/PKCS5Padding";
 		default:
-			return "AES";
+			return "AES/ECB/PKCS5Padding";
 		}
 	}
 
