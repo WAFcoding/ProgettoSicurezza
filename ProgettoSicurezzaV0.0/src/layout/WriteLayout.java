@@ -97,7 +97,7 @@ public class WriteLayout implements GeneralLayout{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				control.setLayout(0);
+				control.setLayout("PRIMARY");
 			}
 		});
 		pane.add(button, c);
