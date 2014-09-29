@@ -52,8 +52,8 @@ public class ServerThread extends Thread implements Runnable {
 	 */
 	private static void printServerSocketInfo(SSLServerSocket s) {
 		System.out.println("Server socket class: " + s.getClass());
-		System.out.println("\tSocker address = " + s.getInetAddress().toString());
-		System.out.println("\tSocker port = " + s.getLocalPort());
+		System.out.println("\tSocket address = " + s.getInetAddress().toString());
+		System.out.println("\tSocket port = " + s.getLocalPort());
 		System.out.println("\tNeed client authentication = " + s.getNeedClientAuth());
 		System.out.println("\tWant client authentication = " + s.getWantClientAuth());
 		System.out.println("\tUse client mode = " + s.getUseClientMode());
