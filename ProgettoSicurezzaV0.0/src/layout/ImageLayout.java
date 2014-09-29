@@ -58,13 +58,13 @@ public class ImageLayout implements GeneralLayout{
     private BufferedImage screenCopy;
     private boolean isSelect;
     private MagickImage m_img;
-    private int backLayout;
+    private String backLayout;
     
     private static final String OUTPUT= "/home/pasquale/ProgettoSicurezza/covered/";
     //private static final String OUTPUT= "/home/giovanni/Immagini/";
     private static final int MAX_CRIPTO_SIZE= 1000;
 
-	public ImageLayout(LayoutControl control, Container pane, int backTo){
+	public ImageLayout(LayoutControl control, Container pane, String backTo){
     	setControl(control);
     	setPane(pane);
     	setViewer(new MagickViewer());
@@ -278,11 +278,11 @@ public class ImageLayout implements GeneralLayout{
 	public void setSelect(boolean isSelect) {
 		this.isSelect = isSelect;
 	}
-	public int getBackLayout() {
+	public String getBackLayout() {
 		return backLayout;
 	}
 
-	public void setBackLayout(int backLayout) {
+	public void setBackLayout(String backLayout) {
 		this.backLayout = backLayout;
 	}
 	//le azioni da compiere con il mouse

@@ -114,7 +114,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				getControl().setLayout(0);
+				getControl().setLayout("PRIMARY");
 			}
 		});
 		pane.add(button, c);

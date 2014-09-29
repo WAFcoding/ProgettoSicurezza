@@ -140,7 +140,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				getControl().setLayout(0);
+				getControl().setLayout("PRIMARY");
 			}
 		});
 		button.setBackground(Color.BLUE);
@@ -239,7 +239,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 		public void actionPerformed(ActionEvent e) {
 	
 			if(getList_selected() != null){
-				control.draw(getList_selected(), 1);
+				control.draw(getList_selected(), "ENCODE");
 				/*MagickImage img= MagickUtility.getImage(getList_selected());
 				MagickImage cropped = MagickUtility.cropImage(img, 10, 50, 400, 200);
 				MagickImage covered = MagickUtility.coverWithImage(img, cropped, 400, 400);

@@ -72,7 +72,7 @@ public class PrimaryLayout implements GeneralLayout{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				System.out.println("SCRIVI");
-				control.setLayout(3);
+				control.setLayout("WRITE");
 			}
 		});
 		pane.add(button, c);
@@ -84,7 +84,7 @@ public class PrimaryLayout implements GeneralLayout{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				getControl().setLayout(1);
+				getControl().setLayout("ENCODE");
 				System.out.println("ENCODE");		
 			}
 		});
@@ -105,7 +105,7 @@ public class PrimaryLayout implements GeneralLayout{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				getControl().setLayout(2);
+				getControl().setLayout("SETTINGS");
 				System.out.println("SETTINGS");		
 			}
 		});
@@ -171,7 +171,7 @@ public class PrimaryLayout implements GeneralLayout{
 				System.out.println("Il file scelto è: " + getFile_choosed());
 				
 				//control.addImageChoice(getFile_choosed());
-				control.draw(getFile_choosed(), 0);
+				control.draw(getFile_choosed(), "PRIMARY");
 			}
 		}
     }	

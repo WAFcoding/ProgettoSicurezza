@@ -25,11 +25,16 @@ public class LayoutControl {
 	private PrimaryLayout p_layout;
 	private EncodeLayout e_layout;
 	private WriteLayout w_layout;
+	private HomeLayout h_layout;
 	private ArrayList<String> choosed_images;
 
 	private ArrayList<String> choosed_files;
 	private String[] image_types= {"gif", "jpg", "png", "bmp"};
 	private String[] text_types= {"txt"};
+	
+	private enum LAYOUT{
+		PRIMARY, ENCODE, SETTINGS, HOME, WRITE
+	}
 	
 	public LayoutControl(){
 		
@@ -40,7 +45,7 @@ public class LayoutControl {
 		mainFrame.setSize(WIDTH, HEIGHT);
 		mainFrame.setVisible(true);
 		mainFrame.setLocation(150, 100);
-		setLayout(0);
+		setLayout("HOME");
 	}
 	
 	public void createLayout(){
@@ -52,7 +57,8 @@ public class LayoutControl {
 	 * Imposta il layout da visualizzare
 	 * @param layout int 0=Primary, 1=Encode, 2=Settings
 	 */
-	public void setLayout(int layout){
+	public void setLayout(String name_layout){
+		int layout= getLayoutByName(name_layout);
 		if(layout == 0){
 			PrimaryLayout();
 			mainFrame.setSize(WIDTH, HEIGHT);
@@ -68,11 +74,33 @@ public class LayoutControl {
 		else if(layout == 3){
 			WriteLayout();
 			mainFrame.setSize(800, 600);
+		}else if(layout == 4){
+			HomeLayout();
+			mainFrame.setSize(800, 600);
 		}
 		
 		//mainFrame.pack();
 		mainFrame.repaint();
 		mainFrame.validate();
+	}	
+	
+	public int getLayoutByName(String name_layout){
+		
+		LAYOUT lay= LAYOUT.valueOf(name_layout);
+		switch (lay){
+			case PRIMARY:
+				return 0;
+			case ENCODE:
+				return 1;
+			case SETTINGS:
+				return 2;
+			case WRITE:
+				return 3;
+			case HOME:
+				return 4;
+		}
+		
+		return -1;
 	}
 
 	public void PrimaryLayout(){
@@ -92,6 +120,36 @@ public class LayoutControl {
 		}
 		else{
 			e_layout.addComponentsToPane();
+		}
+	}
+
+	public void SettingsLayout(){
+		if(s_layout == null){
+			s_layout= new SettingsLayout(this, mainFrame.getContentPane());
+			s_layout.addComponentsToPane();
+		}
+		else{
+			s_layout.addComponentsToPane();
+		}
+	}
+	
+	public void WriteLayout(){
+		if(w_layout == null){
+			w_layout= new WriteLayout(this, mainFrame.getContentPane());
+			w_layout.addComponentsToPane();
+		}
+		else{
+			w_layout.addComponentsToPane();
+		}
+	}
+	
+	public void HomeLayout(){
+		if(h_layout == null){
+			h_layout= new HomeLayout(this, mainFrame.getContentPane());
+			h_layout.addComponentsToPane();
+		}
+		else{
+			w_layout.addComponentsToPane();
 		}
 	}
 	
@@ -120,26 +178,6 @@ public class LayoutControl {
 	 */
 	public void setChoosed_images(ArrayList<String> choosed_images) {
 		this.choosed_images = choosed_images;
-	}
-
-	public void SettingsLayout(){
-		if(s_layout == null){
-			s_layout= new SettingsLayout(this, mainFrame.getContentPane());
-			s_layout.addComponentsToPane();
-		}
-		else{
-			s_layout.addComponentsToPane();
-		}
-	}
-	
-	public void WriteLayout(){
-		if(w_layout == null){
-			w_layout= new WriteLayout(this, mainFrame.getContentPane());
-			w_layout.addComponentsToPane();
-		}
-		else{
-			w_layout.addComponentsToPane();
-		}
 	}
 	//============================================================================
 	/**
@@ -224,7 +262,7 @@ public class LayoutControl {
 	 * Disegna l'immagine scelta nella finestra dell'applicazione
 	 * @param path String il percorso dell'imagine da disegnare
 	 */
-	public void drawImage(File f, int backTo){
+	public void drawImage(File f, String backTo){
 
 		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane(), backTo);
 		try {
@@ -290,8 +328,7 @@ public class LayoutControl {
 		
 	}
 	
-	public void draw(String path, int backTo){
-		
+	public void draw(String path, String backTo){
 		File f = new File(path);
 		if(isImage(f)){
 			//addImageChoice(path);
@@ -301,5 +338,5 @@ public class LayoutControl {
 			//addFileChoice(path);
 			drawFile(f);
 		}
-	}	
+	}
 }
