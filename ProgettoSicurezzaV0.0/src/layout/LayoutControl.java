@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+
+import usersManagement.UserManager;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -17,8 +19,8 @@ import javax.swing.JFrame;
 
 public class LayoutControl {
 	
-	private final static int WIDTH= 400;
-	private final static int HEIGHT= 400;
+	private final static int WIDTH= 600;
+	private final static int HEIGHT= 600;
 	
 	private JFrame mainFrame;
 	private SettingsLayout s_layout;
@@ -26,14 +28,17 @@ public class LayoutControl {
 	private EncodeLayout e_layout;
 	private WriteLayout w_layout;
 	private HomeLayout h_layout;
+	private RegistrationLayout r_layout;
 	private ArrayList<String> choosed_images;
 
 	private ArrayList<String> choosed_files;
 	private String[] image_types= {"gif", "jpg", "png", "bmp"};
 	private String[] text_types= {"txt"};
 	
+	private UserManager user_manager;
+	
 	private enum LAYOUT{
-		PRIMARY, ENCODE, SETTINGS, HOME, WRITE
+		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION
 	}
 	
 	public LayoutControl(){
@@ -46,6 +51,8 @@ public class LayoutControl {
 		mainFrame.setVisible(true);
 		mainFrame.setLocation(150, 100);
 		setLayout("HOME");
+		
+		this.setUser_manager(new UserManager());
 	}
 	
 	public void createLayout(){
@@ -55,7 +62,7 @@ public class LayoutControl {
 	//=================GESTIONE LAYOUT=========================================
 	/**
 	 * Imposta il layout da visualizzare
-	 * @param layout int 0=Primary, 1=Encode, 2=Settings
+	 * @param layout int 0=Primary, 1=Encode, 2=Settings, 
 	 */
 	public void setLayout(String name_layout){
 		int layout= getLayoutByName(name_layout);
@@ -74,9 +81,14 @@ public class LayoutControl {
 		else if(layout == 3){
 			WriteLayout();
 			mainFrame.setSize(800, 600);
-		}else if(layout == 4){
+		}
+		else if(layout == 4){
 			HomeLayout();
-			mainFrame.setSize(800, 600);
+			mainFrame.setSize(WIDTH, HEIGHT);
+		}
+		else if(layout == 5){
+			RegistrationLayout();
+			mainFrame.setSize(600, HEIGHT);
 		}
 		
 		//mainFrame.pack();
@@ -98,6 +110,8 @@ public class LayoutControl {
 				return 3;
 			case HOME:
 				return 4;
+			case REGISTRATION:
+				return 5;
 		}
 		
 		return -1;
@@ -149,7 +163,17 @@ public class LayoutControl {
 			h_layout.addComponentsToPane();
 		}
 		else{
-			w_layout.addComponentsToPane();
+			h_layout.addComponentsToPane();
+		}
+	}
+	
+	public void RegistrationLayout(){
+		if(r_layout == null){
+			r_layout= new RegistrationLayout(this, mainFrame.getContentPane());
+			r_layout.addComponentsToPane();
+		}
+		else{
+			r_layout.addComponentsToPane();
 		}
 	}
 	
@@ -338,5 +362,13 @@ public class LayoutControl {
 			//addFileChoice(path);
 			drawFile(f);
 		}
+	}
+
+	public UserManager getUser_manager() {
+		return user_manager;
+	}
+
+	public void setUser_manager(UserManager user_manager) {
+		this.user_manager = user_manager;
 	}
 }
