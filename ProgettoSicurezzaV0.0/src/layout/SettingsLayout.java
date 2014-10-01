@@ -3,6 +3,7 @@
  */
 package layout;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -57,27 +58,33 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor= GridBagConstraints.CENTER;
-		
-		//0.0
+		int posx=0, posy=1;
+		//0.1
 		button= new JButton("APRI");
-		c.gridx= 0;c.gridy= 0;c.weightx = 0.5;c.ipady=0;c.ipadx=0;
-		c.insets= new Insets(10, 0, 0, 10);
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
+		c.insets= new Insets(0, 10, 10, 10);
 		button.addActionListener(new OpenAction(area1));
 		pane.add(button, c);
 		//1.0
+		posx++;posy--;
 		label= new JLabel("Percorso della cartella di default");
-		c.gridx= 1;c.gridy= 0;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
+		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
 		pane.add(label, c);
 		//1.1
+		posy++;
 		area1.setEditable(true);area1.setAutoscrolls(true);area1.setColumns(15);
-		c.gridx= 1;c.gridy= 1;c.weightx = 0.5;c.ipadx= area1.getColumns();c.ipady= area1.getHeight();
-		c.insets= new Insets(0, 10, 10, 10);
+		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.ipadx= area1.getColumns();//c.ipady= area1.getHeight();
+		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
 		pane.add(area1, c);
 		
 		//0.2
 		button= new JButton("APRI");
-		c.gridx= 0;c.gridy= 2;c.weightx = 0.5;c.ipady=0;c.ipadx=0;
-		c.insets= new Insets(10, 0, 0, 10);
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx= 0;c.gridy= 2;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
+		c.insets= new Insets(0, 10, 10, 10);
 		button.addActionListener(new OpenAction(area2));
 		pane.add(button, c);
 		//1.2
@@ -86,14 +93,16 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		pane.add(label, c);
 		//1.3
 		area2.setEditable(true);area2.setAutoscrolls(true);area2.setColumns(15);
-		c.gridx= 1;c.gridy= 3;c.weightx = 0.5;c.ipadx= area2.getColumns();c.ipady= area2.getHeight();
-		c.insets= new Insets(0, 10, 10, 10);
+		c.gridx= 1;c.gridy= 3;c.weightx = 0.5;c.ipadx= area2.getColumns();//c.ipady= area2.getHeight();
+		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
 		pane.add(area2, c);
 		
 		//0.4
 		button= new JButton("APRI");
-		c.gridx= 0;c.gridy= 4;c.weightx = 0.5;c.ipady=0;c.ipadx=0;
-		c.insets= new Insets(10, 0, 0, 10);
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx= 0;c.gridy= 4;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
+		c.insets= new Insets(10, 10, 0, 10);
 		button.addActionListener(new OpenAction(area3));
 		pane.add(button, c);
 		//1.4
@@ -102,12 +111,14 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		pane.add(label, c);
 		//1.5
 		area3.setEditable(true);area3.setAutoscrolls(true);area3.setColumns(15);
-		c.gridx= 1;c.gridy= 5;c.weightx = 0.5;c.ipadx= area3.getColumns();c.ipady= area3.getHeight();
-		c.insets= new Insets(0, 10, 10, 10);
+		c.gridx= 1;c.gridy= 5;c.weightx = 0.5;c.ipadx= area3.getColumns();//c.ipady= area3.getHeight();
+		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
 		pane.add(area3, c);
 		
 		//menu sotto parte da 0.6
 		button= new JButton("BACK");
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
 		c.gridx= 0;c.gridy= 6;c.weightx = 0.5;c.insets= new Insets(10, 10, 10, 10);
 		c.ipady=30;c.ipadx=0;
 		button.addActionListener(new ActionListener() {

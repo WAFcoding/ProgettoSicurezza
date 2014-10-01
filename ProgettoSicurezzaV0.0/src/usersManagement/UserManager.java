@@ -38,7 +38,7 @@ public class UserManager {
 		String mail= registration_value[4];
 		String confirm_mail= registration_value[5];
 		
-		
+		System.out.println("Stai registrando l'utente: " + firstname + ", "+ secondname);
 		
 	}
 	/**
@@ -58,6 +58,43 @@ public class UserManager {
 	 * @return
 	 */
 	public boolean checkPassword(String password){
+		
+		if(password.length() < 8){
+			return false;
+		}
+		
+		if(!containsNumbers(password)){
+			return false;
+		}
+		
+		if(!containsUppercase(password)){
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean containsNumbers(String password){
+		
+		String[] numbers= {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+		
+		for(String n : numbers){
+			if(password.contains(n)){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean containsUppercase(String password){
+		
+		char[] c_pwd= password.toCharArray();
+		for(char c : c_pwd){
+			if(Character.isUpperCase(c)){
+				return true;
+			}
+		}
 		
 		return false;
 	}

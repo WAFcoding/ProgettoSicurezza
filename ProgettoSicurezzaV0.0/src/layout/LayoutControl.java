@@ -29,6 +29,7 @@ public class LayoutControl {
 	private WriteLayout w_layout;
 	private HomeLayout h_layout;
 	private RegistrationLayout r_layout;
+	private ErrorLayout err_layout;
 	private ArrayList<String> choosed_images;
 
 	private ArrayList<String> choosed_files;
@@ -38,7 +39,7 @@ public class LayoutControl {
 	private UserManager user_manager;
 	
 	private enum LAYOUT{
-		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION
+		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR
 	}
 	
 	public LayoutControl(){
@@ -66,6 +67,7 @@ public class LayoutControl {
 	 */
 	public void setLayout(String name_layout){
 		int layout= getLayoutByName(name_layout);
+		
 		if(layout == 0){
 			PrimaryLayout();
 			mainFrame.setSize(WIDTH, HEIGHT);
@@ -90,6 +92,10 @@ public class LayoutControl {
 			RegistrationLayout();
 			mainFrame.setSize(600, HEIGHT);
 		}
+		else if(layout == 6){
+
+			mainFrame.setSize(600, HEIGHT);
+		}
 		
 		//mainFrame.pack();
 		mainFrame.repaint();
@@ -112,9 +118,26 @@ public class LayoutControl {
 				return 4;
 			case REGISTRATION:
 				return 5;
+			case ERROR:
+				return 6;
 		}
 		
 		return -1;
+	}
+	
+	public void setErrorLayout(String error_message, String backTo){
+
+		if(err_layout == null){
+			err_layout= new ErrorLayout(this, mainFrame.getContentPane(), error_message, backTo);
+			err_layout.addComponentsToPane();
+		}
+		else{
+			err_layout.setError_message(error_message);
+			err_layout.setBackTo(backTo);
+			err_layout.addComponentsToPane();
+		}
+		
+		setLayout("ERROR");
 	}
 
 	public void PrimaryLayout(){

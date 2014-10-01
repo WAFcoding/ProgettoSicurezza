@@ -225,6 +225,7 @@ public class HomeLayout implements GeneralLayout{
 			c.gridx= posx;c.gridy=posy;c.gridwidth=4;
 			c.insets= new Insets(10, 5, 1, 5);
 			JLabel label= new JLabel("Se e' il primo avvio registrati");
+			label.setForeground(Color.BLUE);
 			this.add(label, c);
 			
 			//0.6 - REGISTRATION

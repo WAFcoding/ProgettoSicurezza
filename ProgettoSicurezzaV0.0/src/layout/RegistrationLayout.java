@@ -253,31 +253,41 @@ public class RegistrationLayout implements GeneralLayout{
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					//TODO aggiungere la chiamata a UserManager
-					String[] registration_data= {firstname.getText(), secondname.getText(), 
-												new String(pwd.getPassword()), new String(confirm_pwd.getPassword()), 
-												mail.getText(), confirm_mail.getText()};
-					for(String s : registration_data){
-						System.out.print(s + " ");
-					}
+					
+
+					String s_firstname= firstname.getText();
+					String s_secondname= secondname.getText();
+					String s_password= new String(pwd.getPassword());
+					String s_confirm_password= new String(confirm_pwd.getPassword());
+					String s_mail= mail.getText();
+					String s_confirm_mail= confirm_mail.getText();
+					
+					String[] registration_data= {s_firstname, s_secondname, s_password, s_confirm_password,
+												 s_mail, s_confirm_mail};
+					for(String s : registration_data){ System.out.print(s + " "); }
 					System.out.print("\n");
 					
 					UserManager user_manager= control.getUser_manager();
+					
 					//controllo che la password e la confirm password sia identici
-					if(user_manager.confirmPassword(null, null)){
-						
+					if(!user_manager.confirmPassword(s_password, s_confirm_password)){
+						control.setErrorLayout("confrim password doesn't match password", "REGISTRATION");
 					}
 					//controllo che la password rispecchi la struttura assegnata
-					else if(user_manager.checkPassword(null)){
-						
+					else if(!user_manager.checkPassword(s_password)){
+						control.setErrorLayout("password doesn't respect the correct structure \n"
+								+ "it has to contains at least an uppercase char, a number \n"
+								+ "and it has to be at least long 8 chars", "REGISTRATION");
 					}
 					//controllo che la mail e confirm mail sia identici
-					else if(user_manager.confirmMail(null, null)){
-						
+					else if(!user_manager.confirmMail(s_mail, s_confirm_mail)){
+						control.setErrorLayout("confrim mail doesn't match mail", "REGISTRATION");
 					}
-					
-					user_manager.registration(registration_data);
-					getControl().setLayout("PRIMARY");//da modificare la schermata successiva alla registrazione
+					//se supera tutti i controlli procedo con la registrazione
+					else{
+						user_manager.registration(registration_data);
+						getControl().setLayout("PRIMARY");//da modificare la schermata successiva alla registrazione
+					}
 				}
 			});
 			button.setBackground(Color.BLUE);
