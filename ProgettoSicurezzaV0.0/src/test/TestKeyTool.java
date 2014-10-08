@@ -28,7 +28,7 @@ public class TestKeyTool {
 		Certificate certgen = CryptoUtility.createX509Certificate(pair, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		System.out.println(certgen);
 		
-		KeyTool.addCertificate(ks, certgen, "giovanni_key", "pasqualino");
+		KeyTool.addCertificate(ks, certgen, "giovanni_key");
 		KeyTool.storeKeystore(ks, name , "pasqualino");
 	}
 

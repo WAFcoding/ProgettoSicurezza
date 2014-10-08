@@ -69,7 +69,7 @@ public class KeyTool {
 		return pkEntry.getPrivateKey();
 	}
 	
-	public static void addCertificate(KeyStore ks, Certificate cert, String alias, String password) throws KeyStoreException {
+	public static void addCertificate(KeyStore ks, Certificate cert, String alias) throws KeyStoreException {
 		if(ks==null || cert==null || alias == null || alias.isEmpty()) 
 			return;
 		ks.setCertificateEntry(alias, cert);
