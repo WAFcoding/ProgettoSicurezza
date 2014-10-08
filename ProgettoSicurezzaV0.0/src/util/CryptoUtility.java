@@ -504,6 +504,10 @@ public class CryptoUtility {
 	 *            Il nome del paese per esteso.
 	 * @param email
 	 *            L'email.
+	 * @param notBefore
+	 * 			  La data di scadenza del certificato.
+	 * @param notAfter
+	 * 			  La data di inizio di validità del certificato.
 	 * 
 	 * @return Un certificato X.509 valido.
 	 * 
@@ -516,7 +520,7 @@ public class CryptoUtility {
 	 */
 	public static Certificate createX509Certificate(KeyPair kp, String name,
 			String surname, String country_code, String organization,
-			String locality, String state, String email)
+			String locality, String state, String email, Date notBefore, Date notAfter)
 			throws InvalidKeyException, SecurityException, SignatureException,
 			CertificateException, NoSuchAlgorithmException,
 			NoSuchProviderException {
@@ -573,8 +577,8 @@ public class CryptoUtility {
 
 		certGen.setSerialNumber(BigInteger.valueOf(1));
 		certGen.setIssuerDN(new X509Principal(order, attrs));
-		certGen.setNotBefore(new Date(System.currentTimeMillis() - 50000));
-		certGen.setNotAfter(new Date(System.currentTimeMillis() + 50000));
+		certGen.setNotBefore(notBefore);
+		certGen.setNotAfter(notAfter);
 		certGen.setSubjectDN(new X509Principal(order, attrs));
 		certGen.setPublicKey(pubKey);
 		certGen.setSignatureAlgorithm("SHA1withRSA");

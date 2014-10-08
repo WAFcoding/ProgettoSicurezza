@@ -4,7 +4,6 @@ import java.security.KeyPair;
 
 import util.CryptoUtility;
 import util.CryptoUtility.ASYMMCRYPTO_ALGO;
-import util.KeyStoreFacility;
 
 
 public class TestCrypto {
@@ -52,17 +51,6 @@ public class TestCrypto {
 		enc = CryptoUtility.asymm_encrypt(ASYMMCRYPTO_ALGO.RSA, testData.getBytes(), keyps.getPublic());
 		System.out.println("cifrato:" + new String(CryptoUtility.toBase64(enc)));
 		System.out.println(new String(CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, enc, keyps.getPrivate())));
-		
-		System.out.println("\nTEST-KEYSTORE");
-		KeyStoreFacility keystore = KeyStoreFacility.getInstance();
-		keystore.saveKey("giovanni", key);
-		System.out.println(keystore.getKey("giovanni"));
-		keystore.saveChanges();
-		
-		keystore.savePrivateKey(keyps.getPrivate(), CryptoUtility.createX509Certificate(keyps, "Giovanni", "Rossi", "IT", "VeRo Co.", "Rome", "Italy", "gio@mail.com"));
-		System.out.println(CryptoUtility.toBase64(keystore.getPrivateKey().getEncoded()));
-		System.out.println(keystore.getKey("giovanni"));
-		keystore.saveChanges();
 		
 	}
 
