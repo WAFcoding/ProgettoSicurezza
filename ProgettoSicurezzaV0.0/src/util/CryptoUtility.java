@@ -31,8 +31,15 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x500.style.BCStrictStyle;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
@@ -536,38 +543,38 @@ public class CryptoUtility {
 		Vector<ASN1ObjectIdentifier> order = new Vector<ASN1ObjectIdentifier>();
 
 		if (name != null && !name.isEmpty()) {
-			attrs.put(X509Principal.NAME, name);
-			order.addElement(X509Principal.NAME);
+			attrs.put(BCStyle.NAME, name);
+			order.addElement(BCStyle.NAME);
 		}
 
 		if (surname != null && !surname.isEmpty()) {
-			attrs.put(X509Principal.SURNAME, surname);
-			order.addElement(X509Principal.SURNAME);
+			attrs.put(BCStyle.SURNAME, surname);
+			order.addElement(BCStyle.SURNAME);
 		}
 
 		if (country_code != null && !country_code.isEmpty()) {
-			attrs.put(X509Principal.C, country_code);
-			order.addElement(X509Principal.C);
+			attrs.put(BCStyle.C, country_code);
+			order.addElement(BCStyle.C);
 		}
 
 		if (organization != null && !organization.isEmpty()) {
-			attrs.put(X509Principal.O, organization);
-			order.addElement(X509Principal.O);
+			attrs.put(BCStyle.O, organization);
+			order.addElement(BCStyle.O);
 		}
 
 		if (locality != null && !locality.isEmpty()) {
-			attrs.put(X509Principal.L, locality);
-			order.addElement(X509Principal.L);
+			attrs.put(BCStyle.L, locality);
+			order.addElement(BCStyle.L);
 		}
 
 		if (state != null && !state.isEmpty()) {
-			attrs.put(X509Principal.ST, state);
-			order.addElement(X509Principal.ST);
+			attrs.put(BCStyle.ST, state);
+			order.addElement(BCStyle.ST);
 		}
 
 		if (email != null && !email.isEmpty()) {
-			attrs.put(X509Principal.E, email);
-			order.addElement(X509Principal.E);
+			attrs.put(BCStyle.E, email);
+			order.addElement(BCStyle.E);
 		}
 
 		//
@@ -583,7 +590,13 @@ public class CryptoUtility {
 		certGen.setPublicKey(pubKey);
 		certGen.setSignatureAlgorithm("SHA1withRSA");
 
-		X509Certificate cert = certGen.generateX509Certificate(privKey);
+		/*
+		X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(new X500Name(issuer), new BigInteger("1"), dateOfIssuing, dateOfExpiry, new X500Name(subject), SubjectPublicKeyInfo.getInstance(publicKey.getEncoded()));
+		byte[] certBytes = certBuilder.build(new BcRSAContentSignerBuilder(AlgorithmIdentifier, digAlgId).build(privKey)).getEncoded();
+		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+		X509Certificate cert = (X509Certificate)certificateFactory.generateCertificate(new ByteArrayInputStream(certBytes));
+		*/
+		X509Certificate cert = certGen.generate(privKey);
 
 		cert.checkValidity(new Date());
 

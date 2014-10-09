@@ -231,5 +231,16 @@ public class KeyTool {
 			return;
 		KeyTool.addPrivateKey(ks, pk, alias, password.toCharArray());
 	}
+	
+	public static CertData getCertificateData(Certificate cert) {
+		CertData certInfo = new CertData();
+		if(cert==null) 
+			return certInfo;
+		
+	
+		
+		return certInfo;
+
+	}
 
 }
