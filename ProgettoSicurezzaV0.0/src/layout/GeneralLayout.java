@@ -3,7 +3,6 @@
  */
 package layout;
 
-import java.awt.Container;
 
 /**
  * Interfaccia di un generico layout
