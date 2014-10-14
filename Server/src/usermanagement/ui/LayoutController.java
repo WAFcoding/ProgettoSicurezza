@@ -2,9 +2,9 @@ package usermanagement.ui;
 
 import javax.swing.JFrame;
 /**
- * Questa classe e' il controllore del layout dell'applicazione
- * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
- *
+ * Questa classe e' il controllore del layout del server
+ * 
+ * @author Giovanni Rossi
  */
 
 public class LayoutController {
