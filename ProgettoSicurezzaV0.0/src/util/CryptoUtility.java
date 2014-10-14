@@ -3,6 +3,7 @@ package util;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -20,6 +21,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -53,6 +55,7 @@ import sun.misc.BASE64Encoder;
  * @author Giovanni Rossi
  * 
  */
+@SuppressWarnings("deprecation")
 public class CryptoUtility {
 
 	/**
@@ -64,7 +67,7 @@ public class CryptoUtility {
 	 * Permette di stabilire il tipo di algoritmo di cifratura da usare.
 	 */
 	public enum CRYPTO_ALGO {
-		AES, DES
+		AES, DES, IDEA, TWOFISH_256, RIJNDAEL, RC6
 	};
 
 	/**
@@ -77,6 +80,10 @@ public class CryptoUtility {
 	public enum ASYMMCRYPTO_ALGO {
 		RSA
 	};
+	
+	public enum CERT_SIGALGO {
+		SHA1withRSA, SHA256withRSA, SHA1withDSA, SHA1withECDSA, SHA256withECDSA
+	}
 
 	/**
 	 * Converte i dati in input in Base64.
@@ -127,11 +134,20 @@ public class CryptoUtility {
 	 * @return La stringa corrispondente al tipo di algoritmo da usare.
 	 */
 	private static String getCipher(CRYPTO_ALGO algo) {
+		//IDEA, TWOFISH_256, RIJNDAEL, RC5_64, RC6 
 		switch (algo) {
 		case AES:
 			return "AES/ECB/PKCS5Padding";
 		case DES:
 			return "DES/ECB/PKCS5Padding";
+		case IDEA:
+			return "IDEA";
+		case TWOFISH_256:
+			return "TWOFISH";
+		case RIJNDAEL:
+			return "RIJNDAEL";
+		case RC6:
+			return "RC6";
 		default:
 			return "AES/ECB/PKCS5Padding";
 		}
@@ -176,6 +192,31 @@ public class CryptoUtility {
 			return "RSA";
 		}
 	}
+	
+	/**
+	 * Restituisce la stringa con il tipo di algoritmo di firma da usare per un certificato.
+	 * 
+	 * @param algo
+	 *            Il tipo di algoritmo.
+	 * 
+	 * @return La stringa corrispondente al tipo di algoritmo da usare.
+	 */
+	private static String getCertSigAlgo(CERT_SIGALGO algo) {
+		switch (algo) {
+		case SHA256withRSA:
+			return "SHA256WithRSA";
+		case SHA1withRSA:
+			return "SHA1WITHRSA";
+		case SHA1withDSA:
+			return "SHA1WITHDSA";
+		case SHA256withECDSA:
+			return "SHA256WITHECDSA";
+		case SHA1withECDSA:
+			return "SHA1withECDSA";
+		default:
+			return "SHA1WITHRSA";
+		}
+	}
 
 	/**
 	 * Pre processa la chiave in input per adattarla all'algoritmo scelto.
@@ -193,6 +234,15 @@ public class CryptoUtility {
 			return Arrays.copyOf(key, 32);
 		case DES:
 			return Arrays.copyOf(key, 8);
+		case IDEA:
+			return Arrays.copyOf(key, 16);
+		case TWOFISH_256:
+			return Arrays.copyOf(key, 32);
+		case RIJNDAEL:
+			return Arrays.copyOf(key, 32);
+		case RC6:
+			return Arrays.copyOf(key, 32);
+			
 		default:
 			return key;
 		}
@@ -431,11 +481,30 @@ public class CryptoUtility {
 			NoSuchProviderException {
 		Security.addProvider(new BouncyCastleProvider());
 
-		KeyPairGenerator g = KeyPairGenerator
-				.getInstance("RSA", BouncyProvider);
+		KeyPairGenerator g = KeyPairGenerator.getInstance("RSA", BouncyProvider);
 
 		g.initialize(1024, new SecureRandom());
 
+		return g.generateKeyPair();
+	}
+	
+	/**
+	 * Genera una coppia di chiavi asimmetriche ECDSA.
+	 * 
+	 * @return La coppia di chiavi.
+	 * 
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws InvalidAlgorithmParameterException 
+	 */
+	public static KeyPair getKeyPairECDSA() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+		Security.addProvider(new BouncyCastleProvider());
+
+		ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("prime192v1");
+		KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", BouncyProvider);
+
+		g.initialize(ecGenSpec, new SecureRandom());
+		
 		return g.generateKeyPair();
 	}
 
@@ -526,7 +595,7 @@ public class CryptoUtility {
 	 * @throws NoSuchProviderException
 	 * @throws OperatorCreationException
 	 */
-	public static Certificate createX509Certificate2 (KeyPair kp, String name, String surname, String country_code, String organization,
+	public static Certificate createX509Certificate2 (CERT_SIGALGO algo, KeyPair kp, String name, String surname, String country_code, String organization,
 			String locality, String state, String email, Date notBefore, Date notAfter) throws InvalidKeyException, SecurityException, 
 			SignatureException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, OperatorCreationException {
 		
@@ -564,7 +633,7 @@ public class CryptoUtility {
 	   
 	    BigInteger serial=BigInteger.valueOf(System.currentTimeMillis());
 	    X509v3CertificateBuilder certGen=new JcaX509v3CertificateBuilder(builder.build(),serial,notBefore,notAfter,builder.build(),kp.getPublic());
-	    ContentSigner sigGen=new JcaContentSignerBuilder("SHA256WithRSAEncryption").setProvider(BouncyProvider).build(kp.getPrivate());
+	    ContentSigner sigGen=new JcaContentSignerBuilder(CryptoUtility.getCertSigAlgo(algo)).setProvider(BouncyProvider).build(kp.getPrivate());
 	    X509Certificate cert=new JcaX509CertificateConverter().setProvider(BouncyProvider).getCertificate(certGen.build(sigGen));
 	    cert.checkValidity(new Date());
 	    cert.verify(cert.getPublicKey());
@@ -578,7 +647,7 @@ public class CryptoUtility {
 	 * @see {@link CryptoUtility#createX509Certificate2(KeyPair, String, String, String, String, String, String, String, Date, Date)}
 	 * 
 	 * @param kp
-	 *            La coppia di chiavi.
+	 *            La coppia di chiavi RSA.
 	 * @param name
 	 *            Il nome dell'utente.
 	 * @param surname
@@ -696,7 +765,7 @@ public class CryptoUtility {
 	 * @throws NoSuchProviderException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static KeyPair genDSAKeyPair() throws NoSuchAlgorithmException,
+	public static KeyPair genKeyPairDSA() throws NoSuchAlgorithmException,
 			NoSuchProviderException {
 		Security.addProvider(new BouncyCastleProvider());
 

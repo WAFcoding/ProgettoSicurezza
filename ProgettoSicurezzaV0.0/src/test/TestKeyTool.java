@@ -7,6 +7,7 @@ import java.security.cert.Certificate;
 import java.util.Date;
 
 import util.CryptoUtility;
+import util.CryptoUtility.CERT_SIGALGO;
 import util.KeyTool;
 
 public class TestKeyTool {
@@ -25,11 +26,17 @@ public class TestKeyTool {
 		na.setTime(na.getTime() - 1000*60*60*24*30);//-30 giorni
 		System.out.println(nb.toString() + na.toString());
 		KeyPair pair = CryptoUtility.genKeyPairRSA();
+		KeyPair pairdsa = CryptoUtility.genKeyPairDSA();
+		KeyPair pairecdsa = CryptoUtility.getKeyPairECDSA();
 		Certificate certgen = CryptoUtility.createX509Certificate(pair, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
-		System.out.println(certgen);
+		Certificate certgen2 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withDSA, pairdsa, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen3 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withECDSA, pairecdsa, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		
-		KeyTool.addCertificate(ks, certgen, "giovanni_key");
-		KeyTool.storeKeystore(ks, name , "pasqualino");
+		System.out.println(certgen);
+		System.out.println(certgen2);
+		System.out.println(certgen3);
+		//KeyTool.addCertificate(ks, certgen, "giovanni_key");
+		//KeyTool.storeKeystore(ks, name , "pasqualino");
 	}
 
 }
