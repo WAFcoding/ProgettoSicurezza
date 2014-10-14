@@ -237,10 +237,10 @@ public class KeyTool {
 		if(cert==null) 
 			return certInfo;
 		
-	
+		
+		
 		
 		return certInfo;
-
 	}
 
 }
