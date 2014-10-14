@@ -12,6 +12,7 @@ import util.KeyTool;
 
 public class TestKeyTool {
 
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
 		String name = "/home/giovanni/Dropbox/SII/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
 		KeyStore ks = KeyTool.loadKeystore(/*"/home/giovanni/Scrivania/test_ks.jks"*/name, "pasqualino");
@@ -31,12 +32,19 @@ public class TestKeyTool {
 		Certificate certgen = CryptoUtility.createX509Certificate(pair, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		Certificate certgen2 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withDSA, pairdsa, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		Certificate certgen3 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withECDSA, pairecdsa, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen4 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withECDSA, pairecdsa, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen5 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withRSA, pair, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen6 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withRSA, pair, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		
 		System.out.println(certgen);
 		System.out.println(certgen2);
 		System.out.println(certgen3);
-		//KeyTool.addCertificate(ks, certgen, "giovanni_key");
-		//KeyTool.storeKeystore(ks, name , "pasqualino");
+		System.out.println(certgen4);
+		System.out.println(certgen5);
+		System.out.println(certgen6);
+		
+		KeyTool.addCertificate(ks, certgen, "giovanni_key");
+		KeyTool.storeKeystore(ks, name , "pasqualino");
 	}
 
 }
