@@ -22,7 +22,7 @@ public class LayoutController {
 	
 	public LayoutController(){
 		mainFrame= new JFrame("Pannello Admin Server");
-		mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		mainFrame.setDefaultCloseOperation(/*FIXME:JFrame.DISPOSE_ON_CLOSE*/JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(WIDTH, HEIGHT);
 		mainFrame.setVisible(true);
 		mainFrame.setLocation(150, 100);
