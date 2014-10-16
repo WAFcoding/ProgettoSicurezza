@@ -4,6 +4,11 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -158,6 +163,12 @@ public class AdminLayout implements GeneralLayout {
 		pane.add(organizationText, c);
 		
 		//Date TODO
+		JLabel notBefore = new JLabel(new Date().toString());
+		notBefore.addMouseListener(new MouseClickListener());
+		c.gridx= 0;c.gridy= 7;c.weightx = 10;c.ipady=0;c.ipadx=0;
+		c.gridwidth = 3;
+		c.insets= new Insets(10, 10, 0, 10);
+		pane.add(notBefore,c);
 		
 		//add & send 8.0 - 8.1
 		addUserButton = new JButton("Add User");
@@ -192,19 +203,54 @@ public class AdminLayout implements GeneralLayout {
 	private class JTextFieldLimit extends PlainDocument {
 		private static final long serialVersionUID = 4592979636590560189L;
 		private int limit;
-		  JTextFieldLimit(int limit) {
-		    super();
-		    this.limit = limit;
-		  }
-
-		  public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
-		    if (str == null)
-		      return;
-
-		    if ((getLength() + str.length()) <= limit) {
-		      super.insertString(offset, str.toUpperCase(), attr);
-		    }
-		  }
+		JTextFieldLimit(int limit) {
+			super();
+			this.limit = limit;
 		}
+
+		public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
+			if (str == null)
+				return;
+
+			if ((getLength() + str.length()) <= limit) {
+				super.insertString(offset, str.toUpperCase(), attr);
+			}
+		}
+	}
+	
+	private class MouseClickListener implements MouseListener {
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
+			DatePicker dpicker = new DatePicker(control.mainFrame, false, Calendar.getInstance());
+			
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
 
 }
