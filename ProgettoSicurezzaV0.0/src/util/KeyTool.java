@@ -11,6 +11,7 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * Questa classe definisce una serie di funzioni di utilità 
@@ -232,14 +233,15 @@ public class KeyTool {
 		KeyTool.addPrivateKey(ks, pk, alias, password.toCharArray());
 	}
 	
-	public static CertData getCertificateData(Certificate cert) {
-		CertData certInfo = new CertData();
-		if(cert==null) 
-			return certInfo;
-		
-		
-		
-		
+	public static CertData getCertificateData(X509Certificate cert) {
+		CertData certInfo = null;
+		try {
+			certInfo = new CertData(cert);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			return null;
+		}
+
 		return certInfo;
 	}
 
