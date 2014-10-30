@@ -3,6 +3,7 @@ package util;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -20,6 +21,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -31,8 +33,16 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 
@@ -57,7 +67,7 @@ public class CryptoUtility {
 	 * Permette di stabilire il tipo di algoritmo di cifratura da usare.
 	 */
 	public enum CRYPTO_ALGO {
-		AES, DES
+		AES, DES, IDEA, TWOFISH_256, RIJNDAEL, RC6
 	};
 
 	/**
@@ -70,6 +80,10 @@ public class CryptoUtility {
 	public enum ASYMMCRYPTO_ALGO {
 		RSA
 	};
+	
+	public enum CERT_SIGALGO {
+		SHA1withRSA, SHA256withRSA, SHA1withDSA, SHA1withECDSA, SHA256withECDSA
+	}
 
 	/**
 	 * Converte i dati in input in Base64.
@@ -120,11 +134,20 @@ public class CryptoUtility {
 	 * @return La stringa corrispondente al tipo di algoritmo da usare.
 	 */
 	private static String getCipher(CRYPTO_ALGO algo) {
+		//IDEA, TWOFISH_256, RIJNDAEL, RC5_64, RC6 
 		switch (algo) {
 		case AES:
 			return "AES/ECB/PKCS5Padding";
 		case DES:
 			return "DES/ECB/PKCS5Padding";
+		case IDEA:
+			return "IDEA";
+		case TWOFISH_256:
+			return "TWOFISH";
+		case RIJNDAEL:
+			return "RIJNDAEL";
+		case RC6:
+			return "RC6";
 		default:
 			return "AES/ECB/PKCS5Padding";
 		}
@@ -169,6 +192,31 @@ public class CryptoUtility {
 			return "RSA";
 		}
 	}
+	
+	/**
+	 * Restituisce la stringa con il tipo di algoritmo di firma da usare per un certificato.
+	 * 
+	 * @param algo
+	 *            Il tipo di algoritmo.
+	 * 
+	 * @return La stringa corrispondente al tipo di algoritmo da usare.
+	 */
+	private static String getCertSigAlgo(CERT_SIGALGO algo) {
+		switch (algo) {
+		case SHA256withRSA:
+			return "SHA256WithRSA";
+		case SHA1withRSA:
+			return "SHA1WITHRSA";
+		case SHA1withDSA:
+			return "SHA1WITHDSA";
+		case SHA256withECDSA:
+			return "SHA256WITHECDSA";
+		case SHA1withECDSA:
+			return "SHA1withECDSA";
+		default:
+			return "SHA1WITHRSA";
+		}
+	}
 
 	/**
 	 * Pre processa la chiave in input per adattarla all'algoritmo scelto.
@@ -186,6 +234,15 @@ public class CryptoUtility {
 			return Arrays.copyOf(key, 32);
 		case DES:
 			return Arrays.copyOf(key, 8);
+		case IDEA:
+			return Arrays.copyOf(key, 16);
+		case TWOFISH_256:
+			return Arrays.copyOf(key, 32);
+		case RIJNDAEL:
+			return Arrays.copyOf(key, 32);
+		case RC6:
+			return Arrays.copyOf(key, 32);
+			
 		default:
 			return key;
 		}
@@ -424,11 +481,30 @@ public class CryptoUtility {
 			NoSuchProviderException {
 		Security.addProvider(new BouncyCastleProvider());
 
-		KeyPairGenerator g = KeyPairGenerator
-				.getInstance("RSA", BouncyProvider);
+		KeyPairGenerator g = KeyPairGenerator.getInstance("RSA", BouncyProvider);
 
 		g.initialize(1024, new SecureRandom());
 
+		return g.generateKeyPair();
+	}
+	
+	/**
+	 * Genera una coppia di chiavi asimmetriche ECDSA.
+	 * 
+	 * @return La coppia di chiavi.
+	 * 
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws InvalidAlgorithmParameterException 
+	 */
+	public static KeyPair getKeyPairECDSA() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+		Security.addProvider(new BouncyCastleProvider());
+
+		ECGenParameterSpec ecGenSpec = new ECGenParameterSpec("prime192v1");
+		KeyPairGenerator g = KeyPairGenerator.getInstance("ECDSA", BouncyProvider);
+
+		g.initialize(ecGenSpec, new SecureRandom());
+		
 		return g.generateKeyPair();
 	}
 
@@ -484,7 +560,7 @@ public class CryptoUtility {
 		sign.update(message.getBytes());
 		return sign.verify(data);
 	}
-
+	
 	/**
 	 * Genera un certificato X.509 con i parametri inseriti dall'utente.
 	 * 
@@ -504,6 +580,92 @@ public class CryptoUtility {
 	 *            Il nome del paese per esteso.
 	 * @param email
 	 *            L'email.
+	 * @param notBefore
+	 * 			  La data di scadenza del certificato.
+	 * @param notAfter
+	 * 			  La data di inizio di validità del certificato.
+	 * 
+	 * @return Un certificato X.509 valido.
+	 * 
+	 * @throws InvalidKeyException
+	 * @throws SecurityException
+	 * @throws SignatureException
+	 * @throws CertificateException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws OperatorCreationException
+	 */
+	public static Certificate createX509Certificate2 (CERT_SIGALGO algo, KeyPair kp, String name, String surname, String country_code, String organization,
+			String locality, String state, String email, Date notBefore, Date notAfter) throws InvalidKeyException, SecurityException, 
+			SignatureException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, OperatorCreationException {
+		
+		Security.addProvider(new BouncyCastleProvider());
+		
+	    X500NameBuilder builder=new X500NameBuilder(BCStyle.INSTANCE);
+	    
+		if (name == null || surname==null || name.isEmpty() || surname.isEmpty()) {
+			System.err.println("Missing Name/Surname--Cannot create X.509 Certificate\n");
+			return null;
+		}
+		
+		builder.addRDN(BCStyle.NAME, name);
+		builder.addRDN(BCStyle.SURNAME, surname);
+
+		if (country_code != null && !country_code.isEmpty()) {
+			builder.addRDN(BCStyle.C, country_code);
+		}
+
+		if (organization != null && !organization.isEmpty()) {
+			builder.addRDN(BCStyle.O, organization);
+		}
+
+		if (locality != null && !locality.isEmpty()) {
+			builder.addRDN(BCStyle.L, locality);
+		}
+
+		if (state != null && !state.isEmpty()) {
+			builder.addRDN(BCStyle.ST, state);
+		}
+
+		if (email != null && !email.isEmpty()) {
+			builder.addRDN(BCStyle.E, email);
+		}
+	   
+	    BigInteger serial=BigInteger.valueOf(System.currentTimeMillis());
+	    X509v3CertificateBuilder certGen=new JcaX509v3CertificateBuilder(builder.build(),serial,notBefore,notAfter,builder.build(),kp.getPublic());
+	    ContentSigner sigGen=new JcaContentSignerBuilder(CryptoUtility.getCertSigAlgo(algo)).setProvider(BouncyProvider).build(kp.getPrivate());
+	    X509Certificate cert=new JcaX509CertificateConverter().setProvider(BouncyProvider).getCertificate(certGen.build(sigGen));
+	    cert.checkValidity(new Date());
+	    cert.verify(cert.getPublicKey());
+		
+	    return cert;
+	}
+
+	/**
+	 * Genera un certificato X.509 con i parametri inseriti dall'utente.
+	 * @deprecated
+	 * @see {@link CryptoUtility#createX509Certificate2(KeyPair, String, String, String, String, String, String, String, Date, Date)}
+	 * 
+	 * @param kp
+	 *            La coppia di chiavi RSA.
+	 * @param name
+	 *            Il nome dell'utente.
+	 * @param surname
+	 *            Il cognome dell'utente.
+	 * @param country_code
+	 *            Il codice del Paese.
+	 * @param organization
+	 *            L'organizzazione.
+	 * @param locality
+	 *            La località.
+	 * @param state
+	 *            Il nome del paese per esteso.
+	 * @param email
+	 *            L'email.
+	 * @param notBefore
+	 * 			  La data di scadenza del certificato.
+	 * @param notAfter
+	 * 			  La data di inizio di validità del certificato.
 	 * 
 	 * @return Un certificato X.509 valido.
 	 * 
@@ -516,7 +678,7 @@ public class CryptoUtility {
 	 */
 	public static Certificate createX509Certificate(KeyPair kp, String name,
 			String surname, String country_code, String organization,
-			String locality, String state, String email)
+			String locality, String state, String email, Date notBefore, Date notAfter)
 			throws InvalidKeyException, SecurityException, SignatureException,
 			CertificateException, NoSuchAlgorithmException,
 			NoSuchProviderException {
@@ -532,54 +694,56 @@ public class CryptoUtility {
 		Vector<ASN1ObjectIdentifier> order = new Vector<ASN1ObjectIdentifier>();
 
 		if (name != null && !name.isEmpty()) {
-			attrs.put(X509Principal.NAME, name);
-			order.addElement(X509Principal.NAME);
+			attrs.put(BCStyle.NAME, name);
+			order.addElement(BCStyle.NAME);
 		}
 
 		if (surname != null && !surname.isEmpty()) {
-			attrs.put(X509Principal.SURNAME, surname);
-			order.addElement(X509Principal.SURNAME);
+			attrs.put(BCStyle.SURNAME, surname);
+			order.addElement(BCStyle.SURNAME);
 		}
 
 		if (country_code != null && !country_code.isEmpty()) {
-			attrs.put(X509Principal.C, country_code);
-			order.addElement(X509Principal.C);
+			attrs.put(BCStyle.C, country_code);
+			order.addElement(BCStyle.C);
 		}
 
 		if (organization != null && !organization.isEmpty()) {
-			attrs.put(X509Principal.O, organization);
-			order.addElement(X509Principal.O);
+			attrs.put(BCStyle.O, organization);
+			order.addElement(BCStyle.O);
 		}
 
 		if (locality != null && !locality.isEmpty()) {
-			attrs.put(X509Principal.L, locality);
-			order.addElement(X509Principal.L);
+			attrs.put(BCStyle.L, locality);
+			order.addElement(BCStyle.L);
 		}
 
 		if (state != null && !state.isEmpty()) {
-			attrs.put(X509Principal.ST, state);
-			order.addElement(X509Principal.ST);
+			attrs.put(BCStyle.ST, state);
+			order.addElement(BCStyle.ST);
 		}
 
 		if (email != null && !email.isEmpty()) {
-			attrs.put(X509Principal.E, email);
-			order.addElement(X509Principal.E);
+			attrs.put(BCStyle.E, email);
+			order.addElement(BCStyle.E);
 		}
 
 		//
 		// create the certificate - version 3
 		//
+		
 		X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
 
 		certGen.setSerialNumber(BigInteger.valueOf(1));
 		certGen.setIssuerDN(new X509Principal(order, attrs));
-		certGen.setNotBefore(new Date(System.currentTimeMillis() - 50000));
-		certGen.setNotAfter(new Date(System.currentTimeMillis() + 50000));
+		certGen.setNotBefore(notBefore);
+		certGen.setNotAfter(notAfter);
 		certGen.setSubjectDN(new X509Principal(order, attrs));
 		certGen.setPublicKey(pubKey);
 		certGen.setSignatureAlgorithm("SHA1withRSA");
-
-		X509Certificate cert = certGen.generateX509Certificate(privKey);
+		
+		
+		X509Certificate cert = certGen.generate(privKey);
 
 		cert.checkValidity(new Date());
 
@@ -601,7 +765,7 @@ public class CryptoUtility {
 	 * @throws NoSuchProviderException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static KeyPair genDSAKeyPair() throws NoSuchAlgorithmException,
+	public static KeyPair genKeyPairDSA() throws NoSuchAlgorithmException,
 			NoSuchProviderException {
 		Security.addProvider(new BouncyCastleProvider());
 
