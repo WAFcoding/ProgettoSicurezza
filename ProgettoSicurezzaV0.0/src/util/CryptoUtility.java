@@ -19,7 +19,9 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
@@ -564,8 +566,12 @@ public class CryptoUtility {
 	/**
 	 * Genera un certificato X.509 con i parametri inseriti dall'utente.
 	 * 
-	 * @param kp
-	 *            La coppia di chiavi.
+	 * @param algo
+	 * 			  Il tipo di algoritmo scelto per la firma del certificato
+	 * @param pubkey
+	 *            La chiave pubblica dell'utente.
+	 * @param privkey
+	 * 			  La chiave privata dell'utente. Deve essere conforme all'algoritmo di firma scelto.
 	 * @param name
 	 *            Il nome dell'utente.
 	 * @param surname
@@ -595,7 +601,7 @@ public class CryptoUtility {
 	 * @throws NoSuchProviderException
 	 * @throws OperatorCreationException
 	 */
-	public static Certificate createX509Certificate2 (CERT_SIGALGO algo, KeyPair kp, String name, String surname, String country_code, String organization,
+	public static X509Certificate createX509Certificate2 (CERT_SIGALGO algo, PublicKey pubkey, PrivateKey privkey, String UID,  String name, String surname, String country_code, String organization,
 			String locality, String state, String email, Date notBefore, Date notAfter) throws InvalidKeyException, SecurityException, 
 			SignatureException, CertificateException, NoSuchAlgorithmException, NoSuchProviderException, OperatorCreationException {
 		
@@ -603,11 +609,12 @@ public class CryptoUtility {
 		
 	    X500NameBuilder builder=new X500NameBuilder(BCStyle.INSTANCE);
 	    
-		if (name == null || surname==null || name.isEmpty() || surname.isEmpty()) {
+		if (UID==null || name == null || surname==null || UID.isEmpty() || name.isEmpty() || surname.isEmpty()) {
 			System.err.println("Missing Name/Surname--Cannot create X.509 Certificate\n");
 			return null;
 		}
 		
+		builder.addRDN(BCStyle.UID, UID);
 		builder.addRDN(BCStyle.NAME, name);
 		builder.addRDN(BCStyle.SURNAME, surname);
 
@@ -632,13 +639,42 @@ public class CryptoUtility {
 		}
 	   
 	    BigInteger serial=BigInteger.valueOf(System.currentTimeMillis());
-	    X509v3CertificateBuilder certGen=new JcaX509v3CertificateBuilder(builder.build(),serial,notBefore,notAfter,builder.build(),kp.getPublic());
-	    ContentSigner sigGen=new JcaContentSignerBuilder(CryptoUtility.getCertSigAlgo(algo)).setProvider(BouncyProvider).build(kp.getPrivate());
+	    X509v3CertificateBuilder certGen=new JcaX509v3CertificateBuilder(builder.build(),serial,notBefore,notAfter,builder.build(), pubkey);
+	    ContentSigner sigGen=new JcaContentSignerBuilder(CryptoUtility.getCertSigAlgo(algo)).setProvider(BouncyProvider).build(privkey);
 	    X509Certificate cert=new JcaX509CertificateConverter().setProvider(BouncyProvider).getCertificate(certGen.build(sigGen));
-	    cert.checkValidity(new Date());
-	    cert.verify(cert.getPublicKey());
-		
+   
 	    return cert;
+	}
+	
+	/**
+	 * Verifica il certificato passato in input con la chiave pubblica data.
+	 * 
+	 * @param cert		Il certificato da verificare.
+	 * @param pubkey	La chiave pubblica da usare nella verifica.
+	 * @return	true se il certificato è valido e false altrimenti.
+	 */
+	public static boolean verifyCertificate(X509Certificate cert, PublicKey pubkey) {
+		if(cert==null || pubkey==null)
+			return false;
+		try {
+			cert.checkValidity(new Date());
+		} catch (CertificateExpiredException | CertificateNotYetValidException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		Security.addProvider(new BouncyCastleProvider());
+		
+		try {
+			cert.verify(pubkey, CryptoUtility.BouncyProvider);
+		} catch (InvalidKeyException | CertificateException
+				| NoSuchAlgorithmException | NoSuchProviderException
+				| SignatureException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**

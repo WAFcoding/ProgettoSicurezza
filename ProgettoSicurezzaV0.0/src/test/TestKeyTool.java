@@ -4,8 +4,10 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import util.CertData;
 import util.CryptoUtility;
 import util.CryptoUtility.CERT_SIGALGO;
 import util.KeyTool;
@@ -30,11 +32,11 @@ public class TestKeyTool {
 		KeyPair pairdsa = CryptoUtility.genKeyPairDSA();
 		KeyPair pairecdsa = CryptoUtility.getKeyPairECDSA();
 		Certificate certgen = CryptoUtility.createX509Certificate(pair, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
-		Certificate certgen2 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withDSA, pairdsa, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
-		Certificate certgen3 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withECDSA, pairecdsa, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
-		Certificate certgen4 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withECDSA, pairecdsa, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
-		Certificate certgen5 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withRSA, pair, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
-		Certificate certgen6 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withRSA, pair, "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen2 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withDSA, pairdsa.getPublic(), pairdsa.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen3 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withECDSA, pairecdsa.getPublic(), pairecdsa.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen4 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withECDSA, pairecdsa.getPublic(), pairecdsa.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen5 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withRSA, pair.getPublic(), pair.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		Certificate certgen6 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withRSA, pair.getPublic(), pair.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		
 		System.out.println(certgen);
 		System.out.println(certgen2);
@@ -42,6 +44,11 @@ public class TestKeyTool {
 		System.out.println(certgen4);
 		System.out.println(certgen5);
 		System.out.println(certgen6);
+		
+		CertData cdata = new CertData((X509Certificate)certgen2);
+		System.out.println(cdata.getIssuerDN() + " " + cdata.getSubjectDN() + " " + cdata.getSignatureAlgo());
+		System.out.println(cdata.getIssuerParams() + "\n" + cdata.getSubjectParams());
+		System.out.println(CertData.getParameter(CertData.TYPE.UID, cdata.getIssuerParams()));
 		
 		KeyTool.addCertificate(ks, certgen, "giovanni_key");
 		KeyTool.storeKeystore(ks, name , "pasqualino");
