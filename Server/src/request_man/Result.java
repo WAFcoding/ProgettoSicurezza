@@ -1,4 +1,4 @@
-package request;
+package request_man;
 
 /**
  * Classe astratta che definisce un risultato per un operazione 

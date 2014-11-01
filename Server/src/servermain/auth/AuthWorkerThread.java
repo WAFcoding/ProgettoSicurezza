@@ -6,7 +6,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
-import request.AuthRequestFactory;
+import request_man.factory.AuthRequestFactory;
 import servermain.WorkerThread;
 
 public class AuthWorkerThread extends WorkerThread {
@@ -18,7 +18,7 @@ public class AuthWorkerThread extends WorkerThread {
 
 	@Override
 	protected byte[] executeWork(String request, SSLSession session) throws SSLPeerUnverifiedException {
-		return AuthRequestFactory.generateRequest(request, session).doAndGetResult().toSendFormat().getBytes();
+		return (AuthRequestFactory.generateRequest(request, session)).doAndGetResult().toSendFormat().getBytes();
 	}
 
 }

@@ -1,10 +1,10 @@
-package request;
+package request_man;
 
 public class ResultInvalid extends Result {
 
 	@Override
 	public String toSendFormat() {
-		return "Invalid Request";
+		return "Error during request processing";
 	}
 
 }

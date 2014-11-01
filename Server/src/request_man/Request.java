@@ -1,4 +1,4 @@
-package request;
+package request_man;
 
 /**
  * Classe astratta per generalizzare le varie tipologie di richiesta 

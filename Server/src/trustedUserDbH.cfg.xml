@@ -6,13 +6,15 @@
 		<property name="connection.username">root</property>
 		<property name="connection.password">linux</property>
 		<!-- _____________ End of To be Edited ______________ -->
-		
+
 		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
 		<property name="dialect"> org.hibernate.dialect.MySQL5InnoDBDialect</property>
-		<property name="current_session_context_class">thread</property> 
+		<property name="current_session_context_class">thread</property>
 		<property name="hibernate.show_sql">true</property>
-		
+		<property name="cache.providerclass">org.hibernate.NoCacheProvider</property>
+
 		<!-- _________ Defining the Mapping Files ___________ -->
 		<mapping resource="bean/User.hbm.xml" />
+		<mapping resource="bean/UserCertificateBean.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

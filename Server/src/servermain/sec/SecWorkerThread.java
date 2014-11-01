@@ -6,7 +6,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
-import request.SecRequestFactory;
+import request_man.factory.SecRequestFactory;
 import servermain.WorkerThread;
 
 public class SecWorkerThread extends WorkerThread {

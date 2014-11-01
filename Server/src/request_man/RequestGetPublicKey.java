@@ -1,4 +1,4 @@
-package request;
+package request_man;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
