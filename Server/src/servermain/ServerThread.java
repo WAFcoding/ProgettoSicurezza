@@ -9,18 +9,18 @@ import javax.net.ssl.SSLSocket;
  * 
  * @author Giovanni Rossi
  */
-public class ServerThread extends Thread implements Runnable {
+public abstract class ServerThread extends Thread implements Runnable {
 
 	/**
 	 * La socket utilizzata dal server per accettare le connessioni.
 	 */
-	private SSLServerSocket socket;
+	protected SSLServerSocket socket;
 	
 	/**
 	 * Costruttore principale del thread.
 	 * @param s		La socket su cui accettare le connessioni.
 	 */
-	public ServerThread(SSLServerSocket s) {
+	protected ServerThread(SSLServerSocket s) {
 		if(s==null)
 			throw new NullPointerException("Invalid SSL Server Socket");
 		this.socket = s;
@@ -36,7 +36,7 @@ public class ServerThread extends Thread implements Runnable {
 		while(true) {
 			try {
 				SSLSocket sock = (SSLSocket)socket.accept();
-				work = new WorkerThread(sock);
+				work = initWorker(sock);
 				work.setDaemon(true);
 				work.setName("Worker-"+System.currentTimeMillis());
 				work.start();
@@ -45,12 +45,14 @@ public class ServerThread extends Thread implements Runnable {
 			}
 		}
 	}
+	
+	protected abstract WorkerThread initWorker(SSLSocket sock) throws IOException;
 
 	/**
 	 * Stampa le informazioni essenziali della socket su cui è in ascolto il server.
 	 * @param s		La socket su cui il server è in ascolto.
 	 */
-	private static void printServerSocketInfo(SSLServerSocket s) {
+	protected static void printServerSocketInfo(SSLServerSocket s) {
 		System.out.println("Server socket class: " + s.getClass());
 		System.out.println("\tSocket address = " + s.getInetAddress().toString());
 		System.out.println("\tSocket port = " + s.getLocalPort());

@@ -11,18 +11,18 @@ import javax.net.ssl.SSLSession;
  * 
  * @author Giovanni Rossi
  */
-public abstract class RequestFactory {
+public abstract class AuthRequestFactory {
 	
 	/**
 	 * Definisce il comando per l'operazione di tipo GET della chiave pubblica di un utente.
 	 */
-	private static final String GETPUBLIC = "GET";
+	private static final String SUBMIT_DATA = "SUBMIT";
 	
 	/**
 	 * Definisce il comando per recuperare la chiave di livello necessaria per la cifratura di un
 	 * documento.
 	 */
-	private static final String GETLEVELX = "GETLEVEL";
+	private static final String RETRIEVE_CERT = "RETRIEVE";
 	
 	/**
 	 * Permette di generare il giusto tipo di richiesta a seconda della stringa inviata al server.
@@ -33,8 +33,7 @@ public abstract class RequestFactory {
 	 * @throws SSLPeerUnverifiedException	Se il peer connesso non ha fornito autenticazione.
 	 */
 	public static Request generateRequest(String request, SSLSession session) throws SSLPeerUnverifiedException {
-		String trustedUser = session.getPeerPrincipal().getName();
-		trustedUser = parseCN(trustedUser);
+		//String trustedUser = session.getPeerPrincipal().getName();
 		
 		StringTokenizer tok = new StringTokenizer(request, " ");
 		int tokCount = tok.countTokens();
@@ -44,24 +43,14 @@ public abstract class RequestFactory {
 		if(tokCount == 2) {
 			String reqType = tok.nextToken();
 			String body = tok.nextToken();
-			
-			if(reqType.equalsIgnoreCase(GETPUBLIC))
+			/*
+			if(reqType.equalsIgnoreCase(SUBMIT_DATA))
 				return new RequestGetPublicKey(body);
-			if(reqType.equalsIgnoreCase(GETLEVELX))
+			if(reqType.equalsIgnoreCase(RETRIEVE_CERT))
 				return new RequestGetLevelX(Integer.valueOf(body).intValue(), trustedUser);
+			*/
 		}
 		
 		return new RequestInvalid();
-	}
-
-	/**
-	 * Parsa il nome utente dalla sessione SSL corrente.
-	 * @param trustedUser	La stringa rappresentante le informazioni identificative dell'utente connesso.
-	 * 
-	 * @return Il nome dell'utente specificato nel campo CN del certificato (usato come ID univoco).
-	 */
-	private static String parseCN(String trustedUser) {
-		String[] infos = trustedUser.split(",");
-		return infos[0].split("=")[1];
 	}
 }

@@ -8,6 +8,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Scanner;
 
+import servermain.auth.AuthServerController;
+import servermain.sec.SecServerController;
 import usermanagement.ui.LayoutController;
 
 /**
