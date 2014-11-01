@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.net.SocketException;
 import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
