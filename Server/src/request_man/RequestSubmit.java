@@ -21,10 +21,14 @@ public class RequestSubmit extends Request {
 		Session session = DbHibernateUtils.getTrustedUserDbSession();
 
 		Transaction tx = session.beginTransaction();
+		bean.setSecIdentifier("temp");
 		session.save(bean);
 		
+		String secid;
 		try {
-			bean.setSecIdentifier(CryptoUtility.hash(HASH_ALGO.MD5, bean.getId()+System.currentTimeMillis()+""));
+			secid=CryptoUtility.hash(HASH_ALGO.MD5, bean.getId()+System.currentTimeMillis()+"");
+			String secid_hash=CryptoUtility.hash(HASH_ALGO.SHA1, secid);
+			bean.setSecIdentifier(secid_hash);
 		} catch (Exception e) {
 			tx.rollback();
 			session.close();
@@ -33,9 +37,8 @@ public class RequestSubmit extends Request {
 		
 		session.saveOrUpdate(bean);
 		tx.commit();
-		session.close();
 
-		return new ResultSubmit(bean.getId());
+		return new ResultSubmit(secid);
 	}
 
 }

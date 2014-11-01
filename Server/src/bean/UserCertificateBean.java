@@ -12,7 +12,8 @@ public class UserCertificateBean implements Serializable{
 	private String city;
 	private String organization;
 	private String secIdentifier;
-
+	private int status;
+	
 	private int id;
 	
 	public UserCertificateBean() {
@@ -80,5 +81,13 @@ public class UserCertificateBean implements Serializable{
 
 	public void setSecIdentifier(String secIdentifier) {
 		this.secIdentifier = secIdentifier;
+	}
+
+	public void setStatus(int i) {
+		this.status = i;		
+	}
+
+	public int getStatus() {
+		return status;
 	}
 }

@@ -2,8 +2,8 @@ package request_man;
 
 public class ResultSubmit extends Result {
 
-	private int id;
-	public ResultSubmit(int id) {
+	private String id;
+	public ResultSubmit(String id) {
 		this.id = id;
 	}
 

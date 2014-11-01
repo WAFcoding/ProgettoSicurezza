@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-	<class name="bean.UserCertificateBean" table="pending_signup">
+	<class name="bean.UserCertificateBean" table="registered_request">
 		<id name="id" type="int">
 		    <generator class="increment"/>
 		</id>
@@ -11,7 +11,8 @@
 		<property name="countryCode" column="countryCode" type="string" />
 		<property name="city" column="city" type="string" />
 		<property name="organization" column="organization" type="string" />
-		<property name="secidentifier" column="secidentifier" type="string" />
+		<property name="secIdentifier" column="secidentifier" type="string" />
+		<property name="status" column="status" type="int"/>
 
 	</class>
 </hibernate-mapping>
