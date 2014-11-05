@@ -32,7 +32,7 @@ public class RequestSubmit extends Request {
 		} catch (Exception e) {
 			tx.rollback();
 			session.close();
-			return new ResultInvalidJson();
+			return new ResultInvalidJson("Aborted transaction");
 		}
 		
 		session.saveOrUpdate(bean);

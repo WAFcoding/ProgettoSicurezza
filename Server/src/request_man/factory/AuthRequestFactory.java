@@ -5,6 +5,7 @@ import javax.net.ssl.SSLSession;
 
 import request_man.Request;
 import request_man.RequestInvalidJson;
+import request_man.RequestStatus;
 import request_man.RequestSubmit;
 import bean.UserCertificateBean;
 
@@ -87,23 +88,24 @@ public abstract class AuthRequestFactory {
 				userData.setCountryCode(req.get(_countryCode).getAsString());
 				userData.setCity(req.get(_city).getAsString());
 				userData.setOrganization(req.get(_organization).getAsString());
-				userData.setId(-1); //non ancora definito
-				userData.setStatus(0);//<--pending
+				userData.setId(-1); 	//non ancora definito (gestito da DB)
+				userData.setStatus(RequestStatus.PENDING);	//<--pending
 				
 				return new RequestSubmit(userData);
 				
 			} else if(reqType.equalsIgnoreCase(TYPE.RETRIEVE.toString())) {
 				//controlla presenza campo ID
 				String id = req.get(_id).getAsString();
+				//TODO: completa gestione recupero certificato
 				
 				
 			} else {
-				return new RequestInvalidJson();
+				return new RequestInvalidJson("Unknown type");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new RequestInvalidJson();
+			return new RequestInvalidJson("Malformed request");
 		}
-		return new RequestInvalidJson();
+		return new RequestInvalidJson("Invalid operation");
 	}
 }

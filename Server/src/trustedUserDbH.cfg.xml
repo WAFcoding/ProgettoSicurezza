@@ -12,6 +12,7 @@
 		<property name="current_session_context_class">thread</property>
 		<property name="hibernate.show_sql">true</property>
 		<property name="cache.providerclass">org.hibernate.NoCacheProvider</property>
+		<property name="hibernate.hbm2ddl.auto">update</property>
 
 		<!-- _________ Defining the Mapping Files ___________ -->
 		<mapping resource="bean/User.hbm.xml" />
