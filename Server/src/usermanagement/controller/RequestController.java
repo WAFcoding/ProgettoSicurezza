@@ -2,9 +2,6 @@ package usermanagement.controller;
 
 import java.util.List;
 
-import javax.swing.DefaultListModel;
-import javax.swing.ListModel;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
