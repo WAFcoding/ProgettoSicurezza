@@ -1,6 +1,8 @@
-package usermanagement.ui;
+package usermanagement.controller;
 
 import javax.swing.JFrame;
+
+import usermanagement.ui.AdminLayout;
 /**
  * Questa classe e' il controllore del layout del server
  * 

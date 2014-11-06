@@ -90,4 +90,13 @@ public class UserCertificateBean implements Serializable{
 	public int getStatus() {
 		return status;
 	}
+
+	@Override
+	public String toString() {
+		return "[name=" + name + ", surname=" + surname
+				+ ", country=" + country + ", countryCode=" + countryCode
+				+ ", city=" + city + ", organization=" + organization + "]";
+	}
+	
+	
 }

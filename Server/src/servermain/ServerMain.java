@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 import servermain.auth.AuthServerController;
 import servermain.sec.SecServerController;
-import usermanagement.ui.LayoutController;
+import usermanagement.controller.LayoutController;
 
 /**
  * Classe principale per il server SSL.
