@@ -3,7 +3,7 @@
 <hibernate-mapping>
 	<class name="bean.UserCertificateBean" table="registered_request">
 		<id name="id" type="int">
-		    <generator class="increment"/>
+			<generator class="increment" />
 		</id>
 		<property name="name" column="name" type="string" />
 		<property name="surname" column="surname" type="string" />
@@ -12,7 +12,8 @@
 		<property name="city" column="city" type="string" />
 		<property name="organization" column="organization" type="string" />
 		<property name="secIdentifier" column="secidentifier" type="string" />
-		<property name="status" column="status" type="int"/>
+		<property name="publicKey" column="publicKey" type="string" />
+		<property name="status" column="status" type="int" />
 
 	</class>
 </hibernate-mapping>

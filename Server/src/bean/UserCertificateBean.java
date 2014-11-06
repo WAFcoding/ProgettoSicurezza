@@ -12,6 +12,7 @@ public class UserCertificateBean implements Serializable{
 	private String city;
 	private String organization;
 	private String secIdentifier;
+	private String publicKey;
 	private int status;
 	
 	private int id;
@@ -89,6 +90,14 @@ public class UserCertificateBean implements Serializable{
 
 	public int getStatus() {
 		return status;
+	}
+
+	public String getPublicKey() {
+		return publicKey;
+	}
+
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
 	}
 
 	@Override

@@ -28,6 +28,7 @@ public class RequestController {
 		Query query = session.createQuery(queryString);
 		query.setInteger("status", RequestStatus.PENDING);
 		
+		@SuppressWarnings("unchecked")
 		List<UserCertificateBean> queryResult = query.list();
 		tx.commit();		
 		

@@ -36,6 +36,7 @@ public abstract class AuthRequestFactory {
 	private static final String _city="city";
 	private static final String _organization="organization";
 	private static final String _id="id";
+	private static final String _pubkey = "public_key";
 	
 	/**
 	 * Permette di generare il giusto tipo di richiesta a seconda della stringa inviata al server.
@@ -88,6 +89,7 @@ public abstract class AuthRequestFactory {
 				userData.setCountryCode(req.get(_countryCode).getAsString());
 				userData.setCity(req.get(_city).getAsString());
 				userData.setOrganization(req.get(_organization).getAsString());
+				userData.setPublicKey(req.get(_pubkey).getAsString());
 				userData.setId(-1); 	//non ancora definito (gestito da DB)
 				userData.setStatus(RequestStatus.PENDING);	//<--pending
 				
