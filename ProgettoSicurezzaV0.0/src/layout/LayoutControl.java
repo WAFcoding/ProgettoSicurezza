@@ -60,7 +60,7 @@ public class LayoutControl {
 		
 		set_ctrl= new SettingsControl();
 		set_ctrl.setPathToSave(PATH);
-		set_ctrl.readSettings();
+		set_ctrl.readSettings();//FIXME leggere su db non su file
 	}
 	
 	public void createLayout(){
