@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import entities.SettingsControl;
 import usersManagement.UserManager;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
@@ -21,6 +22,7 @@ public class LayoutControl {
 	
 	private final static int WIDTH= 600;
 	private final static int HEIGHT= 600;
+	private static String PATH="settings/settings.ser";//FIXME da implementare tramite il controllore
 	
 	private JFrame mainFrame;
 	private SettingsLayout s_layout;
@@ -31,6 +33,7 @@ public class LayoutControl {
 	private RegistrationLayout r_layout;
 	private ErrorLayout err_layout;
 	private ArrayList<String> choosed_images;
+	private SettingsControl set_ctrl;
 
 	private ArrayList<String> choosed_files;
 	private String[] image_types= {"gif", "jpg", "png", "bmp"};
@@ -54,6 +57,10 @@ public class LayoutControl {
 		setLayout("HOME");
 		
 		this.setUser_manager(new UserManager());
+		
+		set_ctrl= new SettingsControl();
+		set_ctrl.setPathToSave(PATH);
+		set_ctrl.readSettings();
 	}
 	
 	public void createLayout(){
@@ -393,5 +400,39 @@ public class LayoutControl {
 
 	public void setUser_manager(UserManager user_manager) {
 		this.user_manager = user_manager;
+	}
+	/**
+	 * 
+	 * @return il percorso assoluto della cartella di default
+	 */
+	public String getSettingsDefault(){
+		return set_ctrl.getSettingsDefault();
+	}
+	/**
+	 * 
+	 * @return il percorso assoluto della cartella di input
+	 */
+	public String getSettingsInput(){
+		return set_ctrl.getSettingsInput();
+	}
+	/**
+	 * 
+	 * @return il percorso assoluto della cartella di output
+	 */
+	public String getSettingsOutput(){
+		return set_ctrl.getSettingsOutput();
+	}
+	/**
+	 * Imposta i percorsi delle carte e li salva su file, eseguendo un hash prima
+	 * @param def percorso assoluto della cartella di default
+	 * @param in percorso assoluto della cartella di input
+	 * @param out percorso assoluto della cartella di output
+	 */
+	public void setSettings(String def, String in, String out){
+		
+		//TODO LayoutControl: fare hash dei percorsi dei file
+		
+		set_ctrl.setSettings(def, in, out);
+		set_ctrl.saveSetting();
 	}
 }

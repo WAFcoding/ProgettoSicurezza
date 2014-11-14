@@ -37,21 +37,15 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	private static String PATH="settings/settings.ser";//FIXME da implementare tramite il controllore
 	
 	private Container pane;
 	private LayoutControl control;
 	private String file_choosed;
 	private JTextArea areaDefault, areaInput, areaOutput;
-	private SettingsControl set_ctrl;
 	
 	public SettingsLayout(LayoutControl control, Container pane){
 		setPane(pane);
 		setControl(control);
-		set_ctrl= new SettingsControl();
-		set_ctrl.setPathToSave(PATH);
-		set_ctrl.readSettings();
 	}
 
 	@Override
@@ -86,7 +80,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		pane.add(button, c);
 		//1.1
 		posx++;
-		areaDefault.setEditable(true);areaDefault.setAutoscrolls(true);areaDefault.setColumns(15);areaDefault.setText(set_ctrl.getSettingsDefault());
+		areaDefault.setEditable(true);areaDefault.setAutoscrolls(true);areaDefault.setColumns(15);areaDefault.setText(control.getSettingsDefault());
 		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.ipadx= areaDefault.getColumns();
 		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
 		pane.add(areaDefault, c);
@@ -106,7 +100,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		pane.add(button, c);
 		//1.3
 		posx++;
-		areaInput.setEditable(true);areaInput.setAutoscrolls(true);areaInput.setColumns(15);areaInput.setText(set_ctrl.getSettingsInput());
+		areaInput.setEditable(true);areaInput.setAutoscrolls(true);areaInput.setColumns(15);areaInput.setText(control.getSettingsInput());
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= areaInput.getColumns();
 		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
 		pane.add(areaInput, c);
@@ -126,7 +120,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		pane.add(button, c);
 		//1.5
 		posx++;
-		areaOutput.setEditable(true);areaOutput.setAutoscrolls(true);areaOutput.setColumns(15);areaOutput.setText(set_ctrl.getSettingsOutput());
+		areaOutput.setEditable(true);areaOutput.setAutoscrolls(true);areaOutput.setColumns(15);areaOutput.setText(control.getSettingsOutput());
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= areaOutput.getColumns();
 		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
 		pane.add(areaOutput, c);
@@ -212,9 +206,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 			tmp_default= areaDefault.getText();
 			tmp_input= areaInput.getText();
 			tmp_output= areaOutput.getText();
-			
-			set_ctrl.setSettings(tmp_default, tmp_input, tmp_output);
-			set_ctrl.saveSetting();
+			control.setSettings(tmp_default, tmp_input, tmp_output);
 		}
 		
 	}
