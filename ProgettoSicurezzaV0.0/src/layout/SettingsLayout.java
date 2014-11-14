@@ -19,6 +19,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import entities.Settings;
 import entities.SettingsControl;
@@ -41,7 +42,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 	private Container pane;
 	private LayoutControl control;
 	private String file_choosed;
-	private JTextArea areaDefault, areaInput, areaOutput;
+	private JTextField areaDefault, areaInput, areaOutput;
 	
 	public SettingsLayout(LayoutControl control, Container pane){
 		setPane(pane);
@@ -56,9 +57,9 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		GridBagConstraints c = new GridBagConstraints();
 		
 		JButton button;
-		areaDefault= new JTextArea();
-		areaInput= new JTextArea();
-		areaOutput= new JTextArea();
+		areaDefault= new JTextField();
+		areaInput= new JTextField();
+		areaOutput= new JTextField();
 		
 		JLabel label;
 		
@@ -177,8 +178,8 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 
 	private class OpenAction implements ActionListener{
 		
-		private JTextArea m_area;
-		public OpenAction(JTextArea area){
+		private JTextField m_area;
+		public OpenAction(JTextField area){
 			this.m_area= area;
 		}
 

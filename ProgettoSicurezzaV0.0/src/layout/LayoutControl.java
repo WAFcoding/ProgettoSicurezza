@@ -60,7 +60,7 @@ public class LayoutControl {
 		
 		set_ctrl= new SettingsControl();
 		set_ctrl.setPathToSave(PATH);
-		set_ctrl.readSettings();//FIXME leggere su db non su file
+		//set_ctrl.readSettings();//FIXME leggere su db non su file
 	}
 	
 	public void createLayout(){
@@ -97,7 +97,7 @@ public class LayoutControl {
 		}
 		else if(layout == 5){
 			RegistrationLayout();
-			mainFrame.setSize(600, HEIGHT);
+			mainFrame.setSize(800, 700);
 		}
 		else if(layout == 6){
 
