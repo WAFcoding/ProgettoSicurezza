@@ -9,34 +9,32 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
-import request.RequestFactory;
-
 /**
  * Definisce il thread che esegue il lavoro del server.
  * 
  * @author Giovanni Rossi
  */
-public class WorkerThread extends Thread implements Runnable{
+public abstract class WorkerThread extends Thread implements Runnable{
 
 	/**
 	 * Oggetto per la scrittura di dati sul peer.
 	 */
-	private BufferedWriter w;
+	protected BufferedWriter w;
 	
 	/**
 	 * Oggetto per la lettura di dati dal peer.
 	 */
-	private BufferedReader r;
+	protected BufferedReader r;
 	
 	/**
 	 * Socket della connessione corrente.
 	 */
-	private SSLSocket sock;
+	protected SSLSocket sock;
 	
 	/**
 	 * Messaggio di benvenuto del server.
 	 */
-	private static final String welcomeMessage = "+OK SSL Server Ready";
+	protected String welcomeMessage = "+OK SSL Server Ready";
 	
 	/**
 	 * Costruttore principale di questo thread.
@@ -44,7 +42,7 @@ public class WorkerThread extends Thread implements Runnable{
 	 * 
 	 * @throws IOException
 	 */
-	public WorkerThread(SSLSocket sock) throws IOException {
+	protected WorkerThread(SSLSocket sock) throws IOException {
 		if(sock==null)
 			throw new NullPointerException("Socket Passed is NULL");
 		try {
@@ -106,9 +104,7 @@ public class WorkerThread extends Thread implements Runnable{
 	 * 
 	 * @throws SSLPeerUnverifiedException Se il peer non si è autenticato correttamente.
 	 */
-	private static byte[] executeWork(String request, SSLSession session) throws SSLPeerUnverifiedException {
-		return RequestFactory.generateRequest(request, session).doAndGetResult().toSendFormat().getBytes();
-	}
+	protected abstract byte[] executeWork(String request, SSLSession session) throws SSLPeerUnverifiedException;
 	
 	/**
 	 * Stampa le informazioni base relative alla socket e 

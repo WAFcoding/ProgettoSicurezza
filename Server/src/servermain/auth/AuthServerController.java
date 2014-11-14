@@ -1,4 +1,4 @@
-package servermain;
+package servermain.auth;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import java.security.cert.CertificateException;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+
+import servermain.ServerController;
 
 public class AuthServerController extends ServerController {
 	
@@ -35,6 +37,6 @@ public class AuthServerController extends ServerController {
 		SSLServerSocket s = (SSLServerSocket) ssf.createServerSocket(SERVER_PORT);		
 		s.setNeedClientAuth(false);
 
-		_mainServerThread = new ServerThread(s);
+		_mainServerThread = new AuthServerThread(s);
 	}
 }

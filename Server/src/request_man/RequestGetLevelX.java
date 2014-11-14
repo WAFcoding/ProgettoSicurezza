@@ -1,4 +1,4 @@
-package request;
+package request_man;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -32,9 +32,9 @@ public class RequestGetLevelX extends Request {
 		txUser.commit();		
 
 		if(user==null)
-			return new ResultGetPublicKey("404 - User " + trustedUser + " not found");
+			return new ResultGetLevelX("404 - User " + trustedUser + " not found");
 		if(user.getTrustLevel() < level)
-			return new ResultGetPublicKey("403 - Unauthorized");
+			return new ResultGetLevelX("403 - Unauthorized");
 		
 		Session sessionKey = DbHibernateUtils.getKeyLevelDbSession();
 		Transaction txKey = sessionKey.beginTransaction();
@@ -49,13 +49,13 @@ public class RequestGetLevelX extends Request {
 		txKey.commit();		
 		
 		if(lkey==null)
-			return new ResultGetPublicKey("404 - Key not found for level " + this.level);
+			return new ResultGetLevelX("404 - Key not found for level " + this.level);
 		
 		try {
-			return new ResultGetPublicKey(lkey.getClearKey());
+			return new ResultGetLevelX(lkey.getClearKey());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResultGetPublicKey("500 - Security Exception");
+			return new ResultGetLevelX("500 - Security Exception");
 		}
 	}
 

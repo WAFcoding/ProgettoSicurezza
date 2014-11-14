@@ -1,9 +1,14 @@
-package request;
+package request_man.factory;
 
 import java.util.StringTokenizer;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
+
+import request_man.Request;
+import request_man.RequestGetLevelX;
+import request_man.RequestGetPublicKey;
+import request_man.RequestInvalid;
 
 /**
  * Classe che permette di parsare la richiesta in ingresso e di eseguire 
@@ -11,7 +16,7 @@ import javax.net.ssl.SSLSession;
  * 
  * @author Giovanni Rossi
  */
-public abstract class RequestFactory {
+public abstract class SecRequestFactory {
 	
 	/**
 	 * Definisce il comando per l'operazione di tipo GET della chiave pubblica di un utente.

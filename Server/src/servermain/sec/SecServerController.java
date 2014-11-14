@@ -1,4 +1,4 @@
-package servermain;
+package servermain.sec;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import java.security.cert.CertificateException;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+
+import servermain.ServerController;
 
 /**
  * Controllore per il thread principale del server.
@@ -40,6 +42,6 @@ public class SecServerController extends ServerController {
 		SSLServerSocket s = (SSLServerSocket) ssf.createServerSocket(SERVER_PORT);		
 		s.setNeedClientAuth(true);
 
-		_mainServerThread = new ServerThread(s);
+		_mainServerThread = new SecServerThread(s);
 	}
 }

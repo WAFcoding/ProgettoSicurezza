@@ -8,7 +8,9 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Scanner;
 
-import usermanagement.ui.LayoutController;
+import servermain.auth.AuthServerController;
+import servermain.sec.SecServerController;
+import usermanagement.controller.LayoutController;
 
 /**
  * Classe principale per il server SSL.

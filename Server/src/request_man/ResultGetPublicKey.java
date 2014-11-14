@@ -1,4 +1,4 @@
-package request;
+package request_man;
 
 public class ResultGetPublicKey extends Result {
 

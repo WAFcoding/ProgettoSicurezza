@@ -1,31 +1,31 @@
 package usermanagement.ui;
 
+import java.awt.CardLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Calendar;
-import java.util.Date;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 
 import layout.GeneralLayout;
-import util.CertData;
-
-public class AdminLayout implements GeneralLayout {
-
-	private Container pane;
-    private LayoutController control;
-    
+import usermanagement.controller.LayoutController;
+import usermanagement.controller.RequestController;
+/**
+ * TODO: x pasquale
+ * 
+ * dichiarazioni:
     private JList<CertData> certList;
     private JTextField nameText;
     private JTextField surnameText;
@@ -36,17 +36,8 @@ public class AdminLayout implements GeneralLayout {
     private JButton deleteUserButton;
     private JButton addUserButton;
     private JButton sendCertificateButton;
-    //private DateTime notBefore;
-    //private DateTime notAfter;
-    
-    public AdminLayout(LayoutController control, Container pane){
-    	setControl(control);
-    	setPane(pane);
-    }
-    
-	@Override
-	public void addComponentsToPane() {
-		//TODO:completare
+ * 
+ * costruzione:
 		pane.removeAll();
 		pane.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -179,7 +170,132 @@ public class AdminLayout implements GeneralLayout {
 		c.gridx= 2;c.gridy= 8;c.weightx = 0.5;c.ipady=0;c.ipadx=0;
 		c.gridwidth = 2;
 		pane.add(addUserButton,c);
+ * 
+ *---------------------------------------------------------------------------------
+ 
+    //Limite textfield
+	private class JTextFieldLimit extends PlainDocument {
+		private static final long serialVersionUID = 4592979636590560189L;
+		private int limit;
+		JTextFieldLimit(int limit) {
+			super();
+			this.limit = limit;
+		}
 
+		public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
+			if (str == null)
+				return;
+
+			if ((getLength() + str.length()) <= limit) {
+				super.insertString(offset, str.toUpperCase(), attr);
+			}
+		}
+	}
+ *
+ */
+
+
+public class AdminLayout implements GeneralLayout {
+
+	private Container pane;
+    private LayoutController control;
+
+    private JTabbedPane panel;
+    private JPanel pendingPanel;
+    private JPanel acceptedPanel;
+    private JPanel rejectedPanel;
+    
+    public AdminLayout(LayoutController control, Container pane){
+    	setControl(control);
+    	setPane(pane);
+    }
+    
+	@Override
+	public void addComponentsToPane() {
+		pane.removeAll();
+		pane.setLayout(new CardLayout());
+		
+		pendingPanel = new JPanel();
+		acceptedPanel = new JPanel();
+		rejectedPanel = new JPanel();
+		
+		panel = new JTabbedPane();
+		panel.addTab("Pending", pendingPanel);
+		panel.addTab("Accepted", acceptedPanel);
+		panel.addTab("Rejected", rejectedPanel);
+		
+		pendingPanel.setLayout(new GridBagLayout());
+		acceptedPanel.setLayout(new GridBagLayout());
+		rejectedPanel.setLayout(new GridBagLayout());
+		
+		buildRequestPanel(pendingPanel);
+		buildAcceptedPanel(acceptedPanel);
+		buildRejectedPanel(rejectedPanel);
+		
+		pane.add(panel);
+	}
+	
+	private void buildRequestPanel(JPanel p)  {
+		//TODO: aggiungere i listener
+		
+		p.setLayout(new CardLayout());
+		
+		//super-pannello
+		JPanel superPanel = new JPanel();
+		superPanel.setLayout(new BoxLayout(superPanel, BoxLayout.Y_AXIS));
+		
+		//pannello superiore
+		JPanel ptable = new JPanel();
+		ptable.setLayout(new BoxLayout(ptable, BoxLayout.Y_AXIS));
+		JLabel intestazione = new JLabel("Pending Requests:");
+		ptable.add(intestazione);
+		
+		JTable pendingList = new JTable(RequestController.retrieveRequests(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		JScrollPane scrolling = new JScrollPane(pendingList);
+		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		ptable.add(scrolling);
+		
+		//pannello controlli
+		JPanel pbuttons = new JPanel();
+		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
+		JButton btnAccept = new JButton("Accept");
+		btnAccept.setEnabled(false);
+		pbuttons.add(btnAccept);
+		
+		JButton btnReject = new JButton("Reject");
+		btnReject.setEnabled(false);
+		pbuttons.add(btnReject);
+		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
+		
+		JLabel trustLabel = new JLabel("Trust Level:");
+		pbuttons.add(trustLabel);
+		
+		JComboBox<Integer> trustLevel = new JComboBox<Integer>(new Integer[] {1,2,3,4,5,6,7});//aggiungi altri eventualmente...
+		
+		trustLevel.setMaximumSize(new Dimension(100,200));
+		
+		pbuttons.add(trustLevel);
+		
+		//collega al super-layout
+		superPanel.add(ptable);
+		superPanel.add(pbuttons);
+		
+		//aggiungi la card
+		p.add(superPanel);
+	}
+	
+	private void buildAcceptedPanel(JPanel p)  {
+		GridBagConstraints c = new GridBagConstraints();
+		
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor= GridBagConstraints.CENTER;
+	}
+	
+	private void buildRejectedPanel(JPanel p)  {
+		GridBagConstraints c = new GridBagConstraints();
+		
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor= GridBagConstraints.CENTER;
 	}
 	
     public Container getPane() {
@@ -198,56 +314,28 @@ public class AdminLayout implements GeneralLayout {
 		this.control = control;
 	}
 	
-	//Limite textfield
-	private class JTextFieldLimit extends PlainDocument {
-		private static final long serialVersionUID = 4592979636590560189L;
-		private int limit;
-		JTextFieldLimit(int limit) {
-			super();
-			this.limit = limit;
-		}
-
-		public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
-			if (str == null)
-				return;
-
-			if ((getLength() + str.length()) <= limit) {
-				super.insertString(offset, str.toUpperCase(), attr);
-			}
-		}
-	}
+	
 	
 	private class MouseClickListener implements MouseListener {
 
 		@Override
 		public void mouseClicked(MouseEvent arg0) {
-			DatePicker dpicker = new DatePicker(control.mainFrame, false, Calendar.getInstance());
-			
-			
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void mouseExited(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void mousePressed(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
 		}
 		
 	}
