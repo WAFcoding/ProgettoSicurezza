@@ -36,7 +36,7 @@ public class WorkerThread extends Thread implements Runnable{
 	/**
 	 * Messaggio di benvenuto del server.
 	 */
-	private static final String welcomeMessage = "+OK SSL Key Distribution Server Ready";
+	private static final String welcomeMessage = "+OK SSL Server Ready";
 	
 	/**
 	 * Costruttore principale di questo thread.
@@ -115,6 +115,7 @@ public class WorkerThread extends Thread implements Runnable{
 	 * alla sessione SSL attuale (a cui questo thread è stato assegnato).  
 	 * @param s		La socket SSL relativa alla connessione attuale.
 	 */
+
 	private static void printSocketInfo(SSLSocket s) {
 		System.out.println("Socket class: " + s.getClass());
 		System.out.println("\tRemote address = " + s.getInetAddress().toString());

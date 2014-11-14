@@ -1,9 +1,9 @@
 package test;
 
+import servermain.ServerMasterKey;
 import util.CryptoUtility;
 import util.CryptoUtility.CRYPTO_ALGO;
 import bean.LevelKey;
-import servermain.*;
 
 public class TestLevelKey {
 

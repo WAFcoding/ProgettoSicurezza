@@ -62,7 +62,8 @@ public class ServerMain {
 		}
 		
 		try {
-			new ServerController().startServer();
+			new SecServerController().startServer();
+			new AuthServerController().startServer();
 		} catch (UnrecoverableKeyException | KeyManagementException
 				| KeyStoreException | NoSuchAlgorithmException
 				| CertificateException | IOException e) {
