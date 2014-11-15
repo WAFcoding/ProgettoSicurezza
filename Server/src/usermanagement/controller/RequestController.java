@@ -12,11 +12,11 @@ public class RequestController {
 	public RequestController() {
 	}
 	
-	public static String[][] retrieveRequests() {
+	protected static String[][] retrieveData(int status) {
 		
 		UserCertificateDAO dao = new UserCertificateDaoImpl();
 		
-		List<UserCertificateBean> queryResult = dao.findByStatus(RequestStatus.PENDING);		
+		List<UserCertificateBean> queryResult = dao.findByStatus(status);		
 		
 		String[][] dataMatrix = new String[queryResult.size()][5];
 		int i=0;
@@ -26,6 +26,18 @@ public class RequestController {
 		}
 		
 		return dataMatrix;
+	}
+	
+	public static String[][] retrieveRequests() {
+		return retrieveData(RequestStatus.PENDING);
+	}
+
+	public static String[][] retrieveAccepted() {
+		return retrieveData(RequestStatus.ACCEPTED);
+	}
+
+	public static String[][] retrieveBlocked() {
+		return retrieveData(RequestStatus.REJECTED);
 	}
 
 }

@@ -3,7 +3,6 @@ package usermanagement.ui;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -205,6 +204,13 @@ public class AdminLayout implements GeneralLayout {
     private JPanel acceptedPanel;
     private JPanel rejectedPanel;
     
+    /*
+     *TODO Componenti pubbliche
+     */
+    
+    
+    private static final Integer[] levels = {1,2,3,4,5,6,7};//aggiungi altri eventualmente...
+    
     public AdminLayout(LayoutController control, Container pane){
     	setControl(control);
     	setPane(pane);
@@ -270,7 +276,7 @@ public class AdminLayout implements GeneralLayout {
 		JLabel trustLabel = new JLabel("Trust Level:");
 		pbuttons.add(trustLabel);
 		
-		JComboBox<Integer> trustLevel = new JComboBox<Integer>(new Integer[] {1,2,3,4,5,6,7});//aggiungi altri eventualmente...
+		JComboBox<Integer> trustLevel = new JComboBox<Integer>(levels);
 		
 		trustLevel.setMaximumSize(new Dimension(100,200));
 		
@@ -285,17 +291,94 @@ public class AdminLayout implements GeneralLayout {
 	}
 	
 	private void buildAcceptedPanel(JPanel p)  {
-		GridBagConstraints c = new GridBagConstraints();
+		p.setLayout(new CardLayout());
 		
-		c.fill = GridBagConstraints.BOTH;
-		c.anchor= GridBagConstraints.CENTER;
+		//super-pannello
+		JPanel superPanel = new JPanel();
+		superPanel.setLayout(new BoxLayout(superPanel, BoxLayout.Y_AXIS));
+		
+		//pannello superiore
+		JPanel ptable = new JPanel();
+		ptable.setLayout(new BoxLayout(ptable, BoxLayout.Y_AXIS));
+		JLabel intestazione = new JLabel("Trusted Users:");
+		ptable.add(intestazione);
+		
+		JTable trustedList = new JTable(RequestController.retrieveAccepted(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		JScrollPane scrolling = new JScrollPane(trustedList);
+		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		ptable.add(scrolling);
+		
+		//pannello controlli
+		JPanel pbuttons = new JPanel();
+		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
+		JButton btnBlock = new JButton("Block");
+		btnBlock.setEnabled(false);
+		pbuttons.add(btnBlock);
+		
+		JButton btnUpdate = new JButton("Update Level");
+		btnUpdate.setEnabled(false);
+		pbuttons.add(btnUpdate);
+		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
+		
+		JLabel trustLabel = new JLabel("Trust Level:");
+		pbuttons.add(trustLabel);
+		
+		JComboBox<Integer> trustLevel = new JComboBox<Integer>(levels);
+		
+		trustLevel.setMaximumSize(new Dimension(100,200));
+		
+		pbuttons.add(trustLevel);
+		
+		//collega al super-layout
+		superPanel.add(ptable);
+		superPanel.add(pbuttons);
+		
+		//aggiungi la card
+		p.add(superPanel);
 	}
 	
 	private void buildRejectedPanel(JPanel p)  {
-		GridBagConstraints c = new GridBagConstraints();
+		p.setLayout(new CardLayout());
 		
-		c.fill = GridBagConstraints.BOTH;
-		c.anchor= GridBagConstraints.CENTER;
+		//super-pannello
+		JPanel superPanel = new JPanel();
+		superPanel.setLayout(new BoxLayout(superPanel, BoxLayout.Y_AXIS));
+		
+		//pannello superiore
+		JPanel ptable = new JPanel();
+		ptable.setLayout(new BoxLayout(ptable, BoxLayout.Y_AXIS));
+		JLabel intestazione = new JLabel("Blocked Users:");
+		ptable.add(intestazione);
+		
+		JTable blockedList = new JTable(RequestController.retrieveBlocked(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		JScrollPane scrolling = new JScrollPane(blockedList);
+		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		ptable.add(scrolling);
+		
+		//pannello controlli
+		JPanel pbuttons = new JPanel();
+		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
+		
+		JButton btnUnblock = new JButton("UnBlock");
+		btnUnblock.setEnabled(false);
+		pbuttons.add(btnUnblock);
+		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
+		
+		JLabel trustLabel = new JLabel("Trust Level:");
+		pbuttons.add(trustLabel);
+		
+		JComboBox<Integer> trustLevel = new JComboBox<Integer>(levels);
+		
+		trustLevel.setMaximumSize(new Dimension(100,200));
+		
+		pbuttons.add(trustLevel);
+		
+		//collega al super-layout
+		superPanel.add(ptable);
+		superPanel.add(pbuttons);
+		
+		//aggiungi la card
+		p.add(superPanel);
 	}
 	
     public Container getPane() {

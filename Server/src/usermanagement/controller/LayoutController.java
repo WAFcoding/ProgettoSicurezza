@@ -14,7 +14,7 @@ public class LayoutController {
 	private final static int WIDTH= 400;
 	private final static int HEIGHT= 400;
 	
-	public JFrame mainFrame;
+	private JFrame mainFrame;
 	private AdminLayout admin_layout;
 
 	
