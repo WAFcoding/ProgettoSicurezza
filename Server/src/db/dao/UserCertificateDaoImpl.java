@@ -1,4 +1,4 @@
-package db;
+package db.dao;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import db.DbHibernateUtils;
 import util.CryptoUtility;
 import util.CryptoUtility.HASH_ALGO;
 import bean.UserCertificateBean;

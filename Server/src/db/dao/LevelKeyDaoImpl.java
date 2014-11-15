@@ -1,9 +1,10 @@
-package db;
+package db.dao;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import db.DbHibernateUtils;
 import bean.LevelKey;
 
 public class LevelKeyDaoImpl implements LevelKeyDAO {

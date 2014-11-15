@@ -4,8 +4,8 @@ import java.util.List;
 
 import request_man.RequestStatus;
 import bean.UserCertificateBean;
-import db.UserCertificateDAO;
-import db.UserCertificateDaoImpl;
+import db.dao.UserCertificateDAO;
+import db.dao.UserCertificateDaoImpl;
 
 public class RequestController {
 

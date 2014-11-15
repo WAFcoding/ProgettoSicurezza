@@ -1,12 +1,11 @@
 package request_man;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
 import bean.LevelKey;
 import bean.User;
-import db.DbHibernateUtils;
+import db.dao.LevelKeyDAO;
+import db.dao.LevelKeyDaoImpl;
+import db.dao.UserDAO;
+import db.dao.UserDaoImpl;
 
 public class RequestGetLevelX extends Request {
 
@@ -20,33 +19,17 @@ public class RequestGetLevelX extends Request {
 
 	@Override
 	public Result doAndGetResult() {
-		Session sessionUser = DbHibernateUtils.getTrustedUserDbSession();
-		Transaction txUser = sessionUser.beginTransaction();
-		
-		String queryStringUser = "from User where username = :username";
-		Query queryUser = sessionUser.createQuery(queryStringUser);
-		queryUser.setString("username", trustedUser);
-		
-		Object queryResultUser = queryUser.uniqueResult();
-		User user = (User) queryResultUser;
-		txUser.commit();		
+		UserDAO daoU = new UserDaoImpl();
+		User user = daoU.findUserByUsername(trustedUser);
 
 		if(user==null)
 			return new ResultGetLevelX("404 - User " + trustedUser + " not found");
 		if(user.getTrustLevel() < level)
 			return new ResultGetLevelX("403 - Unauthorized");
 		
-		Session sessionKey = DbHibernateUtils.getKeyLevelDbSession();
-		Transaction txKey = sessionKey.beginTransaction();
-		
-		String queryStringKey = "from LevelKey where level = :level";
-		Query queryKey = sessionKey.createQuery(queryStringKey);
-		queryKey.setInteger("level", this.level);
 
-		
-		Object queryResultKey = queryKey.uniqueResult();
-		LevelKey lkey = (LevelKey) queryResultKey;
-		txKey.commit();		
+		LevelKeyDAO daoL = new LevelKeyDaoImpl();
+		LevelKey lkey = daoL.findKeyByLevel(level);
 		
 		if(lkey==null)
 			return new ResultGetLevelX("404 - Key not found for level " + this.level);

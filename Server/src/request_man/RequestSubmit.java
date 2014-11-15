@@ -1,8 +1,8 @@
 package request_man;
 
 import bean.UserCertificateBean;
-import db.UserCertificateDAO;
-import db.UserCertificateDaoImpl;
+import db.dao.UserCertificateDAO;
+import db.dao.UserCertificateDaoImpl;
 
 public class RequestSubmit extends Request {
 
