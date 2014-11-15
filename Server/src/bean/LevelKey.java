@@ -1,11 +1,17 @@
 package bean;
 
+import java.io.Serializable;
+
 import servermain.ServerMasterKey;
 import util.CryptoUtility;
 import util.CryptoUtility.CRYPTO_ALGO;
 
-public class LevelKey {
+public class LevelKey implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6612072472881322290L;
 	private String key; //base64 del decriptato
 	private int level;
 	

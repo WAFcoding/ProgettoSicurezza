@@ -1,9 +1,15 @@
 package bean;
 
+import java.io.Serializable;
+
 import util.CryptoUtility;
 
-public class User {
+public class User implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1687530967441079737L;
 	private String publicKey;
 	private String username;
 	private int trustLevel;

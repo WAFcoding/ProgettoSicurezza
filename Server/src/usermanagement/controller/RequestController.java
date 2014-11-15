@@ -2,32 +2,21 @@ package usermanagement.controller;
 
 import java.util.List;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
 import request_man.RequestStatus;
 import bean.UserCertificateBean;
-import db.DbHibernateUtils;
+import db.UserCertificateDAO;
+import db.UserCertificateDaoImpl;
 
 public class RequestController {
 
 	public RequestController() {
-		
 	}
 	
 	public static String[][] retrieveRequests() {
 		
-		Session session = DbHibernateUtils.getTrustedUserDbSession();
-		Transaction tx = session.beginTransaction();
+		UserCertificateDAO dao = new UserCertificateDaoImpl();
 		
-		String queryString = "from UserCertificateBean where status = :status";
-		Query query = session.createQuery(queryString);
-		query.setInteger("status", RequestStatus.PENDING);
-		
-		@SuppressWarnings("unchecked")
-		List<UserCertificateBean> queryResult = query.list();
-		tx.commit();		
+		List<UserCertificateBean> queryResult = dao.findByStatus(RequestStatus.PENDING);		
 		
 		String[][] dataMatrix = new String[queryResult.size()][5];
 		int i=0;
