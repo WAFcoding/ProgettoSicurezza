@@ -8,6 +8,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+
 import util.CryptoUtility;
 
 /**
@@ -17,9 +25,34 @@ import util.CryptoUtility;
 public class UserManager {
 
 	private ArrayList<User> users;//tutti gli utenti
+	private static final SessionFactory factory= createSession();
+	
 	public UserManager(){
 		this.users= new ArrayList<User>();
+	} 
+	//___________________Gestione DB Hibernate______________________________________________	
+	public static SessionFactory createSession(){
+
+		try{
+			Configuration configuration= new Configuration();
+			configuration.configure();
+			ServiceRegistry serviceRegistry= new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+			return configuration.buildSessionFactory(serviceRegistry);
+		}
+		catch(Throwable e){
+			System.err.println("Unable to create a session " + e);
+			throw new ExceptionInInitializerError(e);
+		}
 	}
+	
+	public static SessionFactory getSessionFactory(){
+		return factory;
+	}
+	
+	public static void closeSession(){
+		getSessionFactory().close();
+	}
+	//___________________________________________________________________________________
 	
 	//===================LOGIN==================
 	public void checkForLogin(){
@@ -157,4 +190,47 @@ public class UserManager {
 		return true;
 	}
 	
+	public static void main(String[] args){
+		System.out.println("prova hibernate");
+		Session session= UserManager.getSessionFactory().openSession();
+		Transaction tx= null;
+		try{
+			tx= session.beginTransaction();
+			
+			User user= new User();
+			user.setID(0);
+			user.setName("giov");
+			user.setSurname("ros");
+			user.setMail("yeah@tu.it");
+			user.setCode("00002");
+			user.setCity("rome");
+			user.setCountry("Italy");
+			user.setCountry_code("IT");
+			user.setOrganization("yours");
+			user.setDir_def("uyt");
+			user.setDir_in("uyt");
+			user.setDir_out("oiu");
+			user.setPublicKey("ooo");
+			user.setPrivateKey("iii");
+			session.save(user);
+			
+			UserPublicKeyKnown user_pbck= new UserPublicKeyKnown();
+			user_pbck.setID_user("3");
+			user_pbck.setPbc_key("yuuuuuuuuuuuuuuu");
+			user_pbck.setUser(user);
+			user.getPublicKeyKnown().add(user_pbck);
+			session.save(user_pbck);
+			
+			tx.commit();
+			
+			System.out.println("ok");
+		}
+		catch(HibernateException e){
+			if(tx != null) tx.rollback();
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
+	}
 }

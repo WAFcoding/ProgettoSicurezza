@@ -1,31 +1,46 @@
-/**
- * 
- */
 package usersManagement;
 
+import java.io.Serializable;
 import java.security.KeyPair;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.*;
+
 
 /**
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
  *
  */
-public class User {
-	//chiave privata 
-	//chiave pubblica
-	//le chiavi pubbliche
-	//i percorsi delle cartelle 
-	
-	private KeyPair keys;
-	private HashMap<String, String > publicKeys;//la chiave e' l'user, il valore e' la chiave pubblica, TODO User: va serializzata l'hashmap
+@Entity
+@Table(name = "Users")
+public class User implements Serializable{
+	private static final long serialVersionUID = 1L;
 
-	private String dir_def, dir_in, dir_out, name, surname, country, country_code, city, organization, mail, code;
-	public User(KeyPair keys, String dir_def, String dir_in, String dir_out, String name, String surname, String country,
-					String country_code, String city, String organization, String mail, String code){
-		
-		this.publicKeys= new HashMap<String, String>();
-		setKeys(keys);
+	private Integer ID;
+	private String name; 
+	private String surname;
+	private String mail;
+	private String code;
+	private String city; 
+	private String country;
+	private String country_code;
+	private String organization;
+	private String dir_def;
+	private String dir_in;
+	private String dir_out;
+	private String publicKey;
+	private String privateKey;
+	
+	private Set<UserPublicKeyKnown> publicKeyKnown= new HashSet<UserPublicKeyKnown>(0);
+	
+	public User(){
+	}
+	
+	public User(String name, String surname, String mail, String code, String city, String country,
+					String country_code, String organization, String dir_def, String dir_in, String dir_out){
+
 		setDir_def(dir_def);
 		setDir_in(dir_in);
 		setDir_out(dir_out);
@@ -37,73 +52,28 @@ public class User {
 		setOrganization(organization);
 		setMail(mail);
 		setCode(code);
+		
+	}
+	/**
+	 * @return the iD
+	 */
+	@Id 
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name= "ID_user", unique= true, nullable= false)
+	public Integer getID() {
+		return ID;
 	}
 
 	/**
-	 * @return the code
+	 * @param iD the iD to set
 	 */
-	public String getCode() {
-		return code;
-	}
-	/**
-	 * @param code the code to set
-	 */
-	public void setCode(String code) {
-		this.code = code;
-	}
-	/**
-	 * @return the mail
-	 */
-	public String getMail() {
-		return mail;
-	}
-
-	/**
-	 * @param mail the mail to set
-	 */
-	public void setMail(String mail) {
-		this.mail = mail;
-	}
-	
-	/**
-	 * @return the dir_def
-	 */
-	public String getDir_def() {
-		return dir_def;
-	}
-	/**
-	 * @param dir_def the dir_def to set
-	 */
-	public void setDir_def(String dir_def) {
-		this.dir_def = dir_def;
-	}
-	/**
-	 * @return the dir_in
-	 */
-	public String getDir_in() {
-		return dir_in;
-	}
-	/**
-	 * @param dir_in the dir_in to set
-	 */
-	public void setDir_in(String dir_in) {
-		this.dir_in = dir_in;
-	}
-	/**
-	 * @return the dir_out
-	 */
-	public String getDir_out() {
-		return dir_out;
-	}
-	/**
-	 * @param dir_out the dir_out to set
-	 */
-	public void setDir_out(String dir_out) {
-		this.dir_out = dir_out;
+	public void setID(Integer iD) {
+		ID = iD;
 	}
 	/**
 	 * @return the name
 	 */
+	@Column(name = "name", nullable= false, length= 255 )
 	public String getName() {
 		return name;
 	}
@@ -116,6 +86,7 @@ public class User {
 	/**
 	 * @return the surname
 	 */
+	@Column(name = "surname", nullable= false, length= 255 )
 	public String getSurname() {
 		return surname;
 	}
@@ -126,8 +97,49 @@ public class User {
 		this.surname = surname;
 	}
 	/**
+	 * @return the mail
+	 */
+	@Column(name = "mail", nullable= false, length= 255 )
+	public String getMail() {
+		return mail;
+	}
+
+	/**
+	 * @param mail the mail to set
+	 */
+	public void setMail(String mail) {
+		this.mail = mail;
+	}
+	/**
+	 * @return the code
+	 */
+	@Column(name = "code", nullable= false, length= 5 )
+	public String getCode() {
+		return code;
+	}
+	/**
+	 * @param code the code to set
+	 */
+	public void setCode(String code) {
+		this.code = code;
+	}
+	/**
+	 * @return the city
+	 */
+	@Column(name = "city", nullable= false, length= 255 )
+	public String getCity() {
+		return city;
+	}
+	/**
+	 * @param city the city to set
+	 */
+	public void setCity(String city) {
+		this.city = city;
+	}
+	/**
 	 * @return the country
 	 */
+	@Column(name = "country", nullable= false, length= 255 )
 	public String getCountry() {
 		return country;
 	}
@@ -140,6 +152,7 @@ public class User {
 	/**
 	 * @return the country_code
 	 */
+	@Column(name = "country_code", nullable= false, length= 2 )
 	public String getCountry_code() {
 		return country_code;
 	}
@@ -150,20 +163,9 @@ public class User {
 		this.country_code = country_code;
 	}
 	/**
-	 * @return the city
-	 */
-	public String getCity() {
-		return city;
-	}
-	/**
-	 * @param city the city to set
-	 */
-	public void setCity(String city) {
-		this.city = city;
-	}
-	/**
 	 * @return the organization
 	 */
+	@Column(name = "organization", nullable= false, length= 255 )
 	public String getOrganization() {
 		return organization;
 	}
@@ -174,28 +176,74 @@ public class User {
 		this.organization = organization;
 	}
 	/**
+	 * @return the dir_def
+	 */
+	@Column(name = "dir_default", nullable= false, length= 255 )
+	public String getDir_def() {
+		return dir_def;
+	}
+	/**
+	 * @param dir_def the dir_def to set
+	 */
+	public void setDir_def(String dir_def) {
+		this.dir_def = dir_def;
+	}
+	/**
+	 * @return the dir_in
+	 */
+	@Column(name = "dir_input", nullable= false, length= 255 )
+	public String getDir_in() {
+		return dir_in;
+	}
+	/**
+	 * @param dir_in the dir_in to set
+	 */
+	public void setDir_in(String dir_in) {
+		this.dir_in = dir_in;
+	}
+	/**
+	 * @return the dir_out
+	 */
+	@Column(name = "dir_output", nullable= false, length= 255 )
+	public String getDir_out() {
+		return dir_out;
+	}
+	/**
+	 * @param dir_out the dir_out to set
+	 */
+	public void setDir_out(String dir_out) {
+		this.dir_out = dir_out;
+	}
+
+	@Column(name = "pbc_key", nullable= false, length= 255 )
+	public String getPublicKey() {
+		return publicKey;
+	}
+
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
+	}
+
+	@Column(name = "pvt_key", nullable= false, length= 255 )
+	public String getPrivateKey() {
+		return privateKey;
+	}
+
+	public void setPrivateKey(String privateKey) {
+		this.privateKey = privateKey;
+	}
+	/**
 	 * Inserisce l'utente e la sua chiave pubblica, se l'utente e' presente
 	 * viene sovrascritto il precedente valore
 	 * @param user
 	 * @param paramPblKey
 	 */
-	public void addPublicKey(String user, String paramPblKey){
+	@OneToMany(fetch = FetchType.LAZY, mappedBy= "user")
+	public Set<UserPublicKeyKnown> getPublicKeyKnown() {
+		return publicKeyKnown;
+	}
 
-		this.publicKeys.put(user, paramPblKey);
-	}
-	
-	/**
-	 * @return the publicKeys
-	 */
-	public HashMap<String, String> getPublicKeys() {
-		return publicKeys;
-	}
-	
-	public KeyPair getKeys() {
-		return keys;
-	}
-	
-	public void setKeys(KeyPair keys) {
-		this.keys = keys;
+	public void setPublicKeyKnown(Set<UserPublicKeyKnown> publicKeyKnown) {
+		this.publicKeyKnown = publicKeyKnown;
 	}
 }
