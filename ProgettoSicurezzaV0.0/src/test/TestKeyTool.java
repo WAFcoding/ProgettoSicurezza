@@ -16,7 +16,7 @@ public class TestKeyTool {
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
-		String name = "/home/giovanni/Dropbox/SII/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
+		String name = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
 		KeyStore ks = KeyTool.loadKeystore(/*"/home/giovanni/Scrivania/test_ks.jks"*/name, "pasqualino");
 		Certificate cert = KeyTool.getCertificate(ks, "client1_key");
 		System.out.println(cert.toString() + cert.getClass());

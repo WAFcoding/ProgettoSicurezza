@@ -9,6 +9,7 @@ import request_man.Request;
 import request_man.RequestGetLevelX;
 import request_man.RequestGetPublicKey;
 import request_man.RequestInvalid;
+import util.CertData;
 
 /**
  * Classe che permette di parsare la richiesta in ingresso e di eseguire 
@@ -38,8 +39,23 @@ public abstract class SecRequestFactory {
 	 * @throws SSLPeerUnverifiedException	Se il peer connesso non ha fornito autenticazione.
 	 */
 	public static Request generateRequest(String request, SSLSession session) throws SSLPeerUnverifiedException {
+		
+		//autenticazione TODO:completa autenticazione
+		
+		try { 
+			CertData data = new CertData(session.getPeerCertificateChain()[0]);
+			System.out.println(data.getIssuerDN() + " " + data.getSubjectDN() + " " + data.getSignatureAlgo());
+			//solo test
+		
+		} catch(Exception e) {
+			return new RequestInvalid();
+		}
+		
+		//vecchio sistema TODO:rimuovi
 		String trustedUser = session.getPeerPrincipal().getName();
 		trustedUser = parseCN(trustedUser);
+		
+		//<--fine autenticazione
 		
 		StringTokenizer tok = new StringTokenizer(request, " ");
 		int tokCount = tok.countTokens();

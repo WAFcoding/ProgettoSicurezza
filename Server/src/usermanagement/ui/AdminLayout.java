@@ -20,7 +20,7 @@ import javax.swing.ScrollPaneConstants;
 
 import layout.GeneralLayout;
 import usermanagement.controller.LayoutController;
-import usermanagement.controller.RequestController;
+import usermanagement.controller.AdminController;
 /**
  * TODO: x pasquale
  * 
@@ -204,9 +204,23 @@ public class AdminLayout implements GeneralLayout {
     private JPanel acceptedPanel;
     private JPanel rejectedPanel;
     
-    /*
-     *TODO Componenti pubbliche
-     */
+ 
+    //Request
+    private JTable pendingList;
+    private JButton btnAccept;
+    private JButton btnReject;
+    private JComboBox<Integer> acceptWithTrustLevel;
+    
+    //accepted
+    private JTable trustedList;
+    private JButton btnBlock;
+    private JButton btnUpdate;
+    private JComboBox<Integer> modifiedWithTrustLevel;
+    
+    //rejected
+    private JTable blockedList;
+    private JButton btnUnblock;
+    private JComboBox<Integer> reAcceptWithTrustLevel;
     
     
     private static final Integer[] levels = {1,2,3,4,5,6,7};//aggiungi altri eventualmente...
@@ -256,7 +270,7 @@ public class AdminLayout implements GeneralLayout {
 		JLabel intestazione = new JLabel("Pending Requests:");
 		ptable.add(intestazione);
 		
-		JTable pendingList = new JTable(RequestController.retrieveRequests(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		pendingList = new JTable(AdminController.retrieveRequests(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
 		JScrollPane scrolling = new JScrollPane(pendingList);
 		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		ptable.add(scrolling);
@@ -264,11 +278,11 @@ public class AdminLayout implements GeneralLayout {
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
-		JButton btnAccept = new JButton("Accept");
+		btnAccept = new JButton("Accept");
 		btnAccept.setEnabled(false);
 		pbuttons.add(btnAccept);
 		
-		JButton btnReject = new JButton("Reject");
+		btnReject = new JButton("Reject");
 		btnReject.setEnabled(false);
 		pbuttons.add(btnReject);
 		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
@@ -276,11 +290,10 @@ public class AdminLayout implements GeneralLayout {
 		JLabel trustLabel = new JLabel("Trust Level:");
 		pbuttons.add(trustLabel);
 		
-		JComboBox<Integer> trustLevel = new JComboBox<Integer>(levels);
+		acceptWithTrustLevel = new JComboBox<Integer>(levels);
+		acceptWithTrustLevel.setMaximumSize(new Dimension(100,200));
 		
-		trustLevel.setMaximumSize(new Dimension(100,200));
-		
-		pbuttons.add(trustLevel);
+		pbuttons.add(acceptWithTrustLevel);
 		
 		//collega al super-layout
 		superPanel.add(ptable);
@@ -303,7 +316,7 @@ public class AdminLayout implements GeneralLayout {
 		JLabel intestazione = new JLabel("Trusted Users:");
 		ptable.add(intestazione);
 		
-		JTable trustedList = new JTable(RequestController.retrieveAccepted(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		trustedList = new JTable(AdminController.retrieveAccepted(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
 		JScrollPane scrolling = new JScrollPane(trustedList);
 		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		ptable.add(scrolling);
@@ -311,11 +324,11 @@ public class AdminLayout implements GeneralLayout {
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
-		JButton btnBlock = new JButton("Block");
+		btnBlock = new JButton("Block");
 		btnBlock.setEnabled(false);
 		pbuttons.add(btnBlock);
 		
-		JButton btnUpdate = new JButton("Update Level");
+		btnUpdate = new JButton("Update Level");
 		btnUpdate.setEnabled(false);
 		pbuttons.add(btnUpdate);
 		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
@@ -323,11 +336,10 @@ public class AdminLayout implements GeneralLayout {
 		JLabel trustLabel = new JLabel("Trust Level:");
 		pbuttons.add(trustLabel);
 		
-		JComboBox<Integer> trustLevel = new JComboBox<Integer>(levels);
+		modifiedWithTrustLevel = new JComboBox<Integer>(levels);
+		modifiedWithTrustLevel.setMaximumSize(new Dimension(100,200));
 		
-		trustLevel.setMaximumSize(new Dimension(100,200));
-		
-		pbuttons.add(trustLevel);
+		pbuttons.add(modifiedWithTrustLevel);
 		
 		//collega al super-layout
 		superPanel.add(ptable);
@@ -350,7 +362,7 @@ public class AdminLayout implements GeneralLayout {
 		JLabel intestazione = new JLabel("Blocked Users:");
 		ptable.add(intestazione);
 		
-		JTable blockedList = new JTable(RequestController.retrieveBlocked(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		blockedList = new JTable(AdminController.retrieveBlocked(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
 		JScrollPane scrolling = new JScrollPane(blockedList);
 		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		ptable.add(scrolling);
@@ -359,7 +371,7 @@ public class AdminLayout implements GeneralLayout {
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
 		
-		JButton btnUnblock = new JButton("UnBlock");
+		btnUnblock = new JButton("UnBlock");
 		btnUnblock.setEnabled(false);
 		pbuttons.add(btnUnblock);
 		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
@@ -367,11 +379,11 @@ public class AdminLayout implements GeneralLayout {
 		JLabel trustLabel = new JLabel("Trust Level:");
 		pbuttons.add(trustLabel);
 		
-		JComboBox<Integer> trustLevel = new JComboBox<Integer>(levels);
+		reAcceptWithTrustLevel = new JComboBox<Integer>(levels);
 		
-		trustLevel.setMaximumSize(new Dimension(100,200));
+		reAcceptWithTrustLevel.setMaximumSize(new Dimension(100,200));
 		
-		pbuttons.add(trustLevel);
+		pbuttons.add(reAcceptWithTrustLevel);
 		
 		//collega al super-layout
 		superPanel.add(ptable);

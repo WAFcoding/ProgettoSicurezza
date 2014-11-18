@@ -7,9 +7,9 @@ import bean.UserCertificateBean;
 import db.dao.UserCertificateDAO;
 import db.dao.UserCertificateDaoImpl;
 
-public class RequestController {
+public class AdminController {
 
-	public RequestController() {
+	public AdminController() {
 	}
 	
 	protected static String[][] retrieveData(int status) {
@@ -38,6 +38,14 @@ public class RequestController {
 
 	public static String[][] retrieveBlocked() {
 		return retrieveData(RequestStatus.REJECTED);
+	}
+	
+	public static void acceptUser(UserCertificateBean user, int trustLevel) {
+		
+	}
+	
+	public static void blockUser(UserCertificateBean user, int trustLevel) {
+		
 	}
 
 }

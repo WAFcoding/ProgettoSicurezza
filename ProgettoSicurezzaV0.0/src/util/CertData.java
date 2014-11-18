@@ -29,7 +29,16 @@ public class CertData {
 		this.subjectDN = cert.getSubjectDN().getName();
 		this.signatureAlgo = cert.getSigAlgName();		
 	}
-	
+
+	public CertData(javax.security.cert.X509Certificate cert) throws IllegalArgumentException {
+		if(cert==null)
+			throw new IllegalArgumentException("Null certificate passed");
+		
+		this.issuerDN = cert.getIssuerDN().getName();
+		this.subjectDN = cert.getSubjectDN().getName();
+		this.signatureAlgo = cert.getSigAlgName();	
+	}
+
 	public String getIssuerDN() {
 		return issuerDN;
 	}

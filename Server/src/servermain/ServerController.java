@@ -31,7 +31,7 @@ public abstract class ServerController {
 	 * Il percorso del keystore da usare per la connessione cifrata e
 	 * l'autenticazione. FIXME: passare percorso keystore diversamente.
 	 */
-	protected static final String SERVER_KEYSTORE = "/home/giovanni/Dropbox/SII/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
+	protected static final String SERVER_KEYSTORE = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
 
 	/**
 	 * La password del keystore. FIXME:rimuovi
