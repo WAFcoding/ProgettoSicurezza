@@ -51,8 +51,8 @@ public abstract class ServerController {
 
 	protected SSLServerSocketFactory init() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException, UnrecoverableKeyException, KeyManagementException {
 		// TODO: rimuovi su versione release
-		if (ServerMasterKey.passphrase == null) {
-			ServerMasterKey.passphrase = this.serverPassword.toCharArray();
+		if (ServerMasterData.passphrase == null) {
+			ServerMasterData.passphrase = this.serverPassword.toCharArray();
 		}
 
 		System.setProperty("javax.net.ssl.trustStore", SERVER_KEYSTORE);
@@ -61,10 +61,10 @@ public abstract class ServerController {
 		// recupero keystore
 		KeyStore ks = KeyStore.getInstance("JKS");
 		ks.load(new FileInputStream(SERVER_KEYSTORE),
-				ServerMasterKey.passphrase);
+				ServerMasterData.passphrase);
 
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(ks, ServerMasterKey.passphrase);
+		kmf.init(ks, ServerMasterData.passphrase);
 
 		// inizializzo contesto SSL
 		SSLContext sc = SSLContext.getInstance("TLS");

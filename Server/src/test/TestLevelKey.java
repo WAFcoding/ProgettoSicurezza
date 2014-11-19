@@ -1,6 +1,6 @@
 package test;
 
-import servermain.ServerMasterKey;
+import servermain.ServerMasterData;
 import util.CryptoUtility;
 import util.CryptoUtility.CRYPTO_ALGO;
 import bean.LevelKey;
@@ -9,7 +9,7 @@ public class TestLevelKey {
 
 	public static void main(String[] args) throws Exception {
 		byte[] key = "pasqualino".getBytes();
-		ServerMasterKey.passphrase = "pasqualino".toCharArray(); 
+		ServerMasterData.passphrase = "pasqualino".toCharArray(); 
 		
 		String k1 = "pasqualino";
 		String k2 = "giovannino";

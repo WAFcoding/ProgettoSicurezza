@@ -2,7 +2,7 @@ package bean;
 
 import java.io.Serializable;
 
-import servermain.ServerMasterKey;
+import servermain.ServerMasterData;
 import util.CryptoUtility;
 import util.CryptoUtility.CRYPTO_ALGO;
 
@@ -20,13 +20,13 @@ public class LevelKey implements Serializable{
 
 	public String getKey() throws Exception {
 		byte[] fb64 = CryptoUtility.fromBase64(key);
-		byte[] enc = CryptoUtility.encrypt(CRYPTO_ALGO.AES, fb64, new String(ServerMasterKey.passphrase));
+		byte[] enc = CryptoUtility.encrypt(CRYPTO_ALGO.AES, fb64, new String(ServerMasterData.passphrase));
 		return CryptoUtility.toBase64(enc);
 	}
 
 	public void setKey(String key) throws Exception {
 		byte[] fb64 = CryptoUtility.fromBase64(key);
-		String dec = CryptoUtility.decrypt(CRYPTO_ALGO.AES, fb64, new String(ServerMasterKey.passphrase));
+		String dec = CryptoUtility.decrypt(CRYPTO_ALGO.AES, fb64, new String(ServerMasterData.passphrase));
 		this.key = CryptoUtility.toBase64(dec.getBytes());
 	}
 	

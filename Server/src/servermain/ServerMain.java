@@ -60,7 +60,8 @@ public class ServerMain {
 					"Password:");
 			cs.flush();
 			pwd = cs.readPassword();
-			ServerMasterKey.passphrase = pwd;
+			ServerMasterData.passphrase = pwd;
+			ServerMasterData.keyStorePath = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
 		}
 		
 		try {
