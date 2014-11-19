@@ -102,6 +102,7 @@ public class AdminController {
 			
 			//aggiunta al keystore del server
 			KeyTool.addCertificate(ks, certUser, user.getName()+"_"+user.getId());
+			KeyTool.storeKeystore(ks, ServerMasterData.keyStorePath , ServerMasterData.passphrase);
 			
 			//aggiornamento DB
 			UserCertificateDAO bdao = new UserCertificateDaoImpl();
@@ -119,9 +120,7 @@ public class AdminController {
 		} catch (KeyStoreException | NoSuchAlgorithmException
 				| CertificateException | IOException | UnrecoverableEntryException | InvalidKeyException | SecurityException | SignatureException | NoSuchProviderException | OperatorCreationException | InvalidKeySpecException e) {
 			e.printStackTrace();
-		}
-
-		
+		}		
 	}
 	
 	public static void blockUser(UserCertificateBean user, int trustLevel) {

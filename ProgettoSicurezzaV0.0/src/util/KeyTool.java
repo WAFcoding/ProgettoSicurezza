@@ -201,6 +201,12 @@ public class KeyTool {
 		ks.setCertificateEntry(alias, cert);
 	}
 	
+	public static void removeEntry(KeyStore ks,  String alias) throws KeyStoreException {
+		if(ks==null || alias == null || alias.isEmpty()) 
+			return;
+		ks.deleteEntry(alias);
+	}
+	
 	/**
 	 * Aggiunge una chiave privata al KeyStore.
 	 * 
