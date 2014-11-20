@@ -49,7 +49,7 @@ public class KeyTool {
 	 * @throws CertificateException
 	 * @throws IOException
 	 */
-	public static KeyStore loadKeystore(String path, char[] password) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+	public static synchronized KeyStore loadKeystore(String path, char[] password) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
 		if(path == null || password == null || path.isEmpty() || password.length==0)
 			return null;
 		
@@ -117,7 +117,7 @@ public class KeyTool {
 	 * @throws CertificateException
 	 * @throws IOException
 	 */
-	public static void storeKeystore(KeyStore ks, String name, char[] password) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+	public static synchronized void storeKeystore(KeyStore ks, String name, char[] password) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
 		if(ks==null || password==null || password.length==0 || name==null || name.isEmpty())
 			return;
 	    FileOutputStream fos = null;

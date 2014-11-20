@@ -37,33 +37,11 @@ public class AdminController {
 	public AdminController() {
 	}
 	
-	protected static String[][] retrieveData(int status) {
-		
-		UserCertificateDAO dao = new UserCertificateDaoImpl();
-		
-		List<UserCertificateBean> queryResult = dao.findByStatus(status);		
-		
-		String[][] dataMatrix = new String[queryResult.size()][5];
-		int i=0;
-		for(UserCertificateBean b : queryResult) {
-			dataMatrix[i] = new String[] {b.getName(), b.getSurname(), b.getCountry(), b.getCountryCode(), b.getOrganization()};
-			i++;
-		}
-		
-		return dataMatrix;
+	private static String buildUserAlias(UserCertificateBean user) {
+		return user.getName() + "_" + user.getId();
 	}
 	
-	public static String[][] retrieveRequests() {
-		return retrieveData(RequestStatus.PENDING);
-	}
-
-	public static String[][] retrieveAccepted() {
-		return retrieveData(RequestStatus.ACCEPTED);
-	}
-
-	public static String[][] retrieveBlocked() {
-		return retrieveData(RequestStatus.REJECTED);
-	}
+	
 	
 	public static void acceptUser(UserCertificateBean user, int trustLevel) {
 		if(trustLevel<0)
@@ -97,11 +75,11 @@ public class AdminController {
 					user.getCity(), 
 					user.getCountry(), 
 					"", 
-					new Date(), 
-					notAfter);
+					notAfter, 
+					new Date());
 			
 			//aggiunta al keystore del server
-			KeyTool.addCertificate(ks, certUser, user.getName()+"_"+user.getId());
+			KeyTool.addCertificate(ks, certUser, buildUserAlias(user));
 			KeyTool.storeKeystore(ks, ServerMasterData.keyStorePath , ServerMasterData.passphrase);
 			
 			//aggiornamento DB
@@ -111,7 +89,7 @@ public class AdminController {
 			
 			UserDAO udao = new UserDaoImpl();
 			User u = new User();
-			u.setUsername(user.getName()+"_"+user.getId());
+			u.setUsername(buildUserAlias(user));
 			u.setTrustLevel(trustLevel);
 			u.setPublicKey(user.getPublicKey());
 			
@@ -123,7 +101,32 @@ public class AdminController {
 		}		
 	}
 	
-	public static void blockUser(UserCertificateBean user, int trustLevel) {
+	public static void changeUserTrustLevel(User user, int newTrustLevel) {
+		if(newTrustLevel < 0)
+			return;
+		
+		UserDAO udao = new UserDaoImpl();
+		user.setTrustLevel(newTrustLevel);
+		
+		udao.updateUser(user);
+	}
+	
+	public static void blockUser(UserCertificateBean user) {
+		UserCertificateDAO bdao = new UserCertificateDaoImpl();
+		user.setStatus(RequestStatus.REJECTED);
+		bdao.updateUserCertificate(user);
+		
+		KeyStore ks;
+		try {
+			ks = KeyTool.loadKeystore(ServerMasterData.keyStorePath, ServerMasterData.passphrase);
+			if(ks!=null && ks.containsAlias(buildUserAlias(user))) {
+				KeyTool.removeEntry(ks, buildUserAlias(user));
+				KeyTool.storeKeystore(ks, ServerMasterData.keyStorePath, ServerMasterData.passphrase);
+			}
+		} catch (KeyStoreException | NoSuchAlgorithmException
+				| CertificateException | IOException e) {
+			e.printStackTrace();
+		}
 		
 	}
 

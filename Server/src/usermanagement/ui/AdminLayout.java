@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -17,10 +18,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.table.DefaultTableModel;
 
 import layout.GeneralLayout;
-import usermanagement.controller.LayoutController;
+import request_man.RequestStatus;
 import usermanagement.controller.AdminController;
+import usermanagement.controller.AdminTableFiller;
+import usermanagement.controller.LayoutController;
+import bean.UserCertificateBean;
 /**
  * TODO: x pasquale
  * 
@@ -204,6 +209,10 @@ public class AdminLayout implements GeneralLayout {
     private JPanel acceptedPanel;
     private JPanel rejectedPanel;
     
+    //filler
+    private AdminTableFiller reqFiller;
+    private AdminTableFiller accFiller;
+    private AdminTableFiller rejFiller;
  
     //Request
     private JTable pendingList;
@@ -232,6 +241,11 @@ public class AdminLayout implements GeneralLayout {
     
 	@Override
 	public void addComponentsToPane() {
+		
+		reqFiller = new AdminTableFiller(RequestStatus.PENDING);
+		accFiller = new AdminTableFiller(RequestStatus.ACCEPTED);
+		rejFiller = new AdminTableFiller(RequestStatus.REJECTED);
+		
 		pane.removeAll();
 		pane.setLayout(new CardLayout());
 		
@@ -270,10 +284,18 @@ public class AdminLayout implements GeneralLayout {
 		JLabel intestazione = new JLabel("Pending Requests:");
 		ptable.add(intestazione);
 		
-		pendingList = new JTable(AdminController.retrieveRequests(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		pendingList = new JTable(reqFiller.getData(), AdminTableFiller.fields);
 		JScrollPane scrolling = new JScrollPane(pendingList);
 		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		ptable.add(scrolling);
+		
+		pendingList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				btnAccept.setEnabled(true);
+				btnReject.setEnabled(true);
+			}
+		});
 		
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
@@ -286,6 +308,35 @@ public class AdminLayout implements GeneralLayout {
 		btnReject.setEnabled(false);
 		pbuttons.add(btnReject);
 		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
+		
+		btnAccept.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int selected = pendingList.getSelectedRow();
+				UserCertificateBean user = reqFiller.getList().get(selected);
+				int selectedTL = acceptWithTrustLevel.getItemAt(acceptWithTrustLevel.getSelectedIndex()).intValue();
+				
+				AdminController.acceptUser(user, selectedTL);
+				accFiller.add(user);
+				reqFiller.remove(selected);
+				pendingList.setModel(new DefaultTableModel(reqFiller.getData(), AdminTableFiller.fields));
+				trustedList.setModel(new DefaultTableModel(accFiller.getData(), AdminTableFiller.fields));
+			}
+		});
+		
+		btnReject.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int selected = pendingList.getSelectedRow();
+				UserCertificateBean user = reqFiller.getList().get(selected);
+				
+				AdminController.blockUser(user);
+				rejFiller.add(user);
+				reqFiller.remove(selected);
+				pendingList.setModel(new DefaultTableModel(reqFiller.getData(), AdminTableFiller.fields));
+				blockedList.setModel(new DefaultTableModel(rejFiller.getData(), AdminTableFiller.fields));
+			}
+		});
 		
 		JLabel trustLabel = new JLabel("Trust Level:");
 		pbuttons.add(trustLabel);
@@ -316,7 +367,7 @@ public class AdminLayout implements GeneralLayout {
 		JLabel intestazione = new JLabel("Trusted Users:");
 		ptable.add(intestazione);
 		
-		trustedList = new JTable(AdminController.retrieveAccepted(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		trustedList = new JTable(accFiller.getData(), AdminTableFiller.fields);
 		JScrollPane scrolling = new JScrollPane(trustedList);
 		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		ptable.add(scrolling);
@@ -362,7 +413,7 @@ public class AdminLayout implements GeneralLayout {
 		JLabel intestazione = new JLabel("Blocked Users:");
 		ptable.add(intestazione);
 		
-		blockedList = new JTable(AdminController.retrieveBlocked(), new String[] {"Name", "Surname", "Country", "Country Code", "Organization"});
+		blockedList  = new JTable(rejFiller.getData(), AdminTableFiller.fields);
 		JScrollPane scrolling = new JScrollPane(blockedList);
 		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		ptable.add(scrolling);
