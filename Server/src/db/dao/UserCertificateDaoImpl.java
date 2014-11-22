@@ -6,10 +6,12 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import db.DbHibernateUtils;
+import request_man.RequestStatus;
 import util.CryptoUtility;
 import util.CryptoUtility.HASH_ALGO;
+import bean.User;
 import bean.UserCertificateBean;
+import db.DbHibernateUtils;
 
 public class UserCertificateDaoImpl implements UserCertificateDAO {
 
@@ -22,6 +24,8 @@ public class UserCertificateDaoImpl implements UserCertificateDAO {
 
 	@Override
 	public String saveUserCertificate(UserCertificateBean bean) {
+		if(bean==null)
+			return null;
 		Session session = DbHibernateUtils.getTrustedUserDbSession();
 
 		Transaction tx = session.beginTransaction();
@@ -48,6 +52,8 @@ public class UserCertificateDaoImpl implements UserCertificateDAO {
 
 	@Override
 	public void updateUserCertificate(UserCertificateBean bean) {
+		if(bean==null)
+			return;
 		Session s = getSession();
 		Transaction tx = s.beginTransaction();
 		s.update(bean);
@@ -56,6 +62,8 @@ public class UserCertificateDaoImpl implements UserCertificateDAO {
 
 	@Override
 	public void deleteUserCertificate(UserCertificateBean bean) {
+		if(bean==null)
+			return;
 		Session s = getSession();
 		Transaction tx = s.beginTransaction();
 		s.delete(bean);
@@ -64,6 +72,8 @@ public class UserCertificateDaoImpl implements UserCertificateDAO {
 
 	@Override
 	public UserCertificateBean findBySecureId(String secId) {
+		if(secId==null)
+			return null;
 		Session s = getSession();
 		Transaction tx = s.beginTransaction();
 
@@ -97,6 +107,15 @@ public class UserCertificateDaoImpl implements UserCertificateDAO {
 		@SuppressWarnings("unchecked")
 		List<UserCertificateBean> beans = (List<UserCertificateBean>) queryResult;	
 		tx.commit();
+		
+		if (status == RequestStatus.ACCEPTED) {
+			UserDAO udao = new UserDaoImpl();
+			for (UserCertificateBean b : beans) {
+				User u = udao.findUserByUsername(b.getUID());
+				if (u != null)
+					b.setTrustLevel(u.getTrustLevel());
+			}
+		}
 		return beans;
 	}
 

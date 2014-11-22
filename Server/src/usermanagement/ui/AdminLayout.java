@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -156,7 +155,6 @@ import bean.UserCertificateBean;
 		c.insets= new Insets(10, 10, 0, 10);
 		pane.add(organizationText, c);
 		
-		//Date TODO
 		JLabel notBefore = new JLabel(new Date().toString());
 		notBefore.addMouseListener(new MouseClickListener());
 		c.gridx= 0;c.gridy= 7;c.weightx = 10;c.ipady=0;c.ipadx=0;
@@ -270,7 +268,6 @@ public class AdminLayout implements GeneralLayout {
 	}
 	
 	private void buildRequestPanel(JPanel p)  {
-		//TODO: aggiungere i listener
 		
 		p.setLayout(new CardLayout());
 		
@@ -321,6 +318,9 @@ public class AdminLayout implements GeneralLayout {
 				reqFiller.remove(selected);
 				pendingList.setModel(new DefaultTableModel(reqFiller.getData(), AdminTableFiller.fields));
 				trustedList.setModel(new DefaultTableModel(accFiller.getData(), AdminTableFiller.fields));
+				
+				btnAccept.setEnabled(false);
+				btnReject.setEnabled(false);
 			}
 		});
 		
@@ -335,6 +335,9 @@ public class AdminLayout implements GeneralLayout {
 				reqFiller.remove(selected);
 				pendingList.setModel(new DefaultTableModel(reqFiller.getData(), AdminTableFiller.fields));
 				blockedList.setModel(new DefaultTableModel(rejFiller.getData(), AdminTableFiller.fields));
+				
+				btnAccept.setEnabled(false);
+				btnReject.setEnabled(false);
 			}
 		});
 		
@@ -372,6 +375,14 @@ public class AdminLayout implements GeneralLayout {
 		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		ptable.add(scrolling);
 		
+		trustedList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				btnBlock.setEnabled(true);
+				btnUpdate.setEnabled(true);
+			}
+		});
+		
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
@@ -383,6 +394,40 @@ public class AdminLayout implements GeneralLayout {
 		btnUpdate.setEnabled(false);
 		pbuttons.add(btnUpdate);
 		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
+		
+		btnBlock.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int selected = trustedList.getSelectedRow();
+				UserCertificateBean user = accFiller.getList().get(selected);
+				AdminController.blockUser(user);
+				
+				rejFiller.add(user);
+				accFiller.remove(selected);
+				blockedList.setModel(new DefaultTableModel(rejFiller.getData(), AdminTableFiller.fields));
+				trustedList.setModel(new DefaultTableModel(accFiller.getData(), AdminTableFiller.fields));
+				
+				btnBlock.setEnabled(false);
+				btnUpdate.setEnabled(false);
+			}
+		});
+		
+		btnUpdate.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int selected = trustedList.getSelectedRow();
+				UserCertificateBean user = accFiller.getList().get(selected);
+				int selectedTL = modifiedWithTrustLevel.getItemAt(modifiedWithTrustLevel.getSelectedIndex()).intValue();
+				
+				AdminController.changeUserTrustLevel(user, selectedTL);
+
+				accFiller.updateTrustLevel(selected, selectedTL);
+				trustedList.setModel(new DefaultTableModel(accFiller.getData(), AdminTableFiller.fields));
+				
+				btnBlock.setEnabled(false);
+				btnUpdate.setEnabled(false);
+			}
+		});
 		
 		JLabel trustLabel = new JLabel("Trust Level:");
 		pbuttons.add(trustLabel);
@@ -418,6 +463,13 @@ public class AdminLayout implements GeneralLayout {
 		scrolling.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		ptable.add(scrolling);
 		
+		blockedList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				btnUnblock.setEnabled(true);
+			}
+		});
+		
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
@@ -426,6 +478,24 @@ public class AdminLayout implements GeneralLayout {
 		btnUnblock.setEnabled(false);
 		pbuttons.add(btnUnblock);
 		pbuttons.add(Box.createRigidArea(new Dimension(15,0)));
+		
+		btnUnblock.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int selected = blockedList.getSelectedRow();
+				UserCertificateBean user = rejFiller.getList().get(selected);
+				int selectedTL = reAcceptWithTrustLevel.getItemAt(reAcceptWithTrustLevel.getSelectedIndex()).intValue();
+				
+				AdminController.acceptUser(user, selectedTL);
+				accFiller.add(user);
+				rejFiller.remove(selected);
+				blockedList.setModel(new DefaultTableModel(rejFiller.getData(), AdminTableFiller.fields));
+				trustedList.setModel(new DefaultTableModel(accFiller.getData(), AdminTableFiller.fields));
+				
+				btnUnblock.setEnabled(false);
+
+			}
+		});
 		
 		JLabel trustLabel = new JLabel("Trust Level:");
 		pbuttons.add(trustLabel);
@@ -459,31 +529,4 @@ public class AdminLayout implements GeneralLayout {
 	public void setControl(LayoutController control) {
 		this.control = control;
 	}
-	
-	
-	
-	private class MouseClickListener implements MouseListener {
-
-		@Override
-		public void mouseClicked(MouseEvent arg0) {
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent arg0) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent arg0) {
-		}
-
-		@Override
-		public void mousePressed(MouseEvent arg0) {
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent arg0) {
-		}
-		
-	}
-
 }

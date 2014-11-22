@@ -2,10 +2,9 @@ package usermanagement.controller;
 
 import java.util.List;
 
-import request_man.RequestStatus;
+import bean.UserCertificateBean;
 import db.dao.UserCertificateDAO;
 import db.dao.UserCertificateDaoImpl;
-import bean.UserCertificateBean;
 
 public class AdminTableFiller {
 
@@ -13,7 +12,7 @@ public class AdminTableFiller {
 	private List<UserCertificateBean> list;
 	private int fillingType;
 	
-	public static final String[] fields = {"Name", "Surname", "Country", "Country Code", "Organization"};
+	public static final String[] fields = {"Name", "Surname", "Country", "Country Code", "Organization", "Trust Level"};
 
 	public AdminTableFiller(int fillingType) {
 		this.fillingType = fillingType;
@@ -21,10 +20,14 @@ public class AdminTableFiller {
 	}
 
 	protected void fillMatrix(List<UserCertificateBean> list) {
-		data = new String[list.size()][5];
+		data = new String[list.size()][fields.length];
 		int i = 0;
 		for (UserCertificateBean b : list) {
-			data[i] = new String[] { b.getName(), b.getSurname(), b.getCountry(), b.getCountryCode(), b.getOrganization() };
+			String tLevel = b.getTrustLevel() + "";
+			if(b.getTrustLevel()<0)
+				tLevel = "N.D.";
+			
+			data[i] = new String[] { b.getName(), b.getSurname(), b.getCountry(), b.getCountryCode(), b.getOrganization(), tLevel };
 			i++;
 		}
 	}
@@ -32,7 +35,7 @@ public class AdminTableFiller {
 	protected void retrieveData(int status) {
 
 		UserCertificateDAO dao = new UserCertificateDaoImpl();
-
+		
 		list = dao.findByStatus(status);
 		
 		fillMatrix(list);
@@ -57,6 +60,11 @@ public class AdminTableFiller {
 	
 	public void update() {
 		retrieveData(this.fillingType);
+	}
+	
+	public void updateTrustLevel(int index, int trustLevel) {
+		list.get(index).setTrustLevel(trustLevel);
+		fillMatrix(list);
 	}
 	
 	public void add(UserCertificateBean bean) {

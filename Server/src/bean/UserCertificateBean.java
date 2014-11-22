@@ -13,13 +13,19 @@ public class UserCertificateBean implements Serializable{
 	private String organization;
 	private String secIdentifier;
 	private String publicKey;
+	private int trustLevel;
 	private int status;
 	
 	private int id;
 	
 	public UserCertificateBean() {
+		this.trustLevel = -1;
 	}
 
+	public String getUID() {
+		return getName() + "_" + getId();
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -98,6 +104,14 @@ public class UserCertificateBean implements Serializable{
 
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
+	}
+
+	public int getTrustLevel() {
+		return trustLevel;
+	}
+
+	public void setTrustLevel(int trustLevel) {
+		this.trustLevel = trustLevel;
 	}
 
 	@Override

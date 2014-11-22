@@ -21,11 +21,11 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class TestClient {
 	
-	private static final String path = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/client1.jks";
+	private static final String path = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/test_user.jks";
 	
 	public static void main(String[] args) throws Exception{
 		System.setProperty("javax.net.ssl.trustStore",path);
-		System.setProperty("javax.net.ssl.trustStorePassword", "pasqualino");
+		System.setProperty("javax.net.ssl.trustStorePassword", "progettoSII");
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		PrintStream out = System.out;
 
@@ -36,7 +36,7 @@ public class TestClient {
 		ks.load(new FileInputStream(path), null);
 		
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(ks, "pasqualino".toCharArray());
+		kmf.init(ks, "progettoSII".toCharArray());
 		
 		sc.init(kmf.getKeyManagers(), null, null);
 

@@ -16,7 +16,6 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
-import java.util.List;
 
 import org.bouncycastle.operator.OperatorCreationException;
 
@@ -35,13 +34,7 @@ import db.dao.UserDaoImpl;
 public class AdminController {
 
 	public AdminController() {
-	}
-	
-	private static String buildUserAlias(UserCertificateBean user) {
-		return user.getName() + "_" + user.getId();
-	}
-	
-	
+	}	
 	
 	public static void acceptUser(UserCertificateBean user, int trustLevel) {
 		if(trustLevel<0)
@@ -52,7 +45,9 @@ public class AdminController {
 		try {
 			//chiave privata server
 			ks = KeyTool.loadKeystore(ServerMasterData.keyStorePath, ServerMasterData.passphrase);
-			PrivateKey serverPrivateKey = KeyTool.getPrivateKey(ks, "server_key", ServerMasterData.passphrase) ; 
+			PrivateKey serverPrivateKey = KeyTool.getPrivateKey(ks, "server", ServerMasterData.passphrase) ; 
+			
+			System.out.println(serverPrivateKey.getClass());
 			
 			//chiave pubblica utente
 			PublicKey clientPublicKey;
@@ -79,7 +74,7 @@ public class AdminController {
 					new Date());
 			
 			//aggiunta al keystore del server
-			KeyTool.addCertificate(ks, certUser, buildUserAlias(user));
+			KeyTool.addCertificate(ks, certUser, user.getUID());
 			KeyTool.storeKeystore(ks, ServerMasterData.keyStorePath , ServerMasterData.passphrase);
 			
 			//aggiornamento DB
@@ -89,11 +84,12 @@ public class AdminController {
 			
 			UserDAO udao = new UserDaoImpl();
 			User u = new User();
-			u.setUsername(buildUserAlias(user));
+			u.setUsername(user.getUID());
 			u.setTrustLevel(trustLevel);
 			u.setPublicKey(user.getPublicKey());
 			
 			udao.saveUser(u);
+			user.setTrustLevel(trustLevel);
 			
 		} catch (KeyStoreException | NoSuchAlgorithmException
 				| CertificateException | IOException | UnrecoverableEntryException | InvalidKeyException | SecurityException | SignatureException | NoSuchProviderException | OperatorCreationException | InvalidKeySpecException e) {
@@ -101,14 +97,15 @@ public class AdminController {
 		}		
 	}
 	
-	public static void changeUserTrustLevel(User user, int newTrustLevel) {
+	public static void changeUserTrustLevel(UserCertificateBean user, int newTrustLevel) {
 		if(newTrustLevel < 0)
 			return;
 		
 		UserDAO udao = new UserDaoImpl();
-		user.setTrustLevel(newTrustLevel);
+		User u = udao.findUserByUsername(user.getUID());
+		u.setTrustLevel(newTrustLevel);
 		
-		udao.updateUser(user);
+		udao.updateUser(u);
 	}
 	
 	public static void blockUser(UserCertificateBean user) {
@@ -116,11 +113,15 @@ public class AdminController {
 		user.setStatus(RequestStatus.REJECTED);
 		bdao.updateUserCertificate(user);
 		
+		UserDAO udao = new UserDaoImpl();
+		User u = udao.findUserByUsername(user.getUID());
+		udao.deleteUser(u);
+		
 		KeyStore ks;
 		try {
 			ks = KeyTool.loadKeystore(ServerMasterData.keyStorePath, ServerMasterData.passphrase);
-			if(ks!=null && ks.containsAlias(buildUserAlias(user))) {
-				KeyTool.removeEntry(ks, buildUserAlias(user));
+			if(ks!=null && ks.containsAlias(user.getUID())) {
+				KeyTool.removeEntry(ks, user.getUID());
 				KeyTool.storeKeystore(ks, ServerMasterData.keyStorePath, ServerMasterData.passphrase);
 			}
 		} catch (KeyStoreException | NoSuchAlgorithmException

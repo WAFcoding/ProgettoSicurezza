@@ -20,6 +20,8 @@ public class UserDaoImpl implements UserDAO{
 
 	@Override
 	public void saveUser(User u) {
+		if(u==null)
+			return;
 		Session s = getSession();
 		Transaction tx = s.beginTransaction();
 		s.save(u);
@@ -28,6 +30,8 @@ public class UserDaoImpl implements UserDAO{
 
 	@Override
 	public void updateUser(User u) {
+		if(u==null)
+			return;
 		Session s = getSession();
 		Transaction tx = s.beginTransaction();
 		s.update(u);
@@ -36,6 +40,8 @@ public class UserDaoImpl implements UserDAO{
 
 	@Override
 	public void deleteUser(User u) {
+		if(u==null)
+			return;
 		Session s = getSession();
 		Transaction tx = s.beginTransaction();
 		s.delete(u);
@@ -44,6 +50,8 @@ public class UserDaoImpl implements UserDAO{
 
 	@Override
 	public User findUserByUsername(String username) {
+		if(username==null)
+			return null;
 		Session s = getSession();
 		Transaction tx = s.beginTransaction();
 

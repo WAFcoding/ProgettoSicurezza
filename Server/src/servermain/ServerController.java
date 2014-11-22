@@ -28,15 +28,10 @@ public abstract class ServerController {
 	protected static int DEFAULT_SERVER_PORT = 8888;
 
 	/**
-	 * Il percorso del keystore da usare per la connessione cifrata e
-	 * l'autenticazione. FIXME: passare percorso keystore diversamente.
+	 *FIXME: rimuovi questi campi in RELEASE
 	 */
 	protected static final String SERVER_KEYSTORE = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
-
-	/**
-	 * La password del keystore. FIXME:rimuovi
-	 */
-	protected String serverPassword = "pasqualino";
+	protected String serverPassword = "progettoSII";
 
 	/**
 	 * Il thread principale del server.
@@ -50,17 +45,21 @@ public abstract class ServerController {
 	protected AtomicBoolean running = new AtomicBoolean(false);
 
 	protected SSLServerSocketFactory init() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException, UnrecoverableKeyException, KeyManagementException {
-		// TODO: rimuovi su versione release
+		// TODO: rimuovi su versione release --> ricontrolla tutto
+		if(ServerMasterData.keyStorePath == null) {
+			ServerMasterData.keyStorePath = SERVER_KEYSTORE;
+		}
 		if (ServerMasterData.passphrase == null) {
 			ServerMasterData.passphrase = this.serverPassword.toCharArray();
 		}
 
-		System.setProperty("javax.net.ssl.trustStore", SERVER_KEYSTORE);
-		System.setProperty("javax.net.ssl.trustStorePassword", serverPassword);
+		
+		System.setProperty("javax.net.ssl.trustStore", ServerMasterData.keyStorePath);
+		System.setProperty("javax.net.ssl.trustStorePassword", new String(ServerMasterData.passphrase));
 
 		// recupero keystore
 		KeyStore ks = KeyStore.getInstance("JKS");
-		ks.load(new FileInputStream(SERVER_KEYSTORE),
+		ks.load(new FileInputStream(ServerMasterData.keyStorePath),
 				ServerMasterData.passphrase);
 
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
