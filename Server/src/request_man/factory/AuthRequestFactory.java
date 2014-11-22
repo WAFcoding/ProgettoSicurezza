@@ -5,6 +5,7 @@ import javax.net.ssl.SSLSession;
 
 import request_man.Request;
 import request_man.RequestInvalidJson;
+import request_man.RequestRetrieve;
 import request_man.RequestStatus;
 import request_man.RequestSubmit;
 import bean.UserCertificateBean;
@@ -98,9 +99,7 @@ public abstract class AuthRequestFactory {
 			} else if(reqType.equalsIgnoreCase(TYPE.RETRIEVE.toString())) {
 				//controlla presenza campo ID
 				String id = req.get(_id).getAsString();
-				//TODO: completa gestione recupero certificato
-				
-				
+				return new RequestRetrieve(id);				
 			} else {
 				return new RequestInvalidJson("Unknown type");
 			}
@@ -108,6 +107,5 @@ public abstract class AuthRequestFactory {
 			e.printStackTrace();
 			return new RequestInvalidJson("Malformed request");
 		}
-		return new RequestInvalidJson("Invalid operation");
 	}
 }
