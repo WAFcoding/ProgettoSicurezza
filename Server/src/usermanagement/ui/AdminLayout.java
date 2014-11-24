@@ -297,6 +297,17 @@ public class AdminLayout implements GeneralLayout {
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
+		JButton update = new JButton("Update");
+		pbuttons.add(update);
+		
+		update.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				reqFiller.update();
+				pendingList.setModel(new DefaultTableModel(reqFiller.getData(), AdminTableFiller.fields));
+			}
+		});
+		
 		btnAccept = new JButton("Accept");
 		btnAccept.setEnabled(false);
 		pbuttons.add(btnAccept);
@@ -386,6 +397,18 @@ public class AdminLayout implements GeneralLayout {
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
+		
+		JButton update = new JButton("Update");
+		pbuttons.add(update);
+		
+		update.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				accFiller.update();
+				trustedList.setModel(new DefaultTableModel(accFiller.getData(), AdminTableFiller.fields));
+			}
+		});
+		
 		btnBlock = new JButton("Block");
 		btnBlock.setEnabled(false);
 		pbuttons.add(btnBlock);
@@ -473,6 +496,17 @@ public class AdminLayout implements GeneralLayout {
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
+		
+		JButton update = new JButton("Update");
+		pbuttons.add(update);
+		
+		update.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				rejFiller.update();
+				blockedList.setModel(new DefaultTableModel(rejFiller.getData(), AdminTableFiller.fields));
+			}
+		});
 		
 		btnUnblock = new JButton("UnBlock");
 		btnUnblock.setEnabled(false);

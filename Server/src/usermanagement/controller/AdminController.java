@@ -104,6 +104,7 @@ public class AdminController {
 		UserDAO udao = new UserDaoImpl();
 		User u = udao.findUserByUsername(user.getUID());
 		u.setTrustLevel(newTrustLevel);
+		user.setTrustLevel(newTrustLevel);
 		
 		udao.updateUser(u);
 	}

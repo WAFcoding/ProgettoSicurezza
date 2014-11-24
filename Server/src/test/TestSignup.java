@@ -1,9 +1,5 @@
 package test;
 
-/**
- * SslSocketClient.java
- * Copyright (c) 2005 by Dr. Herong Yang
- */
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -21,11 +17,14 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class TestSignup {
 	
-	private static final String path = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/client1.jks";
+	private static final String PWD = "progettoSII";
+	
+	//il keystore del client deve essere preesistente e deve contenere il certificato del server come "fidato".
+	private static final String path = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/client.jks";
 	
 	public static void main(String[] args) throws Exception{
 		System.setProperty("javax.net.ssl.trustStore",path);
-		System.setProperty("javax.net.ssl.trustStorePassword", "pasqualino");
+		System.setProperty("javax.net.ssl.trustStorePassword", PWD);
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		PrintStream out = System.out;
 
@@ -36,7 +35,7 @@ public class TestSignup {
 		ks.load(new FileInputStream(path), null);
 		
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(ks, "pasqualino".toCharArray());
+		kmf.init(ks, PWD.toCharArray());
 
 		sc.init(kmf.getKeyManagers(), null, null);
 
