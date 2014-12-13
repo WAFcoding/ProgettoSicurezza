@@ -188,9 +188,14 @@ public class HomeLayout implements GeneralLayout{
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					//TODO aggiungere la chiamata a UserManager
-					control.getUser_manager().login();
-					getControl().setLayout("PRIMARY");
+					String name= login_firstname.getText();
+					String surname= login_secondname.getText();
+					String password= login_pwd.getPassword().toString();
+					String code= login_code.getText();
+					String[] login= {name, surname, password, code};
+
+					if(control.getUser_manager().login(login))
+						getControl().setLayout("PRIMARY");
 				}
 			});
 			button.setBackground(Color.BLUE);

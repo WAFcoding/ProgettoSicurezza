@@ -7,8 +7,11 @@ import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -17,6 +20,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 import util.CryptoUtility;
+import util.CryptoUtility.HASH_ALGO;
 
 /**
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -58,19 +62,33 @@ public class UserManager {
 	public void checkForLogin(){
 		
 	}
-	public void login(){
+	public boolean login(String[] arg){
+		
+		String name= arg[0];
+		String surname= arg[1];
+		String password= arg[2];
+		String code= arg[3];
+		//TODO UserManager: controlli su login
+		//query exact match su nome e cognome
+		//hash password
+		//hash code
+		
+		
 		System.out.println("stai effettuando il login");
+		
+		return false;
 	}
 	//===================REGISTRATION===========
 
 	public void registration(String[] registration_value){
 		
+		
 		String name= registration_value[0];
 		String surname= registration_value[1];
 		String password= registration_value[2];
-		String confirm_password= registration_value[3];
+		//String confirm_password= registration_value[3];
 		String mail= registration_value[4];
-		String confirm_mail= registration_value[5];
+		//String confirm_mail= registration_value[5];
 		String city= registration_value[6];
 		String country= registration_value[7];
 		String country_code= registration_value[8];
@@ -79,21 +97,72 @@ public class UserManager {
 		String dir_in= registration_value[11];
 		String dir_put= registration_value[12];
 		
+		//genero la coppia di chiavi
 		KeyPair key;
 		String public_key= "";
 		String private_key= "";
 		try {
 			key = getKey();
-			public_key= key.getPublic().toString();
-			private_key= key.getPrivate().toString();
+			public_key= CryptoUtility.toBase64(key.getPublic().getEncoded()).replace("\n", "");
+			private_key= CryptoUtility.toBase64(key.getPrivate().getEncoded()).replace("\n", "");
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
 			
 			e.printStackTrace();
 		}
-		//TODO UserManager: eseguire la query, dal db prelevare l'utente appena inserito, creare user, aggiungerlo alla lista
+
+		Session session= getSessionFactory().openSession();
+		//genero il codice
+		String code= generateCode(session, public_key);
+		Transaction tx= null;
+		try{
+			//hash della password
+			String hash_password= CryptoUtility.hash(HASH_ALGO.SHA1, password);
+			//hash del code per autenticazione forte
+			String hash_code= CryptoUtility.hash(HASH_ALGO.SHA1, code);
+			tx= session.beginTransaction();
+			
+			User user= new User();
+			user.setName(name);
+			user.setSurname(surname);
+			user.setMail(mail);
+			user.setCode(hash_code);
+			user.setCity(city);
+			user.setCountry(country);
+			user.setCountry_code(country_code);
+			user.setOrganization(organization);
+			user.setDir_def(dir_def);
+			user.setDir_in(dir_in);
+			user.setDir_out(dir_put);
+			user.setPublicKey(public_key);//FIXME UserManager: controllo se e' nulla
+			user.setPrivateKey(private_key);//FIXME UserManager: controllo se e' nulla
+			user.setPassword(hash_password);
+			session.save(user);
 		
+			tx.commit();
+			
+			//TODO UserManager: creare file pdf con riassunto dei dati necessari al login e farlo scaricare all'utente
+			
+			//TODO UserMAnager: questo si fa quando si prelevano le informazioni di un utente per
+			//criptare un documento
+			/*UserPublicKeyKnown user_pbck= new UserPublicKeyKnown();
+			user_pbck.setID_user("3");
+			user_pbck.setPbc_key("yuuuuuuuuuuuuuuu");
+			user_pbck.setUser(user);
+			user.getPublicKeyKnown().add(user_pbck);
+			session.save(user_pbck);
+			*/
+		}
+		catch(Exception e){
+			if(tx != null) tx.rollback();
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}		
 		
-		System.out.println("Stai registrando l'utente: " + name + ", "+ surname + ", con chiave pubblica " + public_key + " e chiave private " + private_key);
+		System.out.println("Stai registrando l'utente: " + name + ", "+ surname + 
+							", con chiave pubblica " + public_key + "\ne chiave privata " + private_key + 
+							"\nlunghe " + public_key.length() + " e " + private_key.length());
 		
 	}
 	
@@ -176,28 +245,50 @@ public class UserManager {
 	 * @param password
 	 * @return il code
 	 */
-	public String generateCode(String user, String password){
-		
-		return "00000";
+	public static String generateCode(Session session, String pbc_key){
+
+		Random rn= new Random();
+		int start= rn.nextInt(200);//non dovrebbero esserci problemi, la chiave è a 255 quindi sto nel range
+		String code= pbc_key.substring(start, start + 5);
+
+		boolean isAlreadyUsed= true;
+		while(isAlreadyUsed){
+			if(codeIsPresent(code, session)){
+				start= rn.nextInt(200);//non dovrebbero esserci problemi, la chiave è a 255 quindi sto nel range
+				code= pbc_key.substring(start, start + 5);
+			}
+			else
+				isAlreadyUsed= false;
+		}
+
+		return code;
 	}
 	/**
 	 * Controlla che il code generato non sia gia utilizzato da altri utenti
 	 * @param paramCode
 	 * @return
 	 */
-	public boolean codeIsPresent(String paramCode){
-		//TODO eseguire una query che preleva tutti i code nella tabella degli utenti
-		return true;
+	public static boolean codeIsPresent(String paramCode, Session session){
+		//FIXME non mi convince
+		String hql= "SELECT U.code FROM User U";
+		Query query= session.createQuery(hql);
+		List<String> result= query.list();
+		try {
+			paramCode= CryptoUtility.hash(HASH_ALGO.SHA1, paramCode);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result.contains(paramCode);
 	}
-	
+
 	public static void main(String[] args){
 		System.out.println("prova hibernate");
 		Session session= UserManager.getSessionFactory().openSession();
 		Transaction tx= null;
 		try{
-			tx= session.beginTransaction();
+			//tx= session.beginTransaction();
 			
-			User user= new User();
+			/*User user= new User();
 			user.setID(0);
 			user.setName("giov");
 			user.setSurname("ros");
@@ -220,13 +311,19 @@ public class UserManager {
 			user_pbck.setUser(user);
 			user.getPublicKeyKnown().add(user_pbck);
 			session.save(user_pbck);
+			*/
+			String code= generateCode(session, "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmW8LWgFUT3JjhkV4zulQX0bvMIfuQxTm5O40L2q+mulqvE55OlTGICgDxHDPjGmtICd70f5u+eO+vw3QKC9E1srmVnUW1V/1tw7gOUY5CfeFTIwX8he+4BLPP1+Mj9BvYiJqhceEKrIwkzNWh/0YWUFTnpgeqtdhQZtDx0HUN2QIDAQAB");
+			if(codeIsPresent(code, session)){
+				System.out.println(code + " is present");
+			}
+			else
+				System.out.println(code + " is not present");
+			//tx.commit();
 			
-			tx.commit();
-			
-			System.out.println("ok");
+			//System.out.println("ok");
 		}
 		catch(HibernateException e){
-			if(tx != null) tx.rollback();
+			//if(tx != null) tx.rollback();
 			e.printStackTrace();
 		}
 		finally{

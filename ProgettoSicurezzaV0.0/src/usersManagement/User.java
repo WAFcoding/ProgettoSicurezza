@@ -32,6 +32,7 @@ public class User implements Serializable{
 	private String dir_out;
 	private String publicKey;
 	private String privateKey;
+	private String password;
 	
 	private Set<UserPublicKeyKnown> publicKeyKnown= new HashSet<UserPublicKeyKnown>(0);
 	
@@ -215,7 +216,7 @@ public class User implements Serializable{
 		this.dir_out = dir_out;
 	}
 
-	@Column(name = "pbc_key", nullable= false, length= 255 )
+	@Column(name = "pbc_key", nullable= false, length= 1024 )
 	public String getPublicKey() {
 		return publicKey;
 	}
@@ -224,7 +225,7 @@ public class User implements Serializable{
 		this.publicKey = publicKey;
 	}
 
-	@Column(name = "pvt_key", nullable= false, length= 255 )
+	@Column(name = "pvt_key", nullable= false, length= 1024 )
 	public String getPrivateKey() {
 		return privateKey;
 	}
@@ -245,5 +246,13 @@ public class User implements Serializable{
 
 	public void setPublicKeyKnown(Set<UserPublicKeyKnown> publicKeyKnown) {
 		this.publicKeyKnown = publicKeyKnown;
+	}
+	@Column(name = "password", nullable= false, length= 1024)
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }

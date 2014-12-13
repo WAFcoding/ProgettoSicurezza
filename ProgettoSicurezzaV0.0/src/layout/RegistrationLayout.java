@@ -102,6 +102,7 @@ public class RegistrationLayout implements GeneralLayout{
 	
 	private class InnerPanelRegistrationDirectory extends JPanel implements GeneralLayout{
 
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void addComponentsToPane() {
@@ -385,14 +386,18 @@ public class RegistrationLayout implements GeneralLayout{
 				
 				@Override
 				public void focusLost(FocusEvent arg0) {
-					country_code.setDocument(new JTextFieldLimit(20));
-					country_code.setText("country Code");
+					if(country_code.getText().equals("")){
+						country_code.setDocument(new JTextFieldLimit(20));
+						country_code.setText("Country Code");
+					}
 				}
 				
 				@Override
 				public void focusGained(FocusEvent arg0) {
 					country_code.setDocument(new JTextFieldLimit(2));
-					country_code.setText("");
+					if(country_code.getText().equals("Country Code")){
+						country_code.setText("");
+					}
 				}
 			});
 			this.add(country_code, c);
@@ -508,6 +513,8 @@ public class RegistrationLayout implements GeneralLayout{
 							user_manager.registration(registration_data);
 							getControl().setLayout("PRIMARY");//da modificare la schermata successiva alla registrazione
 						}*/
+
+						user_manager.registration(registration_data);
 					}
 					else{
 						System.out.println("Alcuni campi sono vuoti, non possono essere vuoti");
