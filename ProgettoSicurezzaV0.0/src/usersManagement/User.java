@@ -114,7 +114,7 @@ public class User implements Serializable{
 	/**
 	 * @return the code
 	 */
-	@Column(name = "code", nullable= false, length= 5 )
+	@Column(name = "code", nullable= false, length= 1024 )
 	public String getCode() {
 		return code;
 	}

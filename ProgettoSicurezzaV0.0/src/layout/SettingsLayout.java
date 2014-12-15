@@ -42,7 +42,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 	private Container pane;
 	private LayoutControl control;
 	private String file_choosed;
-	private JTextField areaDefault, areaInput, areaOutput;
+	private JTextField fieldDefault, fieldInput, fieldOutput;
 	
 	public SettingsLayout(LayoutControl control, Container pane){
 		setPane(pane);
@@ -57,9 +57,9 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		GridBagConstraints c = new GridBagConstraints();
 		
 		JButton button;
-		areaDefault= new JTextField();
-		areaInput= new JTextField();
-		areaOutput= new JTextField();
+		fieldDefault= new JTextField();
+		fieldInput= new JTextField();
+		fieldOutput= new JTextField();
 		
 		JLabel label;
 		
@@ -67,7 +67,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		c.anchor= GridBagConstraints.CENTER;
 		//1.0
 		int posx=1, posy=0;
-		label= new JLabel("Percorso della cartella di default");
+		label= new JLabel("Default directory");
 		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
 		pane.add(label, c);
 		//0.1
@@ -77,17 +77,17 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		button.setForeground(Color.WHITE);
 		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
 		c.insets= new Insets(0, 10, 10, 10);
-		button.addActionListener(new OpenAction(areaDefault));
+		button.addActionListener(new OpenAction(fieldDefault));
 		pane.add(button, c);
 		//1.1
 		posx++;
-		areaDefault.setEditable(true);areaDefault.setAutoscrolls(true);areaDefault.setColumns(15);areaDefault.setText(control.getSettingsDefault());
-		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.ipadx= areaDefault.getColumns();
+		fieldDefault.setEditable(true);fieldDefault.setAutoscrolls(true);fieldDefault.setColumns(15);fieldDefault.setText(control.getSettingsDefault());
+		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.ipadx= fieldDefault.getColumns();
 		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
-		pane.add(areaDefault, c);
+		pane.add(fieldDefault, c);
 		//1.2
 		posy++;
-		label= new JLabel("Percorso della cartella di input");
+		label= new JLabel("Input directory");
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
 		pane.add(label, c);
 		//0.3
@@ -97,17 +97,17 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		button.setForeground(Color.WHITE);
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
 		c.insets= new Insets(0, 10, 10, 10);
-		button.addActionListener(new OpenAction(areaInput));
+		button.addActionListener(new OpenAction(fieldInput));
 		pane.add(button, c);
 		//1.3
 		posx++;
-		areaInput.setEditable(true);areaInput.setAutoscrolls(true);areaInput.setColumns(15);areaInput.setText(control.getSettingsInput());
-		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= areaInput.getColumns();
+		fieldInput.setEditable(true);fieldInput.setAutoscrolls(true);fieldInput.setColumns(15);fieldInput.setText(control.getSettingsInput());
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= fieldInput.getColumns();
 		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
-		pane.add(areaInput, c);
+		pane.add(fieldInput, c);
 		//1.4
 		posy++;
-		label= new JLabel("Percorso della cartella di output");
+		label= new JLabel("Output directory");
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
 		pane.add(label, c);
 		//0.5
@@ -117,14 +117,14 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		button.setForeground(Color.WHITE);
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
 		c.insets= new Insets(10, 10, 0, 10);
-		button.addActionListener(new OpenAction(areaOutput));
+		button.addActionListener(new OpenAction(fieldOutput));
 		pane.add(button, c);
 		//1.5
 		posx++;
-		areaOutput.setEditable(true);areaOutput.setAutoscrolls(true);areaOutput.setColumns(15);areaOutput.setText(control.getSettingsOutput());
-		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= areaOutput.getColumns();
+		fieldOutput.setEditable(true);fieldOutput.setAutoscrolls(true);fieldOutput.setColumns(15);fieldOutput.setText(control.getSettingsOutput());
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= fieldOutput.getColumns();
 		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
-		pane.add(areaOutput, c);
+		pane.add(fieldOutput, c);
 		
 		//0.6 - BACK
 		posx--;posy++;
@@ -204,9 +204,9 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		public void actionPerformed(ActionEvent arg0) {
 			
 			String tmp_default, tmp_input, tmp_output;
-			tmp_default= areaDefault.getText();
-			tmp_input= areaInput.getText();
-			tmp_output= areaOutput.getText();
+			tmp_default= fieldDefault.getText();
+			tmp_input= fieldInput.getText();
+			tmp_output= fieldOutput.getText();
 			control.setSettings(tmp_default, tmp_input, tmp_output);
 		}
 		

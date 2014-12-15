@@ -22,7 +22,7 @@ public class LayoutControl {
 	
 	private final static int WIDTH= 600;
 	private final static int HEIGHT= 600;
-	private static String PATH="settings/settings.ser";//FIXME da implementare tramite il controllore
+	//private static String PATH="settings/settings.ser";//FIXME da implementare tramite il controllore
 	
 	private JFrame mainFrame;
 	private SettingsLayout s_layout;
@@ -56,10 +56,9 @@ public class LayoutControl {
 		mainFrame.setLocation(150, 100);
 		setLayout("HOME");
 		
-		this.setUser_manager(new UserManager());
+		this.setUser_manager(new UserManager(this));
 		
 		set_ctrl= new SettingsControl();
-		set_ctrl.setPathToSave(PATH);
 		//set_ctrl.readSettings();//FIXME leggere su db non su file
 	}
 	
@@ -430,9 +429,6 @@ public class LayoutControl {
 	 */
 	public void setSettings(String def, String in, String out){
 		
-		//TODO LayoutControl: fare hash dei percorsi dei file
-		
 		set_ctrl.setSettings(def, in, out);
-		set_ctrl.saveSetting();
 	}
 }

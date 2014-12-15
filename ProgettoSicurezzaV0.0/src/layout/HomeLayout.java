@@ -190,12 +190,14 @@ public class HomeLayout implements GeneralLayout{
 				public void actionPerformed(ActionEvent arg0) {
 					String name= login_firstname.getText();
 					String surname= login_secondname.getText();
-					String password= login_pwd.getPassword().toString();
+					String password=new String(login_pwd.getPassword());
 					String code= login_code.getText();
 					String[] login= {name, surname, password, code};
 
-					if(control.getUser_manager().login(login))
+					if(control.getUser_manager().login(login)){
+						
 						getControl().setLayout("PRIMARY");
+					}
 				}
 			});
 			button.setBackground(Color.BLUE);

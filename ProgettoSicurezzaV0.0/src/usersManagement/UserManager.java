@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import layout.LayoutControl;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -19,7 +21,10 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
+import com.itextpdf.text.Document;
+
 import util.CryptoUtility;
+import util.PDFUtil;
 import util.CryptoUtility.HASH_ALGO;
 
 /**
@@ -30,9 +35,11 @@ public class UserManager {
 
 	private ArrayList<User> users;//tutti gli utenti
 	private static final SessionFactory factory= createSession();
+	private LayoutControl control;
 	
-	public UserManager(){
+	public UserManager(LayoutControl p_control){
 		this.users= new ArrayList<User>();
+		this.control= p_control;
 	} 
 	//___________________Gestione DB Hibernate______________________________________________	
 	public static SessionFactory createSession(){
@@ -59,24 +66,77 @@ public class UserManager {
 	//___________________________________________________________________________________
 	
 	//===================LOGIN==================
-	public void checkForLogin(){
-		
-	}
-	public boolean login(String[] arg){
-		
+	public boolean checkForLogin(String[] arg){
 		String name= arg[0];
 		String surname= arg[1];
 		String password= arg[2];
 		String code= arg[3];
-		//TODO UserManager: controlli su login
-		//query exact match su nome e cognome
-		//hash password
-		//hash code
 		
+		if(name.equals("First Name") || name.equals("") ||
+				surname.equals("Second Name") || surname.equals("") ||
+				password.equals("Password") || password.equals("") ||
+				code.equals("Code") || code.equals("") ){
+			control.setErrorLayout("Some fields are incorrect.", "HOME");
+			return false;
+		}
 		
-		System.out.println("stai effettuando il login");
+		return true;
+	}
+	
+	public boolean login(String[] arg){
+		boolean toReturn= false;
+		String name= arg[0];
+		String surname= arg[1];
+		String password= arg[2];
+		String code= arg[3];
+		for(String t : arg){
+
+			System.out.print(t + " ");
+		}
+		System.out.println("");
+		if(checkForLogin(arg)){
+			Session session= getSessionFactory().openSession();
+			try {
+				String hash_password= CryptoUtility.hash(HASH_ALGO.SHA1, password);
+				String hash_code= CryptoUtility.hash(HASH_ALGO.SHA1, code);
+				
+				String hql= "from User where name = :p_name and surname = :p_surname";
+				Query query= session.createQuery(hql);
+				query.setParameter("p_name", name);
+				query.setParameter("p_surname", surname);
+				List<User> result= query.list();
+
+				if(result.isEmpty()){
+					control.setErrorLayout("user doesn't exist", "HOME");
+				}
+				//caso di omonimia
+				else {		
+					System.out.println("user exists");
+					for(User u : result){
+						System.out.println("check user code " + u.getCode() + " equal insert code " + hash_code );
+						if(u.getCode().equals(hash_code)){
+							//controllo password
+							System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
+							if(u.getPassword().equals(hash_password)){
+								System.out.println(name + " " + surname + " is logging in.");
+								control.setSettings(u.getDir_def(), u.getDir_in(), u.getDir_out());
+								toReturn= true;
+							}
+							break;
+						}
+					}
+				}
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+			finally{
+				if(session.isOpen())
+					session.close();
+			}
+		}
 		
-		return false;
+		return toReturn;
 	}
 	//===================REGISTRATION===========
 
@@ -136,11 +196,23 @@ public class UserManager {
 			user.setPublicKey(public_key);//FIXME UserManager: controllo se e' nulla
 			user.setPrivateKey(private_key);//FIXME UserManager: controllo se e' nulla
 			user.setPassword(hash_password);
-			session.save(user);
-		
-			tx.commit();
 			
-			//TODO UserManager: creare file pdf con riassunto dei dati necessari al login e farlo scaricare all'utente
+			session.save(user);
+			tx.commit();
+			//TODO UserManager: deve farlo solo se è andato tutto a buon fine
+			String registration_summary= "|NAME: " + name + "\t | \tSURNAME: " + surname + "\t |\n" + 
+										 "|PASSWORD: " + password + "\t | \tCODE: " + code + "\t |\n" +
+										 "|MAIL: " + mail + "\t |";
+			Document doc= PDFUtil.create(dir_def + "/" + code + ".pdf");
+			if(PDFUtil.open(doc)){
+				PDFUtil.addCredentials(doc, code, "Credentials", "Registration", 
+										"ProgettoSicurezza", "ProgettoSicurezza");
+				PDFUtil.addText(doc, registration_summary);
+				PDFUtil.close(doc);
+			}
+			control.setErrorLayout("Registration summary:\n" + registration_summary, "HOME");
+
+			System.out.println("Stai registrando l'utente: " + registration_summary);
 			
 			//TODO UserMAnager: questo si fa quando si prelevano le informazioni di un utente per
 			//criptare un documento
@@ -160,9 +232,6 @@ public class UserManager {
 			session.close();
 		}		
 		
-		System.out.println("Stai registrando l'utente: " + name + ", "+ surname + 
-							", con chiave pubblica " + public_key + "\ne chiave privata " + private_key + 
-							"\nlunghe " + public_key.length() + " e " + private_key.length());
 		
 	}
 	
@@ -280,7 +349,7 @@ public class UserManager {
 		}
 		return result.contains(paramCode);
 	}
-
+/*
 	public static void main(String[] args){
 		System.out.println("prova hibernate");
 		Session session= UserManager.getSessionFactory().openSession();
@@ -311,7 +380,7 @@ public class UserManager {
 			user_pbck.setUser(user);
 			user.getPublicKeyKnown().add(user_pbck);
 			session.save(user_pbck);
-			*/
+			
 			String code= generateCode(session, "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmW8LWgFUT3JjhkV4zulQX0bvMIfuQxTm5O40L2q+mulqvE55OlTGICgDxHDPjGmtICd70f5u+eO+vw3QKC9E1srmVnUW1V/1tw7gOUY5CfeFTIwX8he+4BLPP1+Mj9BvYiJqhceEKrIwkzNWh/0YWUFTnpgeqtdhQZtDx0HUN2QIDAQAB");
 			if(codeIsPresent(code, session)){
 				System.out.println(code + " is present");
@@ -329,5 +398,5 @@ public class UserManager {
 		finally{
 			session.close();
 		}
-	}
+	}*/
 }
