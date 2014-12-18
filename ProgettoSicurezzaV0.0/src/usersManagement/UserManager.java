@@ -24,6 +24,7 @@ import org.hibernate.service.ServiceRegistry;
 import com.itextpdf.text.Document;
 
 import util.CryptoUtility;
+import util.HibernateUtil;
 import util.PDFUtil;
 import util.CryptoUtility.HASH_ALGO;
 
@@ -34,7 +35,7 @@ import util.CryptoUtility.HASH_ALGO;
 public class UserManager {
 
 	private ArrayList<User> users;//tutti gli utenti
-	private static final SessionFactory factory= createSession();
+	//private static final SessionFactory factory= createSession();
 	private LayoutControl control;
 	
 	public UserManager(LayoutControl p_control){
@@ -57,7 +58,7 @@ public class UserManager {
 	}
 	
 	public static SessionFactory getSessionFactory(){
-		return factory;
+		return null;
 	}
 	
 	public static void closeSession(){
@@ -95,7 +96,7 @@ public class UserManager {
 		}
 		System.out.println("");
 		if(checkForLogin(arg)){
-			Session session= getSessionFactory().openSession();
+			Session session= getSessionFactory().openSession();//TODO UserManager: cambiare con la classe di utilita'
 			try {
 				String hash_password= CryptoUtility.hash(HASH_ALGO.SHA1, password);
 				String hash_code= CryptoUtility.hash(HASH_ALGO.SHA1, code);
@@ -170,7 +171,9 @@ public class UserManager {
 			e.printStackTrace();
 		}
 
-		Session session= getSessionFactory().openSession();
+		//Session session= getSessionFactory().openSession();
+		HibernateUtil.createSession(dir_def+"/prova.db");
+		Session session= HibernateUtil.getSessionFactory().openSession();
 		//genero il codice
 		String code= generateCode(session, public_key);
 		Transaction tx= null;
@@ -229,7 +232,7 @@ public class UserManager {
 			e.printStackTrace();
 		}
 		finally{
-			session.close();
+			HibernateUtil.shutdown();
 		}		
 		
 		
