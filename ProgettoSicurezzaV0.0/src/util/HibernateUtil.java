@@ -11,6 +11,7 @@ public class HibernateUtil {
 	
 	public static void createSession(String dbPath){
 		try{
+			//TODO HibernateUtil: decriptare il db, aggiungere al costruttore un campo password
 			Configuration configuration= new Configuration();
 			configuration.setProperty("hibernate.connection.url", "jdbc:sqlite:"+dbPath);
 			configuration.configure();
@@ -29,5 +30,6 @@ public class HibernateUtil {
 
 	public static void shutdown(){
 		getSessionFactory().close();
+		//TODO HibernateUtil: criptare il db, passare una password come parametro
 	}
 }

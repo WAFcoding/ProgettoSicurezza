@@ -13,7 +13,7 @@ public class Settings implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String defaultDirectory, inputDirectory, outputDirectory;
+	private String defaultDirectory, inputDirectory, outputDirectory, dbPath;
 	
 	public Settings(){
 		setDefaultDirectory("");
@@ -49,6 +49,14 @@ public class Settings implements Serializable{
 
 	public void setOutputDirectory(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
+	}
+
+	public String getDbPath() {
+		return dbPath;
+	}
+
+	public void setDbPath(String dbPath) {
+		this.dbPath = dbPath;
 	}
 
 }

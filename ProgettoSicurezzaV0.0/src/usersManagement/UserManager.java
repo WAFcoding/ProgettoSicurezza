@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.JFileChooser;
+
 import layout.LayoutControl;
 
 import org.hibernate.HibernateException;
@@ -96,7 +98,20 @@ public class UserManager {
 		}
 		System.out.println("");
 		if(checkForLogin(arg)){
-			Session session= getSessionFactory().openSession();//TODO UserManager: cambiare con la classe di utilita'
+			
+			String dbPath= "";
+			
+			if(control.IsSettingsPathNull()){
+				JFileChooser chooser= new JFileChooser();
+				chooser.showOpenDialog(null);
+				dbPath= chooser.getSelectedFile().getAbsolutePath();
+				control.setDbPath(dbPath);
+			}
+			else
+				dbPath= control.getDbPath();
+		
+			HibernateUtil.createSession(dbPath);
+			Session session= HibernateUtil.getSessionFactory().openSession();
 			try {
 				String hash_password= CryptoUtility.hash(HASH_ALGO.SHA1, password);
 				String hash_code= CryptoUtility.hash(HASH_ALGO.SHA1, code);
@@ -120,7 +135,7 @@ public class UserManager {
 							System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
 							if(u.getPassword().equals(hash_password)){
 								System.out.println(name + " " + surname + " is logging in.");
-								control.setSettings(u.getDir_def(), u.getDir_in(), u.getDir_out());
+								control.setSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def() + "/0.db");
 								toReturn= true;
 							}
 							break;
@@ -133,7 +148,7 @@ public class UserManager {
 			}
 			finally{
 				if(session.isOpen())
-					session.close();
+					HibernateUtil.shutdown();
 			}
 		}
 		
@@ -142,7 +157,6 @@ public class UserManager {
 	//===================REGISTRATION===========
 
 	public void registration(String[] registration_value){
-		
 		
 		String name= registration_value[0];
 		String surname= registration_value[1];
@@ -156,7 +170,7 @@ public class UserManager {
 		String organization= registration_value[9];
 		String dir_def= registration_value[10];
 		String dir_in= registration_value[11];
-		String dir_put= registration_value[12];
+		String dir_out= registration_value[12];
 		
 		//genero la coppia di chiavi
 		KeyPair key;
@@ -170,9 +184,8 @@ public class UserManager {
 			
 			e.printStackTrace();
 		}
-
-		//Session session= getSessionFactory().openSession();
-		HibernateUtil.createSession(dir_def+"/prova.db");
+		//TODO UserManager: cambiare il nome del DB?
+		HibernateUtil.createSession(dir_def+"/0.db");
 		Session session= HibernateUtil.getSessionFactory().openSession();
 		//genero il codice
 		String code= generateCode(session, public_key);
@@ -195,14 +208,17 @@ public class UserManager {
 			user.setOrganization(organization);
 			user.setDir_def(dir_def);
 			user.setDir_in(dir_in);
-			user.setDir_out(dir_put);
+			user.setDir_out(dir_out);
 			user.setPublicKey(public_key);//FIXME UserManager: controllo se e' nulla
 			user.setPrivateKey(private_key);//FIXME UserManager: controllo se e' nulla
 			user.setPassword(hash_password);
 			
 			session.save(user);
 			tx.commit();
-			//TODO UserManager: deve farlo solo se è andato tutto a buon fine
+			
+			control.setSettings(dir_def, dir_in, dir_out, dir_def + "/0.db");
+			//TODO UserManager: encode del file serializzato
+			
 			String registration_summary= "|NAME: " + name + "\t | \tSURNAME: " + surname + "\t |\n" + 
 										 "|PASSWORD: " + password + "\t | \tCODE: " + code + "\t |\n" +
 										 "|MAIL: " + mail + "\t |";
@@ -233,6 +249,7 @@ public class UserManager {
 		}
 		finally{
 			HibernateUtil.shutdown();
+			//TODO UserManager: encode db
 		}		
 		
 		

@@ -16,10 +16,12 @@ public class SettingsControl {
 	
 	private Settings settings;
 	private String pathToSave;
+	private boolean isNull;
 	
 	public SettingsControl(){
 		this.settings= new Settings();
-		setPathToSave("");
+		setPathToSave("./set.ser");
+		setNull(false);
 	}
 	
 	public SettingsControl(Settings set, String path){
@@ -94,6 +96,7 @@ public class SettingsControl {
 		}
 		catch(IOException e){
 			e.printStackTrace();
+			setNull(true);
 		}
 		catch(ClassNotFoundException c){
 			c.printStackTrace();
@@ -116,5 +119,21 @@ public class SettingsControl {
 		settings.setDefaultDirectory(def);
 		settings.setInputDirectory(in);
 		settings.setOutputDirectory(out);
+	}
+
+	public boolean isNull() {
+		return isNull;
+	}
+
+	public void setNull(boolean isNull) {
+		this.isNull = isNull;
+	}
+	
+	public void setDbPath(String dbPath){
+		settings.setDbPath(dbPath);
+	}
+	
+	public String getDbPath(){
+		return settings.getDbPath();
 	}
 }

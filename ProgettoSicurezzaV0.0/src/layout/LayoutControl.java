@@ -59,7 +59,7 @@ public class LayoutControl {
 		this.setUser_manager(new UserManager(this));
 		
 		set_ctrl= new SettingsControl();
-		//set_ctrl.readSettings();//FIXME leggere su db non su file
+		set_ctrl.readSettings();
 	}
 	
 	public void createLayout(){
@@ -427,8 +427,20 @@ public class LayoutControl {
 	 * @param in percorso assoluto della cartella di input
 	 * @param out percorso assoluto della cartella di output
 	 */
-	public void setSettings(String def, String in, String out){
+	public void setSettings(String def, String in, String out, String dbPath){
 		
 		set_ctrl.setSettings(def, in, out);
+		set_ctrl.setDbPath(dbPath);
+		set_ctrl.setPathToSave("./set.ser");
+		set_ctrl.saveSetting();
+	}
+	public boolean IsSettingsPathNull(){
+		return set_ctrl.isNull();
+	}
+	public String getDbPath(){
+		return set_ctrl.getDbPath();
+	}
+	public void setDbPath(String dbPath){
+		set_ctrl.setDbPath(dbPath);
 	}
 }

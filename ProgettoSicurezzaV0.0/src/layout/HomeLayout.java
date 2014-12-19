@@ -194,10 +194,10 @@ public class HomeLayout implements GeneralLayout{
 					String code= login_code.getText();
 					String[] login= {name, surname, password, code};
 
-					//if(control.getUser_manager().login(login)){
+					if(control.getUser_manager().login(login)){
 						
 						getControl().setLayout("PRIMARY");
-					//}
+					}
 				}
 			});
 			button.setBackground(Color.BLUE);

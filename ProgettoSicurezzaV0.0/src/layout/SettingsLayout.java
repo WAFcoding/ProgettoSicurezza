@@ -207,7 +207,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 			tmp_default= fieldDefault.getText();
 			tmp_input= fieldInput.getText();
 			tmp_output= fieldOutput.getText();
-			control.setSettings(tmp_default, tmp_input, tmp_output);
+			control.setSettings(tmp_default, tmp_input, tmp_output, tmp_default + "/0.db");
 		}
 		
 	}
