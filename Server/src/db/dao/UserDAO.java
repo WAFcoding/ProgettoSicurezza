@@ -11,4 +11,5 @@ public interface UserDAO {
 	public User findUserByUsername(String username);
 	public List<User> findUserByTrustLevel(int l);
 	public List<User> findUserByMinTrustLevel(int l);
+	public List<User> getAllUsers();
 }

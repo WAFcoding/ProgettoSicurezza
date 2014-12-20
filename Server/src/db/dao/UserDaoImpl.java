@@ -97,4 +97,19 @@ public class UserDaoImpl implements UserDAO{
 		return users;
 	}
 
+	@Override
+	public List<User> getAllUsers() {
+		Session s = getSession();
+		Transaction tx = s.beginTransaction();
+
+		String queryString = "from User";
+		Query query = s.createQuery(queryString);
+		
+		List<?> queryResult = query.list();
+		@SuppressWarnings("unchecked")
+		List<User> users = (List<User>) queryResult;	
+		tx.commit();
+		return users;
+	}
+
 }

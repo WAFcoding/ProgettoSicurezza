@@ -31,6 +31,16 @@ public abstract class SecRequestFactory {
 	private static final String GETLEVELX = "GETLEVEL";
 	
 	/**
+	 * Definisce il comando per recuperare una lista di utenti di un certo livello di fiducia.
+	 */
+	private static final String GETUSERSBYLEVEL = "GETUSERSBYLEVEL";
+	
+	/**
+	 * Definisce il comando per recuperare l'intera lista di utenti.
+	 */
+	private static final String GETALLUSERS = "GETALLUSERS";
+	
+	/**
 	 * Permette di generare il giusto tipo di richiesta a seconda della stringa inviata al server.
 	 * @param request	La stringa inviata al server.
 	 * @param session	La sessione SSL corrente.
@@ -60,8 +70,10 @@ public abstract class SecRequestFactory {
 		StringTokenizer tok = new StringTokenizer(request, " ");
 		int tokCount = tok.countTokens();
 		
-		if(tokCount < 2)
-			return new RequestInvalid();
+		if(tokCount < 2) {
+			if(request.equalsIgnoreCase(GETALLUSERS))
+				return new RequestGetAllUsers();
+		}
 		if(tokCount == 2) {
 			String reqType = tok.nextToken();
 			String body = tok.nextToken();
@@ -70,6 +82,8 @@ public abstract class SecRequestFactory {
 				return new RequestGetPublicKey(body);
 			if(reqType.equalsIgnoreCase(GETLEVELX))
 				return new RequestGetLevelX(Integer.valueOf(body).intValue(), trustedUser);
+			if(reqType.equalsIgnoreCase(GETUSERSBYLEVEL))
+				return new RequestGetUsersByLevel(Integer.valueOf(body).intValue());
 		}
 		
 		return new RequestInvalid();

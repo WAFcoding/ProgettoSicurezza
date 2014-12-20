@@ -10,5 +10,5 @@ public interface UserCertificateDAO {
 	public void updateUserCertificate(UserCertificateBean bean);
 	public void deleteUserCertificate(UserCertificateBean bean);
 	public UserCertificateBean findBySecureId(String secId);
-	public List<UserCertificateBean> findByStatus(int status);	
+	public List<UserCertificateBean> findByStatus(int status);
 }
