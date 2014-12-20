@@ -50,6 +50,9 @@ public class ServerMain {
 	 */
 	public static void main(String[] args) {
 
+		//caricamento configurazione
+		ServerConfig.getInstance();
+		
 		//solo da console (quando si rilascia il JAR)
 		Console cs = System.console();
 		char[] pwd = new char[] {};
