@@ -49,6 +49,40 @@ public abstract class SecRequestFactory {
 	 */
 	private static final String GETALLUSERS = "GETALLUSERS";
 	
+	private static User verifyIdentity(SSLSession session) {
+		//autenticazione
+		User trustedUser = null;
+
+		try {
+			X509Certificate cert = session.getPeerCertificateChain()[0];
+			CertData data = new CertData(cert);
+			
+			//solo test
+			//System.out.println(data.getIssuerDN() + " " + data.getSubjectDN() + " " + data.getSignatureAlgo());
+			
+
+			UserDAO udao = new UserDaoImpl();
+			trustedUser = udao.findUserByUsername(data.getSubjectParameter(TYPE.UID));
+
+			if(trustedUser != null) {
+				//chiave pubblica utente
+				PublicKey clientPublicKey;
+				KeyFactory factory = KeyFactory.getInstance("RSA"); 
+				clientPublicKey =  factory.generatePublic( new X509EncodedKeySpec(CryptoUtility.fromBase64(trustedUser.getPublicKey())));
+				if(!CryptoUtility.verifyCertificate(cert, clientPublicKey))
+					return null;
+			} else {
+				return null;
+			}
+
+
+		} catch(Exception e) {
+			return null;
+		}
+		
+		return trustedUser;
+	}
+	
 	/**
 	 * Permette di generare il giusto tipo di richiesta a seconda della stringa inviata al server.
 	 * @param request	La stringa inviata al server.
@@ -59,33 +93,9 @@ public abstract class SecRequestFactory {
 	 */
 	public static Request generateRequest(String request, SSLSession session) throws SSLPeerUnverifiedException {
 		
-		//autenticazione
-		User trustedUser = null;
-		
-		try {
-			X509Certificate cert = session.getPeerCertificateChain()[0];
-			CertData data = new CertData(cert);
-			//System.out.println(data.getIssuerDN() + " " + data.getSubjectDN() + " " + data.getSignatureAlgo());
-			//solo test
-			
-			UserDAO udao = new UserDaoImpl();
-			trustedUser = udao.findUserByUsername(data.getSubjectParameter(TYPE.UID));
-			
-			if(trustedUser != null) {
-				//chiave pubblica utente
-				PublicKey clientPublicKey;
-				KeyFactory factory = KeyFactory.getInstance("RSA"); 
-			    clientPublicKey =  factory.generatePublic( new X509EncodedKeySpec(CryptoUtility.fromBase64(trustedUser.getPublicKey())));
-				if(!CryptoUtility.verifyCertificate(cert, clientPublicKey))
-					return new RequestInvalid("403 - Identity not verified!");
-			} else {
-				return new RequestInvalid("403 - Identity not verified!");
-			}
-				
-		
-		} catch(Exception e) {
-			return new RequestInvalid();
-		}
+		User u = verifyIdentity(session);
+		if(u==null)
+			return new RequestInvalid("403 - Identity not verified!");
 		
 		StringTokenizer tok = new StringTokenizer(request, " ");
 		int tokCount = tok.countTokens();
@@ -101,7 +111,7 @@ public abstract class SecRequestFactory {
 			if(reqType.equalsIgnoreCase(GETPUBLIC))
 				return new RequestGetPublicKey(body);
 			if(reqType.equalsIgnoreCase(GETLEVELX))
-				return new RequestGetLevelX(Integer.valueOf(body).intValue(), trustedUser.getUsername());
+				return new RequestGetLevelX(Integer.valueOf(body).intValue(), u.getUsername());
 			if(reqType.equalsIgnoreCase(GETUSERSBYLEVEL))
 				return new RequestGetUsersByLevel(Integer.valueOf(body).intValue());
 		}

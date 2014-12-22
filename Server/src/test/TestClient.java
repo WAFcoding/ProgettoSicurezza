@@ -21,7 +21,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 public class TestClient {
 	
-	private static final String path = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/test_user.jks";
+	private static final String path = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/client.jks";
 	
 	public static void main(String[] args) throws Exception{
 		System.setProperty("javax.net.ssl.trustStore",path);
