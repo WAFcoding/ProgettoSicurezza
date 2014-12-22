@@ -28,10 +28,10 @@ public abstract class ServerController {
 	protected static int DEFAULT_SERVER_PORT = 8888;
 
 	/**
-	 *FIXME: rimuovi questi campi in RELEASE
+	 * TODO: Debug
 	 */
-	protected static final String SERVER_KEYSTORE = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
-	protected String serverPassword = "progettoSII";
+	//protected static final String SERVER_KEYSTORE = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
+	//protected String serverPassword = "progettoSII";
 
 	/**
 	 * Il thread principale del server.
@@ -45,14 +45,14 @@ public abstract class ServerController {
 	protected AtomicBoolean running = new AtomicBoolean(false);
 
 	protected SSLServerSocketFactory init() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException, UnrecoverableKeyException, KeyManagementException {
-		// TODO: rimuovi su versione release --> ricontrolla tutto
-		if(ServerMasterData.keyStorePath == null) {
+		//TODO:Debug rimuovi su versione release --> ricontrolla tutto
+		/*if(ServerMasterData.keyStorePath == null) {
 			ServerMasterData.keyStorePath = SERVER_KEYSTORE;
 		}
 		if (ServerMasterData.passphrase == null) {
 			ServerMasterData.passphrase = this.serverPassword.toCharArray();
 		}
-
+		*/
 		
 		System.setProperty("javax.net.ssl.trustStore", ServerMasterData.keyStorePath);
 		System.setProperty("javax.net.ssl.trustStorePassword", new String(ServerMasterData.passphrase));

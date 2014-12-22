@@ -26,6 +26,8 @@ public class ServerConfig {
 	public static final String HIB_PASSWORD = "hibernate.connection.password";
 	public static final String HIB_DB_URL = "hibernate.connection.url";
 	public static final String HIB_SHOWSQL = "hibernate.show_sql";
+	public static final String KEYSTORE_PATH = "security.keystorepath";
+	
 	
 	public static ServerConfig getInstance() {
 		if(_instance == null) {
@@ -53,7 +55,7 @@ public class ServerConfig {
 	}
 	
 	public String getProperty(String key) {
-		if(p==null)
+		if(p==null || !p.containsKey(key))
 			return "";
 		return p.getProperty(key);
 	}

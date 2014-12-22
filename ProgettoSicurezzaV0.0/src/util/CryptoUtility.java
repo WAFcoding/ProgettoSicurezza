@@ -853,4 +853,31 @@ public class CryptoUtility {
 		signer.update(message.getBytes());
 		return (signer.verify(signed));
 	}
+
+	public static boolean verifyCertificate(javax.security.cert.X509Certificate cert, PublicKey pubkey) {
+		if(cert==null || pubkey==null)
+			return false;
+		try {
+			cert.checkValidity(new Date());
+		} catch (javax.security.cert.CertificateExpiredException
+				| javax.security.cert.CertificateNotYetValidException e1) {
+			e1.printStackTrace();
+		}
+		
+		Security.addProvider(new BouncyCastleProvider());
+		
+		try {
+			try {
+				cert.verify(pubkey, CryptoUtility.BouncyProvider);
+			} catch (javax.security.cert.CertificateException e) {
+				e.printStackTrace();
+			}
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchProviderException
+				| SignatureException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;		
+	}
 }

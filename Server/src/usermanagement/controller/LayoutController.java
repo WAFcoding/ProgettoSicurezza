@@ -11,8 +11,8 @@ import usermanagement.ui.AdminLayout;
 
 public class LayoutController {
 	
-	private final static int WIDTH= 400;
-	private final static int HEIGHT= 400;
+	private final static int WIDTH= 500;
+	private final static int HEIGHT= 500;
 	
 	private JFrame mainFrame;
 	private AdminLayout admin_layout;
@@ -24,7 +24,7 @@ public class LayoutController {
 	
 	public LayoutController(){
 		mainFrame= new JFrame("Pannello Admin Server");
-		mainFrame.setDefaultCloseOperation(/*FIXME:JFrame.DISPOSE_ON_CLOSE*/JFrame.EXIT_ON_CLOSE);
+		mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE/*JFrame.EXIT_ON_CLOSE*/);
 		mainFrame.setSize(WIDTH, HEIGHT);
 		mainFrame.setVisible(true);
 		mainFrame.setLocation(150, 100);

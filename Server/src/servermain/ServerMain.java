@@ -6,7 +6,10 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Date;
 import java.util.Scanner;
+
+import org.bouncycastle.util.Arrays;
 
 import servermain.auth.AuthServerController;
 import servermain.sec.SecServerController;
@@ -42,7 +45,7 @@ public class ServerMain {
 	/**
 	 * Codice che provoca la chiusura del server.
 	 */
-	private static final int EXIT_CODE = 1;	
+	private static final int EXIT_CODE = 1;
 	
 	/**
 	 * Avvia il server e richiede le credenziali del keystore.
@@ -51,7 +54,7 @@ public class ServerMain {
 	public static void main(String[] args) {
 
 		//caricamento configurazione
-		ServerConfig.getInstance();
+		ServerConfig conf = ServerConfig.getInstance();
 		
 		//solo da console (quando si rilascia il JAR)
 		Console cs = System.console();
@@ -64,7 +67,11 @@ public class ServerMain {
 			cs.flush();
 			pwd = cs.readPassword();
 			ServerMasterData.passphrase = pwd;
-			ServerMasterData.keyStorePath = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
+			ServerMasterData.keyStorePath = conf.getProperty(ServerConfig.KEYSTORE_PATH);
+			
+		} else {
+			System.err.println("No console found: cannot run!");
+			System.exit(1);
 		}
 		
 		try {
@@ -76,8 +83,8 @@ public class ServerMain {
 			e.printStackTrace();
 		}
 		
-		new LayoutController();
-		//openConsoleSession();
+		//new LayoutController();
+		openConsoleSession();
 	}
 
 	/**
@@ -97,6 +104,16 @@ public class ServerMain {
 		scanner.close();
 		System.exit(0);
 	}
+	
+	private static boolean requestPassword() {
+		System.out.print("Password:");
+		char[] pwd = System.console().readPassword();
+		if(!Arrays.areEqual(pwd, ServerMasterData.passphrase)) {
+			System.err.println("Incorrect Password!");
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Esegue l'operazione corrispondente al comando impartito
@@ -110,10 +127,11 @@ public class ServerMain {
 	 * 
 	 */
 	private static int commandDispatcher(String command) {
-		if(command.equalsIgnoreCase(admin_access)) {
+		
+		if(command.equalsIgnoreCase(admin_access) && requestPassword()) {
 			new LayoutController();
 			return CONTINUE_CODE;
-		} else if(command.equalsIgnoreCase(close_server)) {
+		} else if(command.equalsIgnoreCase(close_server) && requestPassword()) {
 			System.out.println("Goodbye!");
 			return EXIT_CODE;
 		} else if (command.equalsIgnoreCase(help)) {

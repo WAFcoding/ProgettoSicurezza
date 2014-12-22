@@ -1,15 +1,24 @@
 package request_man.factory;
 
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.StringTokenizer;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
+import javax.security.cert.X509Certificate;
 
 import request_man.Request;
 import request_man.RequestGetLevelX;
 import request_man.RequestGetPublicKey;
 import request_man.RequestInvalid;
 import util.CertData;
+import util.CertData.TYPE;
+import util.CryptoUtility;
+import bean.User;
+import db.dao.UserDAO;
+import db.dao.UserDaoImpl;
 
 /**
  * Classe che permette di parsare la richiesta in ingresso e di eseguire 
@@ -50,22 +59,33 @@ public abstract class SecRequestFactory {
 	 */
 	public static Request generateRequest(String request, SSLSession session) throws SSLPeerUnverifiedException {
 		
-		//autenticazione TODO:completa autenticazione
+		//autenticazione
+		User trustedUser = null;
 		
-		try { 
-			CertData data = new CertData(session.getPeerCertificateChain()[0]);
-			System.out.println(data.getIssuerDN() + " " + data.getSubjectDN() + " " + data.getSignatureAlgo());
+		try {
+			X509Certificate cert = session.getPeerCertificateChain()[0];
+			CertData data = new CertData(cert);
+			//System.out.println(data.getIssuerDN() + " " + data.getSubjectDN() + " " + data.getSignatureAlgo());
 			//solo test
+			
+			UserDAO udao = new UserDaoImpl();
+			trustedUser = udao.findUserByUsername(data.getSubjectParameter(TYPE.UID));
+			
+			if(trustedUser != null) {
+				//chiave pubblica utente
+				PublicKey clientPublicKey;
+				KeyFactory factory = KeyFactory.getInstance("RSA"); 
+			    clientPublicKey =  factory.generatePublic( new X509EncodedKeySpec(CryptoUtility.fromBase64(trustedUser.getPublicKey())));
+				if(!CryptoUtility.verifyCertificate(cert, clientPublicKey))
+					return new RequestInvalid("403 - Identity not verified!");
+			} else {
+				return new RequestInvalid("403 - Identity not verified!");
+			}
+				
 		
 		} catch(Exception e) {
 			return new RequestInvalid();
 		}
-		
-		//vecchio sistema TODO:rimuovi
-		String trustedUser = session.getPeerPrincipal().getName();
-		trustedUser = parseCN(trustedUser);
-		
-		//<--fine autenticazione
 		
 		StringTokenizer tok = new StringTokenizer(request, " ");
 		int tokCount = tok.countTokens();
@@ -81,7 +101,7 @@ public abstract class SecRequestFactory {
 			if(reqType.equalsIgnoreCase(GETPUBLIC))
 				return new RequestGetPublicKey(body);
 			if(reqType.equalsIgnoreCase(GETLEVELX))
-				return new RequestGetLevelX(Integer.valueOf(body).intValue(), trustedUser);
+				return new RequestGetLevelX(Integer.valueOf(body).intValue(), trustedUser.getUsername());
 			if(reqType.equalsIgnoreCase(GETUSERSBYLEVEL))
 				return new RequestGetUsersByLevel(Integer.valueOf(body).intValue());
 		}
@@ -89,14 +109,14 @@ public abstract class SecRequestFactory {
 		return new RequestInvalid();
 	}
 
-	/**
+	/*
 	 * Parsa il nome utente dalla sessione SSL corrente.
-	 * @param trustedUser	La stringa rappresentante le informazioni identificative dell'utente connesso.
+	 * param trustedUser	La stringa rappresentante le informazioni identificative dell'utente connesso.
 	 * 
-	 * @return Il nome dell'utente specificato nel campo CN del certificato (usato come ID univoco).
+	 * return Il nome dell'utente specificato nel campo CN del certificato (usato come ID univoco).
 	 */
-	private static String parseCN(String trustedUser) {
-		String[] infos = trustedUser.split(",");
-		return infos[0].split("=")[1];
-	}
+//	private static String parseCN(String trustedUser) {
+//		String[] infos = trustedUser.split(",");
+//		return infos[0].split("=")[1];
+//	}
 }
