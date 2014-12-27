@@ -4,8 +4,6 @@
  */
 package entities;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class Settings implements Serializable{
@@ -13,18 +11,22 @@ public class Settings implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String defaultDirectory, inputDirectory, outputDirectory, dbPath;
+	private String defaultDirectory, inputDirectory, outputDirectory, dbPath, userCode;
 	
 	public Settings(){
 		setDefaultDirectory("");
 		setInputDirectory("");
 		setOutputDirectory("");
+		setUserCode("");
+		setDbPath("");
 	}
 	
 	public Settings(String def, String in, String out){
 		setDefaultDirectory(def);
 		setInputDirectory(in);
 		setOutputDirectory(out);
+		setUserCode("");
+		setDbPath("");
 	}
 
 	public String getDefaultDirectory() {
@@ -57,6 +59,18 @@ public class Settings implements Serializable{
 
 	public void setDbPath(String dbPath) {
 		this.dbPath = dbPath;
+	}
+
+	public String getUserCode() {
+		return userCode;
+	}
+
+	public void setUserCode(String idUser) {
+		this.userCode = idUser;
+	}
+	
+	public void PrintIt(){
+		System.out.println(defaultDirectory + " - " + dbPath + " " + userCode);
 	}
 
 }

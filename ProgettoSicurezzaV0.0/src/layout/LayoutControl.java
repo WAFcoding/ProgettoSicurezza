@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import entities.Settings;
 import entities.SettingsControl;
 import usersManagement.UserManager;
 /**
@@ -56,9 +57,9 @@ public class LayoutControl {
 		mainFrame.setLocation(150, 100);
 		setLayout("HOME");
 		
-		this.setUser_manager(new UserManager(this));
+		user_manager= new UserManager(this);
 		
-		set_ctrl= new SettingsControl();
+		set_ctrl= new SettingsControl(this);
 		set_ctrl.readSettings();
 	}
 	
@@ -405,42 +406,63 @@ public class LayoutControl {
 	 * @return il percorso assoluto della cartella di default
 	 */
 	public String getSettingsDefault(){
-		return set_ctrl.getSettingsDefault();
+		return set_ctrl.getActualSettingsDefault();
 	}
 	/**
 	 * 
 	 * @return il percorso assoluto della cartella di input
 	 */
 	public String getSettingsInput(){
-		return set_ctrl.getSettingsInput();
+		return set_ctrl.getActualSettingsInput();
 	}
 	/**
 	 * 
 	 * @return il percorso assoluto della cartella di output
 	 */
 	public String getSettingsOutput(){
-		return set_ctrl.getSettingsOutput();
+		return set_ctrl.getActualSettingsOutput();
 	}
 	/**
 	 * Imposta i percorsi delle carte e li salva su file, eseguendo un hash prima
 	 * @param def percorso assoluto della cartella di default
 	 * @param in percorso assoluto della cartella di input
 	 * @param out percorso assoluto della cartella di output
+	 * @param dbPath percorso del database
 	 */
-	public void setSettings(String def, String in, String out, String dbPath){
+	public void setActualSettings(String def, String in, String out, String dbPath){
 		
-		set_ctrl.setSettings(def, in, out);
-		set_ctrl.setDbPath(dbPath);
-		set_ctrl.setPathToSave("./set.ser");
-		set_ctrl.saveSetting();
+		set_ctrl.setActualDirSettings(def, in, out);
+		set_ctrl.setActualDbPath(dbPath);
 	}
 	public boolean IsSettingsPathNull(){
 		return set_ctrl.isNull();
 	}
-	public String getDbPath(){
-		return set_ctrl.getDbPath();
+	public String getActualDbPath(){
+		return set_ctrl.getActualDbPath();
 	}
-	public void setDbPath(String dbPath){
-		set_ctrl.setDbPath(dbPath);
+	public void setActualDbPath(String dbPath){
+		set_ctrl.setActualDbPath(dbPath);
+	}
+	public void updateSettingsOnDb(){
+		set_ctrl.updateDb();
+	}
+	public void setActualUserCode(String userCode){
+		set_ctrl.setActualUserCode(userCode);
+	}
+	public void saveSettings(){
+		set_ctrl.setPathToSave("./set.ser");
+		set_ctrl.saveSetting();
+	}
+	public void addSettings(){
+		set_ctrl.addActualSettings();
+	}
+	public Settings getSettingsByCode(String code){
+		return set_ctrl.getSettingsByCode(code);
+	}
+	public void setActualSettings(Settings settings){
+		set_ctrl.setActualSettings(settings);
+	}
+	public SettingsControl getSettingsControl(){
+		return set_ctrl;
 	}
 }

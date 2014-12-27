@@ -25,6 +25,7 @@ import org.hibernate.service.ServiceRegistry;
 
 import com.itextpdf.text.Document;
 
+import entities.Settings;
 import util.CryptoUtility;
 import util.HibernateUtil;
 import util.PDFUtil;
@@ -36,16 +37,15 @@ import util.CryptoUtility.HASH_ALGO;
  */
 public class UserManager {
 
-	private ArrayList<User> users;//tutti gli utenti
 	//private static final SessionFactory factory= createSession();
 	private LayoutControl control;
+	private User actualUser;
 	
 	public UserManager(LayoutControl p_control){
-		this.users= new ArrayList<User>();
 		this.control= p_control;
 	} 
 	//___________________Gestione DB Hibernate______________________________________________	
-	public static SessionFactory createSession(){
+/*	public static SessionFactory createSession(){
 
 		try{
 			Configuration configuration= new Configuration();
@@ -65,7 +65,7 @@ public class UserManager {
 	
 	public static void closeSession(){
 		getSessionFactory().close();
-	}
+	}*/
 	//___________________________________________________________________________________
 	
 	//===================LOGIN==================
@@ -101,33 +101,45 @@ public class UserManager {
 			
 			String dbPath= "";
 			
+			String hash_password= "";
+			String hash_code= "";
+			try {
+				hash_password = CryptoUtility.hash(HASH_ALGO.SHA1, password);
+				hash_code= CryptoUtility.hash(HASH_ALGO.SHA1, code);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			
 			if(control.IsSettingsPathNull()){
 				JFileChooser chooser= new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				chooser.showOpenDialog(null);
 				dbPath= chooser.getSelectedFile().getAbsolutePath();
-				control.setDbPath(dbPath);
+				control.setActualDbPath(dbPath);
 			}
-			else
-				dbPath= control.getDbPath();
-		
-			HibernateUtil.createSession(dbPath);
+			else{
+				control.setActualSettings(control.getSettingsByCode(hash_code));
+				dbPath= control.getActualDbPath();//FIXME ho i miei dubbi che funzioni
+			}
+			
+			if(!HibernateUtil.isCreated())
+				HibernateUtil.createSession(dbPath);
 			Session session= HibernateUtil.getSessionFactory().openSession();
+			Transaction tx= null;
 			try {
-				String hash_password= CryptoUtility.hash(HASH_ALGO.SHA1, password);
-				String hash_code= CryptoUtility.hash(HASH_ALGO.SHA1, code);
-				
+				tx= session.beginTransaction();
 				String hql= "from User where name = :p_name and surname = :p_surname";
 				Query query= session.createQuery(hql);
 				query.setParameter("p_name", name);
 				query.setParameter("p_surname", surname);
 				List<User> result= query.list();
-
+				tx.commit();
+				
 				if(result.isEmpty()){
 					control.setErrorLayout("user doesn't exist", "HOME");
 				}
-				//caso di omonimia
 				else {		
-					System.out.println("user exists");
+					//System.out.println("user exists");
 					for(User u : result){
 						System.out.println("check user code " + u.getCode() + " equal insert code " + hash_code );
 						if(u.getCode().equals(hash_code)){
@@ -135,27 +147,31 @@ public class UserManager {
 							System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
 							if(u.getPassword().equals(hash_password)){
 								System.out.println(name + " " + surname + " is logging in.");
-								control.setSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def() + "/0.db");
+								control.setActualSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def());
+								actualUser= u;
 								toReturn= true;
 							}
+							else
+								System.out.println("password sbagliata.");
+							
 							break;
 						}
+						else
+							System.out.println("codice sbagliato");
 					}
 				}
 			} catch (Exception e) {
-
+				if(tx != null) tx.rollback();
 				e.printStackTrace();
 			}
 			finally{
-				if(session.isOpen())
-					HibernateUtil.shutdown();
+				session.close();
 			}
 		}
 		
 		return toReturn;
 	}
-	//===================REGISTRATION===========
-
+	//===================REGISTRATION==========================
 	public void registration(String[] registration_value){
 		
 		String name= registration_value[0];
@@ -185,7 +201,9 @@ public class UserManager {
 			e.printStackTrace();
 		}
 		//TODO UserManager: cambiare il nome del DB?
-		HibernateUtil.createSession(dir_def+"/0.db");
+		if(!HibernateUtil.isCreated())
+			HibernateUtil.createSession(dir_def);
+		
 		Session session= HibernateUtil.getSessionFactory().openSession();
 		//genero il codice
 		String code= generateCode(session, public_key);
@@ -216,7 +234,13 @@ public class UserManager {
 			session.save(user);
 			tx.commit();
 			
-			control.setSettings(dir_def, dir_in, dir_out, dir_def + "/0.db");
+			control.setActualUserCode(hash_code);
+			control.setActualSettings(dir_def, dir_in, dir_out, dir_def);
+			control.addSettings();
+			control.saveSettings();
+			for(Settings s : control.getSettingsControl().getAl_settings())
+				s.PrintIt();
+			
 			//TODO UserManager: encode del file serializzato
 			
 			String registration_summary= "|NAME: " + name + "\t | \tSURNAME: " + surname + "\t |\n" + 
@@ -229,6 +253,7 @@ public class UserManager {
 				PDFUtil.addText(doc, registration_summary);
 				PDFUtil.close(doc);
 			}
+			//stampa del contenuto del PDF a schermo
 			control.setErrorLayout("Registration summary:\n" + registration_summary, "HOME");
 
 			System.out.println("Stai registrando l'utente: " + registration_summary);
@@ -248,7 +273,7 @@ public class UserManager {
 			e.printStackTrace();
 		}
 		finally{
-			HibernateUtil.shutdown();
+			session.close();
 			//TODO UserManager: encode db
 		}		
 		
@@ -419,4 +444,20 @@ public class UserManager {
 			session.close();
 		}
 	}*/
+
+	public User getActualUser() {
+		if(actualUser == null)
+			return null;
+		
+		return actualUser;
+	}
+
+	public void setActualUser(User actualUser) {
+		this.actualUser = actualUser;
+	}
+	
+	public void printActualUser(){
+		System.out.println(actualUser.getName() + " " + actualUser.getSurname() + "\n" +
+							actualUser.getDir_def() + " " + actualUser.getDir_in() + " " + actualUser.getDir_out());
+	}
 }

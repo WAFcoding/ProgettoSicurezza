@@ -13,7 +13,9 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.draw.LineSeparator;
 
 /**
  * Classe di utilità per la creazione dei pdf
@@ -47,6 +49,7 @@ public class PDFUtil {
 	 * @throws DocumentException
 	 */
 	public static boolean open(Document doc) throws FileNotFoundException, DocumentException{
+		
 		doc.open();
 		
 		if(doc.isOpen()) return true;
@@ -144,6 +147,15 @@ public class PDFUtil {
 		}
 		else
 			System.out.println("Aprire prima il file");
+	}
+	
+	public static void addImage(Document doc, String path, int x, int y){
+		
+	}
+	
+	public static void addLineHorizontal(Document doc, float x1, float x2, float y){
+		
+
 	}
 
 }

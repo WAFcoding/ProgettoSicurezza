@@ -25,9 +25,9 @@ public class TestPDF {
 		/*Document document= new Document(PageSize.A4);
 		PdfWriter.getInstance(document, new FileOutputStream("/home/pasquale/ProgettoSicurezza/test.pdf"));
 		document.open();*/
-		Document doc= PDFUtil.create("/home/pasquale/ProgettoSicurezza/test2.pdf");
+		Document doc= PDFUtil.create("/home/pasquale/ProgettoSicurezza/test_pdf.pdf");
 		if(PDFUtil.open(doc)){
-			PDFUtil.addCredentials(doc, "secondo PDF", "prova", "java", "PV", "PV");
+			PDFUtil.addCredentials(doc, "test_pdf", "prova", "java", "PV", "PV");
 			PDFUtil.addEmptyLine(doc, 4);
 			String text= "questo è il secondo pdf creato, vai giovannino";
 			PDFUtil.addText(doc, text);
