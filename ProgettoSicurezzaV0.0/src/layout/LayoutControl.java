@@ -23,7 +23,6 @@ public class LayoutControl {
 	
 	private final static int WIDTH= 600;
 	private final static int HEIGHT= 600;
-	//private static String PATH="settings/settings.ser";//FIXME da implementare tramite il controllore
 	
 	private JFrame mainFrame;
 	private SettingsLayout s_layout;

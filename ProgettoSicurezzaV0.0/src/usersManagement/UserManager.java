@@ -119,11 +119,15 @@ public class UserManager {
 			}
 			else{
 				control.setActualSettings(control.getSettingsByCode(hash_code));
-				dbPath= control.getActualDbPath();//FIXME ho i miei dubbi che funzioni
+				dbPath= control.getActualDbPath();
+			}
+
+			if(!HibernateUtil.isCreated()){
+				HibernateUtil.setDbPath(dbPath);
+				HibernateUtil.encryptDb(password);
+				HibernateUtil.createSession();
 			}
 			
-			if(!HibernateUtil.isCreated())
-				HibernateUtil.createSession(dbPath);
 			Session session= HibernateUtil.getSessionFactory().openSession();
 			Transaction tx= null;
 			try {
@@ -166,6 +170,8 @@ public class UserManager {
 			}
 			finally{
 				session.close();
+				HibernateUtil.shutdown();
+				HibernateUtil.encryptDb(hash_password);
 			}
 		}
 		
@@ -200,19 +206,29 @@ public class UserManager {
 			
 			e.printStackTrace();
 		}
+		
+		//hash della password
+		String hash_password= "";
+		try {
+			hash_password = CryptoUtility.hash(HASH_ALGO.SHA1, password);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
 		//TODO UserManager: cambiare il nome del DB?
-		if(!HibernateUtil.isCreated())
-			HibernateUtil.createSession(dir_def);
+		if(!HibernateUtil.isCreated()){
+			HibernateUtil.setDbPath(dir_def);
+			HibernateUtil.createSession();
+		}
 		
 		Session session= HibernateUtil.getSessionFactory().openSession();
 		//genero il codice
 		String code= generateCode(session, public_key);
 		Transaction tx= null;
 		try{
-			//hash della password
-			String hash_password= CryptoUtility.hash(HASH_ALGO.SHA1, password);
 			//hash del code per autenticazione forte
 			String hash_code= CryptoUtility.hash(HASH_ALGO.SHA1, code);
+			
 			tx= session.beginTransaction();
 			
 			User user= new User();
@@ -227,8 +243,8 @@ public class UserManager {
 			user.setDir_def(dir_def);
 			user.setDir_in(dir_in);
 			user.setDir_out(dir_out);
-			user.setPublicKey(public_key);//FIXME UserManager: controllo se e' nulla
-			user.setPrivateKey(private_key);//FIXME UserManager: controllo se e' nulla
+			user.setPublicKey(public_key);
+			user.setPrivateKey(private_key);
 			user.setPassword(hash_password);
 			
 			session.save(user);
@@ -238,8 +254,8 @@ public class UserManager {
 			control.setActualSettings(dir_def, dir_in, dir_out, dir_def);
 			control.addSettings();
 			control.saveSettings();
-			for(Settings s : control.getSettingsControl().getAl_settings())
-				s.PrintIt();
+			//for(Settings s : control.getSettingsControl().getAl_settings())
+				//s.PrintIt();
 			
 			//TODO UserManager: encode del file serializzato
 			
@@ -274,7 +290,8 @@ public class UserManager {
 		}
 		finally{
 			session.close();
-			//TODO UserManager: encode db
+			HibernateUtil.shutdown();
+			HibernateUtil.encryptDb(hash_password);
 		}		
 		
 		
@@ -383,7 +400,7 @@ public class UserManager {
 	 * @return
 	 */
 	public static boolean codeIsPresent(String paramCode, Session session){
-		//FIXME non mi convince
+
 		String hql= "SELECT U.code FROM User U";
 		Query query= session.createQuery(hql);
 		List<String> result= query.list();

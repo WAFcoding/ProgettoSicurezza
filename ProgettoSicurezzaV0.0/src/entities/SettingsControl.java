@@ -173,17 +173,21 @@ public class SettingsControl {
 		
 		System.out.println("Update DB");
 		
-		if(!HibernateUtil.isCreated())
-			HibernateUtil.createSession(getActualDbPath());
+		User actualUser= control.getUser_manager().getActualUser();
+		
+		if(!HibernateUtil.isCreated()){
+			HibernateUtil.setDbPath(getActualDbPath());
+			HibernateUtil.decryptDb(actualUser.getPassword());
+			HibernateUtil.createSession();
+		}
 		
 		Session session= HibernateUtil.getSessionFactory().openSession();
 		Transaction tx= null;
 		try{
 			tx= session.beginTransaction();
 			
-			control.getUser_manager().printActualUser();
+			//control.getUser_manager().printActualUser();
 			
-			User actualUser= control.getUser_manager().getActualUser();
 			
 			actualUser.setDir_def(getActualSettingsDefault());
 			actualUser.setDir_in(getActualSettingsInput());
@@ -199,6 +203,8 @@ public class SettingsControl {
 		}
 		finally{
 			session.close();
+			HibernateUtil.shutdown();
+			HibernateUtil.encryptDb(actualUser.getPassword());
 		}
 	}
 	
