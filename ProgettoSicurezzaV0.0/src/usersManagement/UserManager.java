@@ -124,7 +124,7 @@ public class UserManager {
 
 			if(!HibernateUtil.isCreated()){
 				HibernateUtil.setDbPath(dbPath);
-				HibernateUtil.encryptDb(password);
+				HibernateUtil.decryptDb(hash_password);
 				HibernateUtil.createSession();
 			}
 			

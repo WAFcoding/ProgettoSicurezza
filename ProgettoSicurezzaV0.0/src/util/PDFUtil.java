@@ -10,6 +10,7 @@ import com.itextpdf.text.Anchor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -154,8 +155,21 @@ public class PDFUtil {
 	}
 	
 	public static void addLineHorizontal(Document doc, float x1, float x2, float y){
-		
 
 	}
+	
+	public static void addLineVertical(Document doc, float y1, float y2, float x){
+		
+	}
+	
+	public static void addTitle(Document doc, String title){
+		
+	}
+	
+	public static void addLogo(Document doc, Image image){
+		
+	}
+	
+	
 
 }

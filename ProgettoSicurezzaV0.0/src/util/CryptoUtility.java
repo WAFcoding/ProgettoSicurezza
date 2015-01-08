@@ -433,6 +433,11 @@ public class CryptoUtility {
 			throws Exception {
 		return new String(decrypt(algo, data, key.getBytes()));
 	}
+	
+	public static byte[] decryptToByte(CRYPTO_ALGO algo, byte[] data, String key)
+			throws Exception{
+		return decrypt(algo, data, key.getBytes());
+	}
 
 	/**
 	 * Calcola l'hash della stringa in input seguendo l'algoritmo indicato.

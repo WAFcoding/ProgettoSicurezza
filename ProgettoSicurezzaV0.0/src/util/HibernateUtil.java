@@ -5,11 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.commons.io.IOUtils;
 import org.hibernate.SessionFactory;
@@ -103,14 +99,14 @@ public class HibernateUtil {
 			FileInputStream fin= new FileInputStream(dbPath); 
 			InputStream in= fin;
 			data= IOUtils.toByteArray(in);
-			dec_data= CryptoUtility.decrypt(CRYPTO_ALGO.AES, data, password);
-			//TODO fare funzione per criptare che restituisca byte
+			dec_data= CryptoUtility.decryptToByte(CRYPTO_ALGO.AES, data, password);
 			in.close();
 			fin.close();
 			
 			FileOutputStream fout= new FileOutputStream(dbPath);
 			OutputStream out= fout;
-			out.write(dec_data);
+			//out.write(dec_data);
+			IOUtils.write(dec_data, out);
 			out.close();
 			fout.close();
 		} catch (FileNotFoundException e1) {
