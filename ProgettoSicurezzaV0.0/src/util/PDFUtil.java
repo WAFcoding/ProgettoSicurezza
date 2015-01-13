@@ -5,15 +5,22 @@ package util;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Font.FontFamily;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
@@ -25,21 +32,37 @@ import com.itextpdf.text.pdf.draw.LineSeparator;
  *
  */
 public class PDFUtil {
+	
+	private static final float TITLEX= 150;
+	private static final float TITLEY= PageSize.A4.getHeight() - 50;
+	private static final float DEFSIZETEXT= 11;
+	private static final float DEFLINESIZE= 0.05f;
+	
+	private static PdfWriter pdfwr;
+	private static Document doc;
+	private static PdfContentByte pdfcb;
+	private static Font font; 
+	private static BaseFont bf_helv;
 
 	/**
 	 * crea un nuovo documento pdf
 	 * @param doc Document
 	 * @param file_path String il percorso dove salvare
-	 * @return il Document relativo
 	 * @see Document
 	 * @throws FileNotFoundException
 	 * @throws DocumentException
 	 */
-	public static Document create(String file_path) throws FileNotFoundException, DocumentException{
-		Document doc= new Document(PageSize.A4);
-		PdfWriter.getInstance(doc, new FileOutputStream(file_path));
-		
-		return doc;
+	public static boolean create(String file_path) throws FileNotFoundException, DocumentException{
+		doc= new Document(PageSize.A4);
+		pdfwr= PdfWriter.getInstance(doc, new FileOutputStream(file_path));
+		if(open()){
+			pdfcb= pdfwr.getDirectContent();
+			font= new Font(FontFamily.HELVETICA, 12);
+			bf_helv = font.getCalculatedBaseFont(false);
+			return true;
+		}
+
+		return false;
 	}
 	/**
 	 * Crea ed apre un documento pdf
@@ -49,7 +72,7 @@ public class PDFUtil {
 	 * @throws FileNotFoundException
 	 * @throws DocumentException
 	 */
-	public static boolean open(Document doc) throws FileNotFoundException, DocumentException{
+	public static boolean open() throws FileNotFoundException, DocumentException{
 		
 		doc.open();
 		
@@ -62,7 +85,7 @@ public class PDFUtil {
 	 * @param doc Document
 	 * @return true se il documento era aperto, false altrimenti
 	 */
-	public static boolean close(Document doc){
+	public static boolean close(){
 		if(doc.isOpen()){
 			doc.close();
 			return true;
@@ -79,7 +102,7 @@ public class PDFUtil {
 	 * @param author String l'autore
 	 * @param creator String il creatore
 	 */
-	public static void addCredentials(Document doc, String title, String subject, String keywords, 
+	public static void addCredentials(String title, String subject, String keywords, 
 									  String author, String creator){
 		if(doc.isOpen()){
 			if(title != null) doc.addTitle(title);
@@ -94,25 +117,17 @@ public class PDFUtil {
 	}
 	/**
 	 * aggiunge il testo passato in un nuovo paragrafo
-	 * @param doc Document
 	 * @param text String
 	 * @throws DocumentException
 	 */
-	public static void addText(Document doc, String text) throws DocumentException{
-		if(doc.isOpen()){
-			doc.add(new Paragraph(text));
-		}
-	}
-	/**
-	 * aggiunge al documento passato una frase
-	 * @param doc Document
-	 * @param phrase String
-	 * @throws DocumentException
-	 */
-	public static void addPhrase(Document doc, String phrase) throws DocumentException{
-		if(doc.isOpen()){
-			doc.add(new Phrase(phrase));
-		}
+	public static void addText(String text, float x, float y, float textSize) throws DocumentException{
+		pdfcb.beginText();
+		if(textSize == 0) textSize= DEFSIZETEXT;
+		pdfcb.setFontAndSize(bf_helv, textSize);
+		//TODO PDFUtil: cambiare i valori della posizione del titolo
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, text, x, y, 0);
+		pdfcb.endText();
+		//pdfcb.saveState();
 	}
 	/**
 	 * aggiunge un link in una phrase e poi al documento
@@ -122,7 +137,8 @@ public class PDFUtil {
 	 * @param ref String il percorso del link
 	 * @throws DocumentException
 	 */
-	public static void addLink(Document doc, String text, String name, String ref) throws DocumentException{
+	//TODO PDFUtil: da modificare
+	public static void addLink(String text, String name, String ref) throws DocumentException{
 		if(doc.isOpen()){
 			Anchor anc= new Anchor(text);
 			anc.setName(name);
@@ -138,7 +154,7 @@ public class PDFUtil {
 	 * @param nline int
 	 * @throws DocumentException
 	 */
-	public static void addEmptyLine(Document doc, int nline) throws DocumentException{
+	public static void addEmptyLine(int nline) throws DocumentException{
 		Paragraph par= new Paragraph(" ");
 		for(int i=0;i<nline;i++){
 			par.add(" ");
@@ -150,26 +166,68 @@ public class PDFUtil {
 			System.out.println("Aprire prima il file");
 	}
 	
-	public static void addImage(Document doc, String path, int x, int y){
-		
+	public static void addImage(String path, float x, float y) throws MalformedURLException, IOException, DocumentException{
+		Image img = Image.getInstance(path);
+		//img.scaleAbsolute(50, 50);
+		img.setAbsolutePosition(x, y);
+		doc.add(img);
 	}
-	
-	public static void addLineHorizontal(Document doc, float x1, float x2, float y){
+	/**
+	 * Aggiunge una linea orizzontale
+	 * @param x1
+	 * @param x2
+	 * @param y
+	 */
+	public static void addLineHorizontal(float x, float y, float lenght){
+		pdfcb.saveState();
+		pdfcb.setLineWidth(DEFLINESIZE);
+		pdfcb.moveTo(x, y);
+		pdfcb.lineTo(x + lenght, y);
+		pdfcb.stroke();
+		pdfcb.restoreState();
+	}
+	/**
+	 * Aggiunge una linea verticale
+	 * @param y1
+	 * @param y2
+	 * @param x
+	 */
+	public static void addLineVertical(float x, float y, float lenght){
+		pdfcb.saveState();
+		pdfcb.setLineWidth(DEFLINESIZE);
+		pdfcb.moveTo(x, y);
+		pdfcb.lineTo(x, y + lenght);
+		pdfcb.stroke();
+		pdfcb.restoreState();
+	}
+	/**
+	 * Aggiunge il titolo del pdf in cima ad esso
+	 * @param title
+	 */
+	public static void addTitle(String title){
 
+		pdfcb.beginText();
+		pdfcb.setFontAndSize(bf_helv, 30);
+		//TODO PDFUtil: cambiare i valori della posizione del titolo
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, title, TITLEX, TITLEY, 0);
+		pdfcb.endText();
+	}
+	/**
+	 * Aggiunge il logo al pdf nell'angolo in alto a sinistra
+	 * @param imagePath il percorso dell'immagine da aggiungere
+	 * @throws IOException 
+	 * @throws MalformedURLException 
+	 * @throws DocumentException 
+	 */
+	public static void addLogo(String imagePath, float x, float y) throws MalformedURLException, IOException, DocumentException{
+		Image img = Image.getInstance(imagePath);
+		//img.scaleAbsolute(50, 50);
+		img.setAbsolutePosition(x, y);
+		doc.add(img);
 	}
 	
-	public static void addLineVertical(Document doc, float y1, float y2, float x){
-		
+	public static Document getDocument(){
+		return doc;
 	}
-	
-	public static void addTitle(Document doc, String title){
-		
-	}
-	
-	public static void addLogo(Document doc, Image image){
-		
-	}
-	
-	
 
 }

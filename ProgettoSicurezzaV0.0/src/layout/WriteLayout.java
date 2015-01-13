@@ -208,10 +208,10 @@ public class WriteLayout implements GeneralLayout{
 					QRCode.saveFile(path, area.getText());//funzione di utilità sta in QRCode solo per comodità
 					try {
 						String pat_pdf= getOutput_folder() + name_file + ".pdf";
-						Document doc= PDFUtil.create(pat_pdf);
-						if(PDFUtil.open(doc)){
-							PDFUtil.addText(doc, area.getText());
-							PDFUtil.close(doc);
+						PDFUtil.create(pat_pdf);
+						if(PDFUtil.open()){
+							PDFUtil.addText(area.getText(), 40, 400, 0);
+							PDFUtil.close();
 						}
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();

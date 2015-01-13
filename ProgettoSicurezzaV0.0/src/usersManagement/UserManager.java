@@ -262,12 +262,12 @@ public class UserManager {
 			String registration_summary= "|NAME: " + name + "\t | \tSURNAME: " + surname + "\t |\n" + 
 										 "|PASSWORD: " + password + "\t | \tCODE: " + code + "\t |\n" +
 										 "|MAIL: " + mail + "\t |";
-			Document doc= PDFUtil.create(dir_def + "/" + code + ".pdf");
-			if(PDFUtil.open(doc)){
-				PDFUtil.addCredentials(doc, code, "Credentials", "Registration", 
+			PDFUtil.create(dir_def + "/" + code + ".pdf");
+			if(PDFUtil.open()){
+				PDFUtil.addCredentials(code, "Credentials", "Registration", 
 										"ProgettoSicurezza", "ProgettoSicurezza");
-				PDFUtil.addText(doc, registration_summary);
-				PDFUtil.close(doc);
+				PDFUtil.addText(registration_summary, 40, 500, 0);
+				PDFUtil.close();
 			}
 			//stampa del contenuto del PDF a schermo
 			control.setErrorLayout("Registration summary:\n" + registration_summary, "HOME");
