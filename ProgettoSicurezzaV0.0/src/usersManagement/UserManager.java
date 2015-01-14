@@ -411,6 +411,26 @@ public class UserManager {
 		}
 		return result.contains(paramCode);
 	}
+
+	public User getActualUser() {
+		if(actualUser == null)
+			return null;
+		
+		return actualUser;
+	}
+
+	public void setActualUser(User actualUser) {
+		this.actualUser = actualUser;
+	}
+	
+	public void printActualUser(){
+		System.out.println(actualUser.getName() + " " + actualUser.getSurname() + "\n" +
+							actualUser.getDir_def() + " " + actualUser.getDir_in() + " " + actualUser.getDir_out());
+	}
+	
+	public void createPdfResume(String name, String surname, String password, String code, String mail){
+		
+	}
 /*
 	public static void main(String[] args){
 		System.out.println("prova hibernate");
@@ -461,20 +481,4 @@ public class UserManager {
 			session.close();
 		}
 	}*/
-
-	public User getActualUser() {
-		if(actualUser == null)
-			return null;
-		
-		return actualUser;
-	}
-
-	public void setActualUser(User actualUser) {
-		this.actualUser = actualUser;
-	}
-	
-	public void printActualUser(){
-		System.out.println(actualUser.getName() + " " + actualUser.getSurname() + "\n" +
-							actualUser.getDir_def() + " " + actualUser.getDir_in() + " " + actualUser.getDir_out());
-	}
 }

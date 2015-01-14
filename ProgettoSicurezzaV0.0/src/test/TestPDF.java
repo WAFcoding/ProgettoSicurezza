@@ -62,9 +62,11 @@ public class TestPDF {
 			//doc.addCreationDate();
 			//doc.add(ct);
 			String title= "title";
-			PDFUtil.addLogo(image_path, 0, 0);
+			PDFUtil.addLogo(image_path);
 			PDFUtil.addTitle(title);
-			PDFUtil.addLineHorizontal(10, 20, 100);
+			PDFUtil.addAuthor("author");
+			PDFUtil.addSubtitleInfo("date", "1/1", "info", "receiver");
+			PDFUtil.addLineHorizontal(10, 300, 500);
 			PDFUtil.addLineVertical(40, 30, 400);
 			PDFUtil.close();
 		}

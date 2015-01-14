@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import com.itextpdf.text.Anchor;
-import com.itextpdf.text.BadElementException;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -20,10 +18,10 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Font.FontFamily;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.draw.LineSeparator;
 
 /**
  * Classe di utilità per la creazione dei pdf
@@ -32,11 +30,20 @@ import com.itextpdf.text.pdf.draw.LineSeparator;
  *
  */
 public class PDFUtil {
-	
-	private static final float TITLEX= 150;
-	private static final float TITLEY= PageSize.A4.getHeight() - 50;
+
+	private static final Rectangle PAGESIZE= PageSize.A4;
+	private static final float LOGOWIDTH= 70;
+	private static final float LOGOHEIGHT= 83;
+	private static final float LOGOX= 10;
+	private static final float LOGOY= PAGESIZE.getHeight() - 10;
+	private static final float TITLEX= LOGOX + LOGOWIDTH + 20;
+	private static final float TITLEY= PAGESIZE.getHeight() - 30 - 10;
+	private static final float AUTHORX= TITLEX;
+	private static final float AUTHORY= TITLEY - 20 - 10;
+	private static final float INFOX= TITLEX;
+	private static final float INFOY= AUTHORY - 10 - 10;
 	private static final float DEFSIZETEXT= 11;
-	private static final float DEFLINESIZE= 0.05f;
+	private static final float DEFSIZELINE= 0.05f;
 	
 	private static PdfWriter pdfwr;
 	private static Document doc;
@@ -53,7 +60,7 @@ public class PDFUtil {
 	 * @throws DocumentException
 	 */
 	public static boolean create(String file_path) throws FileNotFoundException, DocumentException{
-		doc= new Document(PageSize.A4);
+		doc= new Document(PAGESIZE);
 		pdfwr= PdfWriter.getInstance(doc, new FileOutputStream(file_path));
 		if(open()){
 			pdfcb= pdfwr.getDirectContent();
@@ -169,7 +176,7 @@ public class PDFUtil {
 	public static void addImage(String path, float x, float y) throws MalformedURLException, IOException, DocumentException{
 		Image img = Image.getInstance(path);
 		//img.scaleAbsolute(50, 50);
-		img.setAbsolutePosition(x, y);
+		img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getHeight());
 		doc.add(img);
 	}
 	/**
@@ -180,9 +187,9 @@ public class PDFUtil {
 	 */
 	public static void addLineHorizontal(float x, float y, float lenght){
 		pdfcb.saveState();
-		pdfcb.setLineWidth(DEFLINESIZE);
-		pdfcb.moveTo(x, y);
-		pdfcb.lineTo(x + lenght, y);
+		pdfcb.setLineWidth(DEFSIZELINE);
+		pdfcb.moveTo(x, PAGESIZE.getHeight() - y);
+		pdfcb.lineTo(x + lenght, PAGESIZE.getHeight() - y);
 		pdfcb.stroke();
 		pdfcb.restoreState();
 	}
@@ -194,9 +201,9 @@ public class PDFUtil {
 	 */
 	public static void addLineVertical(float x, float y, float lenght){
 		pdfcb.saveState();
-		pdfcb.setLineWidth(DEFLINESIZE);
-		pdfcb.moveTo(x, y);
-		pdfcb.lineTo(x, y + lenght);
+		pdfcb.setLineWidth(DEFSIZELINE);
+		pdfcb.moveTo(x, PAGESIZE.getHeight() - y);
+		pdfcb.lineTo(x, PAGESIZE.getHeight() - y - lenght);
 		pdfcb.stroke();
 		pdfcb.restoreState();
 	}
@@ -212,6 +219,25 @@ public class PDFUtil {
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, title, TITLEX, TITLEY, 0);
 		pdfcb.endText();
 	}
+	
+	public static void addAuthor(String author){
+
+		pdfcb.beginText();
+		pdfcb.setFontAndSize(bf_helv, 20);
+		//TODO PDFUtil: cambiare i valori della posizione del titolo
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, author, AUTHORX, AUTHORY, 0);
+		pdfcb.endText();
+	}
+	
+	public static void addSubtitleInfo(String date, String pagenumber, String info, String receiver){
+
+		pdfcb.beginText();
+		pdfcb.setFontAndSize(bf_helv, 10);
+		String allInfo= date + " - " + pagenumber + " - " + info + " - " + receiver;
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, allInfo, INFOX, INFOY, 0);
+		pdfcb.endText();
+		//TODO PDFUtil: aggiungere linea orizzontale
+	}
 	/**
 	 * Aggiunge il logo al pdf nell'angolo in alto a sinistra
 	 * @param imagePath il percorso dell'immagine da aggiungere
@@ -219,10 +245,11 @@ public class PDFUtil {
 	 * @throws MalformedURLException 
 	 * @throws DocumentException 
 	 */
-	public static void addLogo(String imagePath, float x, float y) throws MalformedURLException, IOException, DocumentException{
+	public static void addLogo(String imagePath) throws MalformedURLException, IOException, DocumentException{
 		Image img = Image.getInstance(imagePath);
-		//img.scaleAbsolute(50, 50);
-		img.setAbsolutePosition(x, y);
+		img.scaleAbsolute(LOGOWIDTH, LOGOHEIGHT);
+		//System.out.println("larghezza = " + img.getWidth() + "altezza= " + img.getHeight());
+		img.setAbsolutePosition(LOGOX, LOGOY - img.getScaledHeight());
 		doc.add(img);
 	}
 	
