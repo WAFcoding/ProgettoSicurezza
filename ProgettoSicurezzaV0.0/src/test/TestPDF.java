@@ -66,8 +66,14 @@ public class TestPDF {
 			PDFUtil.addTitle(title);
 			PDFUtil.addAuthor("author");
 			PDFUtil.addSubtitleInfo("date", "1/1", "info", "receiver");
-			PDFUtil.addLineHorizontal(10, 300, 500);
-			PDFUtil.addLineVertical(40, 30, 400);
+			PDFUtil.addLineHorizontal(10, 150, 0);
+			PDFUtil.addLineHorizontal(10, 600, 0);
+			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_101.jpg", 10, 610);
+			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_200.jpg", 120, 610);
+			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_297.jpg", 230, 610);
+			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_393.jpg", 340, 610);
+			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_484.jpg", 450, 610);
+			//PDFUtil.addLineVertical(40, 30, 400);
 			PDFUtil.close();
 		}
 	}

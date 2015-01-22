@@ -40,7 +40,7 @@ public class PDFUtil {
 	private static final float TITLEY= PAGESIZE.getHeight() - 30 - 10;
 	private static final float AUTHORX= TITLEX;
 	private static final float AUTHORY= TITLEY - 20 - 10;
-	private static final float INFOX= TITLEX;
+	private static final float INFOX= TITLEX + 50;
 	private static final float INFOY= AUTHORY - 10 - 10;
 	private static final float DEFSIZETEXT= 11;
 	private static final float DEFSIZELINE= 0.05f;
@@ -175,8 +175,9 @@ public class PDFUtil {
 	
 	public static void addImage(String path, float x, float y) throws MalformedURLException, IOException, DocumentException{
 		Image img = Image.getInstance(path);
-		//img.scaleAbsolute(50, 50);
-		img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getHeight());
+		img.scaleAbsolute(100, 100);
+		//img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getHeight());
+		img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getScaledHeight());
 		doc.add(img);
 	}
 	/**
@@ -189,6 +190,7 @@ public class PDFUtil {
 		pdfcb.saveState();
 		pdfcb.setLineWidth(DEFSIZELINE);
 		pdfcb.moveTo(x, PAGESIZE.getHeight() - y);
+		if(lenght == 0) lenght= PAGESIZE.getWidth() - (2*x);
 		pdfcb.lineTo(x + lenght, PAGESIZE.getHeight() - y);
 		pdfcb.stroke();
 		pdfcb.restoreState();

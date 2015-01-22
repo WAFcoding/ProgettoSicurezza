@@ -278,4 +278,6 @@ public class QRCode {
 			e.printStackTrace();
 		}
 	}
+	
+	
 }
