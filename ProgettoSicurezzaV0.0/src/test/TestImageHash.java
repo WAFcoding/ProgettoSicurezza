@@ -1,54 +1,67 @@
 package test;
 
+import java.io.File;
 import java.io.FileInputStream;
-import java.math.BigInteger;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 import util.ImagePHash;
 
 public class TestImageHash {
 
-	public static void main(String[] args)  {
-		ImagePHash hash = new ImagePHash(32,10);
+	public static void main(String[] args) throws Exception {
 		
-		try{
-			String hash1 = hash.getHash(new FileInputStream("/home/giovanni/Scaricati/opencv-2.4.9/samples/cpp/tsukuba_l.png"));
-			String hash2 = hash.getHash(new FileInputStream("/home/giovanni/Scaricati/opencv-2.4.9/samples/cpp/tsukuba_r.png"));
-			String hash3 = hash.getHash(new FileInputStream("/home/giovanni/Scaricati/opencv-2.4.9/samples/cpp/board.jpg"));
-			String hash4 = hash.getHash(new FileInputStream("/home/giovanni/Scaricati/opencv-2.4.9/samples/cpp/fruits.jpg"));
-			String hash5 = hash.getHash(new FileInputStream("/home/giovanni/Scaricati/opencv-2.4.9/samples/cpp/baboon.jpg"));
+		/*int startsize = 12;
+		int maxsize = 50;
+		
+		FileOutputStream fos = new FileOutputStream(new File("/home/giovanni/Scrivania/dati.csv"));
+		PrintStream ps = new PrintStream(fos);
+		ps.println("max;min;contr1;contr2");
+		for(int i = startsize; i < maxsize; i++) {
 
-			System.out.println(hash1.length());
+			for(int j = 2; j <= i ; j ++){
 
-			int hammingDist = hash.distance(hash1, hash2);
-			int hammingDist2 = hash.distance(hash1, hash3);
-			int hammingDist3 = hash.distance(hash1, hash4);
-			int hammingDist4 = hash.distance(hash1, hash5);
+				System.out.println("max: " + i + " === min: " + j);*/
+		ImagePHash hash = new ImagePHash(42, 5);
 
-			System.out.println("Hash1:" + hash1+"\nHash2:" + hash2 + "\nDistance1:" + hammingDist + "\n====");
-			System.out.println("Hash1:" + hash1+"\nHash3:" + hash3 + "\nDistance2:" + hammingDist2 + "\n====");
-			System.out.println("Hash1:" + hash1+"\nHash4:" + hash4 + "\nDistance3:" + hammingDist3 + "\n====");
-			System.out.println("Hash1:" + hash1+"\nHash5:" + hash5 + "\nDistance4:" + hammingDist4 + "\n====");
-			
-			String hex = toHex(hash1);
-			String bin = fromHex(hex);
-			
-			System.out.println("Hex:"+hex);
-			System.out.println("Bina:"+bin + "\nHash:" +hash1);
+		//String originale = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/2/test_2.png"));
+		String originale = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_1.png"));
+		String luminosita1 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_2_lum.png"));
+		String luminosita2 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_3_lum.png"));
+		String contrasto1 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_2_contrasto.png"));
+		String contrasto2 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_3_contrasto.png"));
+		String disturbo1 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_2_disturbo.png"));
+		String disturbo2 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_3_disturbo.png"));
+		String scanner1 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_1_scanner.png"));
+		String scanner2 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_2_scanner.png"));
+		//String contr1 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/2/test_2_1_contraffazione.png"));
+		//String contr2 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/2/test_2_2_contraffazione.png"));
+		String contr1 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_1_contraffatto.png"));
+		String contr2 = hash.getHash(new FileInputStream("/home/giovanni/Scrivania/testphash/1/test1_2_contraffatto.png"));
 
-			
 
-		} catch (Exception e) {
-			e.printStackTrace();
+		System.out.println("originale - lum1: " + hash.matchPercentage(originale, luminosita1));
+		System.out.println("originale - lum2: " + hash.matchPercentage(originale, luminosita2));
+
+		System.out.println("originale - contrasto1: " + hash.matchPercentage(originale, contrasto1));
+		System.out.println("originale - contrasto2: " + hash.matchPercentage(originale, contrasto2));
+
+		System.out.println("originale - disturbo1: " + hash.matchPercentage(originale, disturbo1));
+		System.out.println("originale - disturbo2: " + hash.matchPercentage(originale, disturbo2));
+
+		System.out.println("originale - scanner1: " + hash.matchPercentage(originale, scanner1));
+		System.out.println("originale - scanner2: " + hash.matchPercentage(originale, scanner2));
+		double c1 = hash.matchPercentage(originale, contr1);
+		double c2 = hash.matchPercentage(originale, contr2);
+		System.out.println("originale - contraffatto1: " + c1);
+		System.out.println("originale - contraffatto2: " + c2);
+				/*
+				ps.println(i + ";" + j + ";" + c1 + ";" +c2 );
+				System.out.println("============================================");
+
+			}
 		}
-	}
-	
-	public static String toHex(String s) {
-		BigInteger bi = new BigInteger(s, 2);
-		return bi.toString(16);
-	}
-	
-	public static String fromHex(String s) {
-		BigInteger bi = new BigInteger(s,16);
-		return "0" + bi.toString(2);
+		ps.close();
+		fos.close();*/
 	}
 }

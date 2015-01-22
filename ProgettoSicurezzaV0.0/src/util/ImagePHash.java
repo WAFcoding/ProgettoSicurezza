@@ -5,6 +5,7 @@ import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 
 import javax.imageio.ImageIO;
 
@@ -28,8 +29,20 @@ public class ImagePHash {
 
 		initCoefficients();
 	}
+	
+	public double matchPercentage(String s1, String s2){
+		int dist = distance(s1,s2);
+		if(dist==-1)
+			return 0.0; //non confrontabili
+		int length = s1.length(); //s1 ed s2 hanno la stessa lunghezza.
+   
+		return 100.0 - (((double)dist / (double)length)*100.0);
+	}
 
 	public int distance(String s1, String s2) {
+		if(s1==null || s2==null || s1.length()!=s2.length() )
+			return -1; //stringhe non confrontabili
+		
 		int counter = 0;
 		for (int k = 0; k < s1.length(); k++) {
 			if (s1.charAt(k) != s2.charAt(k)) {
@@ -42,6 +55,9 @@ public class ImagePHash {
 	// Returns a 'binary string' (like. 001010111011100010) which is easy to do
 	// a hamming distance on.
 	public String getHash(InputStream is) throws Exception {
+		
+		long inizio = System.nanoTime();
+		
 		BufferedImage img = ImageIO.read(is);
 
 		/*
@@ -116,6 +132,10 @@ public class ImagePHash {
 			}
 		}
 
+		long fine = System.nanoTime();
+		
+		System.out.println("Current time:"  + (double)(fine-inizio)/1000000000.0 + " secs");
+		
 		return hash;
 	}
 
