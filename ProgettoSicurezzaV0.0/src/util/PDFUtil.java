@@ -7,21 +7,31 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.xmlgraphics.ps.dsc.tools.PageExtractor;
 
 import com.itextpdf.text.Anchor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
-import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.parser.ImageRenderInfo;
+import com.itextpdf.text.pdf.parser.PdfImageObject;
+import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
+import com.itextpdf.text.pdf.parser.RenderListener;
+import com.itextpdf.text.pdf.parser.TextRenderInfo;
 
 /**
  * Classe di utilità per la creazione dei pdf
@@ -47,6 +57,7 @@ public class PDFUtil {
 	
 	private static PdfWriter pdfwr;
 	private static Document doc;
+	private static String filepath;
 	private static PdfContentByte pdfcb;
 	private static Font font; 
 	private static BaseFont bf_helv;
@@ -61,6 +72,7 @@ public class PDFUtil {
 	 */
 	public static boolean create(String file_path) throws FileNotFoundException, DocumentException{
 		doc= new Document(PAGESIZE);
+		filepath= file_path;
 		pdfwr= PdfWriter.getInstance(doc, new FileOutputStream(file_path));
 		if(open()){
 			pdfcb= pdfwr.getDirectContent();
@@ -257,6 +269,88 @@ public class PDFUtil {
 	
 	public static Document getDocument(){
 		return doc;
+	}
+	
+	public static void readPDF() throws IOException{
+		PdfReader reader= new PdfReader(filepath);
+		System.out.println("letto");
+	}
+	/**
+	 * Estrae le immagini da un file pdf
+	 * @param source
+	 * @param destination
+	 * @throws IOException
+	 * @throws DocumentException
+	 */
+	public static void extractImages(String source, String destination) throws IOException, DocumentException{
+		PdfReader reader= new PdfReader(source);
+		PdfReaderContentParser parser= new PdfReaderContentParser(reader);
+		ImageRenderListener listener= new ImageRenderListener(destination);
+
+        for (int i = 1; i <= reader.getNumberOfPages(); i++) {
+            parser.processContent(i, listener);
+        }
+        reader.close();
+	}
+	
+	private static class ImageRenderListener implements RenderListener{
+		
+		protected String path;
+		
+		public ImageRenderListener(String p){
+			path= p;
+		}
+
+		/* (non-Javadoc)
+		 * @see com.itextpdf.text.pdf.parser.RenderListener#beginTextBlock()
+		 */
+		@Override
+		public void beginTextBlock() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see com.itextpdf.text.pdf.parser.RenderListener#endTextBlock()
+		 */
+		@Override
+		public void endTextBlock() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see com.itextpdf.text.pdf.parser.RenderListener#renderImage(com.itextpdf.text.pdf.parser.ImageRenderInfo)
+		 */
+		@Override
+		public void renderImage(ImageRenderInfo renderInfo) {
+			 try {
+		            String filename;
+		            FileOutputStream os;
+		            PdfImageObject image = renderInfo.getImage();
+		            if (image == null) {
+		                return;
+		            }
+		            filename = String.format(path, renderInfo.getRef().getNumber(), image.getFileType());
+		            //System.out.println("Writing image to file: " + filename);
+		            os = new FileOutputStream(filename);
+		            os.write(image.getImageAsBytes());
+		            os.flush();
+		            os.close();
+		        } catch (IOException e) {
+		            Logger.getLogger(ImageRenderListener.class.getName()).log(Level.SEVERE, null, e);
+		        }
+		}
+
+		/* (non-Javadoc)
+		 * @see com.itextpdf.text.pdf.parser.RenderListener#renderText(com.itextpdf.text.pdf.parser.TextRenderInfo)
+		 */
+		@Override
+		public void renderText(TextRenderInfo arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 
 }

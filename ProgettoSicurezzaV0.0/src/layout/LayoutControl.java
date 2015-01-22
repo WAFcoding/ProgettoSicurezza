@@ -32,6 +32,7 @@ public class LayoutControl {
 	private HomeLayout h_layout;
 	private RegistrationLayout r_layout;
 	private ErrorLayout err_layout;
+	private ReceiverSettingsLayout rec_layout;
 	private ArrayList<String> choosed_images;
 	private SettingsControl set_ctrl;
 
@@ -42,7 +43,7 @@ public class LayoutControl {
 	private UserManager user_manager;
 	
 	private enum LAYOUT{
-		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR
+		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER
 	}
 	
 	public LayoutControl(){
@@ -102,6 +103,10 @@ public class LayoutControl {
 
 			mainFrame.setSize(600, HEIGHT);
 		}
+		else if(layout == 7){
+
+			mainFrame.setSize(800, 700);
+		}
 		
 		//mainFrame.pack();
 		mainFrame.repaint();
@@ -126,6 +131,8 @@ public class LayoutControl {
 				return 5;
 			case ERROR:
 				return 6;
+			case RECEIVER:
+				return 7;
 		}
 		
 		return -1;
@@ -204,6 +211,16 @@ public class LayoutControl {
 		else{
 			r_layout.addComponentsToPane();
 		}
+	}
+	
+	public void ReceiverLayout(){
+		if(rec_layout == null){
+			rec_layout= new ReceiverSettingsLayout(this, mainFrame.getContentPane(), true);
+		}
+	}
+	
+	public void setReceiverSingleUSer(boolean b){
+		rec_layout.setSingleUser(b);
 	}
 	
 	/**

@@ -37,30 +37,14 @@ public class TestPDF {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		String image_path= "/home/pasquale/Documenti/logoroma_torvergata.jpg";
+		String image_path= "/home/pasquale/Developing/WorkSpace/Java/ProgettoSiurezzaV0.0/files/logoroma_torvergata.jpg";
+		String path= "/home/pasquale/ProgettoSicurezza/test_pdf.pdf";
 		boolean created= PDFUtil.create("/home/pasquale/ProgettoSicurezza/test_pdf.pdf");
 		//Document doc= new Document(PageSize.A4);
 		//PdfWriter pdfwr = PdfWriter.getInstance(doc, new FileOutputStream("/home/pasquale/ProgettoSicurezza/test_pdf.pdf"));
 		if(created){
-			PDFUtil.addCredentials("test_pdf", "prova", "java", "PV", "PV");
-			/*Image img = Image.getInstance(image_path);
-			img.scaleAbsolute(50, 50);
-			img.setAbsolutePosition(10, PageSize.A4.getHeight() - img.getScaledHeight() - 10);
-			doc.add(img);*/
-			//PDFUtil.addEmptyLine(doc, 4);
-			//PdfContentByte pdfcb= pdfwr.getDirectContent();
-			/*pdfcb.beginText();
-			pdfcb.setFontAndSize(bf_helv, 30);
-			pdfcb.showTextAligned(Element.ALIGN_LEFT, title, 10 + img.getScaledWidth() + 20  , PageSize.A4.getHeight() - 10 - 30, 0);
-			pdfcb.endText();*/
-			//pdfcb.saveState();
-			/*pdfcb.setLineWidth(0.05f);
-			pdfcb.moveTo(10, 200);
-			pdfcb.lineTo(100, 200);
-			//pdfcb.stroke();
-			pdfcb.restoreState();*/
-			//doc.addCreationDate();
-			//doc.add(ct);
+			//PDFUtil.addCredentials("test_pdf", "prova", "java", "PV", "PV");
+
 			String title= "title";
 			PDFUtil.addLogo(image_path);
 			PDFUtil.addTitle(title);
@@ -74,8 +58,17 @@ public class TestPDF {
 			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_393.jpg", 340, 610);
 			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_484.jpg", 450, 610);
 			//PDFUtil.addLineVertical(40, 30, 400);
+			
 			PDFUtil.close();
+			
+			/*PDFUtil.create("/home/pasquale/ProgettoSicurezza/test_pdf.pdf");
+			PDFUtil.extractImages(path, "/home/pasquale/ProgettoSicurezza/Img%s.%s");
+			PDFUtil.close();*/
 		}
+		//PDFUtil.create("/home/pasquale/ProgettoSicurezza/test_pdf.pdf");
+		PDFUtil.extractImages(path, "/home/pasquale/ProgettoSicurezza/img/Img%s.%s");
+		//PDFUtil.close();
+		
 	}
 
 }
