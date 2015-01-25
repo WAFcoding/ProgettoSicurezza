@@ -10,8 +10,6 @@ import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.xmlgraphics.ps.dsc.tools.PageExtractor;
-
 import com.itextpdf.text.Anchor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -25,6 +23,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.parser.ImageRenderInfo;
@@ -42,8 +41,8 @@ import com.itextpdf.text.pdf.parser.TextRenderInfo;
 public class PDFUtil {
 
 	private static final Rectangle PAGESIZE= PageSize.A4;
-	private static final float LOGOWIDTH= 70;
-	private static final float LOGOHEIGHT= 83;
+	private static final float LOGOWIDTH= 109;
+	private static final float LOGOHEIGHT= 130;
 	private static final float LOGOX= 10;
 	private static final float LOGOY= PAGESIZE.getHeight() - 10;
 	private static final float TITLEX= LOGOX + LOGOWIDTH + 20;
@@ -54,6 +53,8 @@ public class PDFUtil {
 	private static final float INFOY= AUTHORY - 10 - 10;
 	private static final float DEFSIZETEXT= 11;
 	private static final float DEFSIZELINE= 0.05f;
+
+	public static final String LOGO_PATH= "/home/pasquale/Developing/WorkSpace/Java/ProgettoSicurezza/ProgettoSicurezzaV0.0/files/logoroma_torvergata.jpg";
 	
 	private static PdfWriter pdfwr;
 	private static Document doc;
@@ -293,6 +294,49 @@ public class PDFUtil {
         reader.close();
 	}
 	
+	public static void createResumeTable(String text1, String text2, String text3, String text4, String text5,
+										 String text6, String text7, String text8, String text9, String text10,
+										 String text11, String text12, String text13, String text14) throws DocumentException, MalformedURLException, IOException{
+		addLogo(LOGO_PATH);
+		addTitle("Registration resume");
+		PDFUtil.addLineHorizontal(10, 150, 0);
+		
+		PdfPTable table= new PdfPTable(2);
+		table.setTotalWidth(PAGESIZE.getWidth() - 40);
+
+		table.addCell("Name");
+		table.addCell(text1);
+		table.addCell("Surname");
+		table.addCell(text2);
+		table.addCell("Password");
+		table.addCell(text3);
+		table.addCell("Code");
+		table.addCell(text4);
+		table.addCell("Mail");
+		table.addCell(text5);
+		table.addCell("City");
+		table.addCell(text6);
+		table.addCell("Country");
+		table.addCell(text7);
+		table.addCell("Contry Code");
+		table.addCell(text8);
+		table.addCell("Organization");
+		table.addCell(text9);
+		table.addCell("Default Directory");
+		table.addCell(text10);
+		table.addCell("Output Direcotory");
+		table.addCell(text11);
+		table.addCell("Input Directory");
+		table.addCell(text12);
+		table.addCell("Public Key");
+		table.addCell(text13);
+		table.addCell("Private Key");
+		table.addCell(text14);
+		table.writeSelectedRows(0, 14, 20, PAGESIZE.getHeight() - 170, pdfcb);
+		
+		//doc.add(table);
+	}
+	
 	private static class ImageRenderListener implements RenderListener{
 		
 		protected String path;
@@ -301,27 +345,19 @@ public class PDFUtil {
 			path= p;
 		}
 
-		/* (non-Javadoc)
-		 * @see com.itextpdf.text.pdf.parser.RenderListener#beginTextBlock()
-		 */
+
 		@Override
 		public void beginTextBlock() {
-			// TODO Auto-generated method stub
 			
 		}
 
-		/* (non-Javadoc)
-		 * @see com.itextpdf.text.pdf.parser.RenderListener#endTextBlock()
-		 */
+
 		@Override
 		public void endTextBlock() {
-			// TODO Auto-generated method stub
 			
 		}
 
-		/* (non-Javadoc)
-		 * @see com.itextpdf.text.pdf.parser.RenderListener#renderImage(com.itextpdf.text.pdf.parser.ImageRenderInfo)
-		 */
+
 		@Override
 		public void renderImage(ImageRenderInfo renderInfo) {
 			 try {
@@ -342,12 +378,8 @@ public class PDFUtil {
 		        }
 		}
 
-		/* (non-Javadoc)
-		 * @see com.itextpdf.text.pdf.parser.RenderListener#renderText(com.itextpdf.text.pdf.parser.TextRenderInfo)
-		 */
 		@Override
 		public void renderText(TextRenderInfo arg0) {
-			// TODO Auto-generated method stub
 			
 		}
 		

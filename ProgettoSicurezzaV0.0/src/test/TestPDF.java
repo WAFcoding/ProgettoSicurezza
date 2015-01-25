@@ -38,15 +38,16 @@ public class TestPDF {
 	public static void main(String[] args) throws Exception {
 
 		String image_path= "/home/pasquale/Developing/WorkSpace/Java/ProgettoSiurezzaV0.0/files/logoroma_torvergata.jpg";
-		String path= "/home/pasquale/ProgettoSicurezza/test_pdf.pdf";
-		boolean created= PDFUtil.create("/home/pasquale/ProgettoSicurezza/test_pdf.pdf");
+		String path_test= "/home/pasquale/ProgettoSicurezza/test_pdf.pdf";
+		String path_registration_test= "/home/pasquale/ProgettoSicurezza/registration_test_pdf.pdf";
+		boolean created= PDFUtil.create(path_registration_test);
 		//Document doc= new Document(PageSize.A4);
 		//PdfWriter pdfwr = PdfWriter.getInstance(doc, new FileOutputStream("/home/pasquale/ProgettoSicurezza/test_pdf.pdf"));
 		if(created){
 			//PDFUtil.addCredentials("test_pdf", "prova", "java", "PV", "PV");
 
 			String title= "title";
-			PDFUtil.addLogo(image_path);
+			PDFUtil.addLogo(PDFUtil.LOGO_PATH);
 			PDFUtil.addTitle(title);
 			PDFUtil.addAuthor("author");
 			PDFUtil.addSubtitleInfo("date", "1/1", "info", "receiver");
@@ -57,17 +58,19 @@ public class TestPDF {
 			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_297.jpg", 230, 610);
 			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_393.jpg", 340, 610);
 			PDFUtil.addImage("/home/pasquale/ProgettoSicurezza/test_0_484.jpg", 450, 610);
-			//PDFUtil.addLineVertical(40, 30, 400);
 			
+			
+			
+			//PDFUtil.addLineVertical(40, 30, 400);
+			//PDFUtil.createResumeTable("test1", "test2", "test3", "test4", "test5", "test6", "test7",
+				//					  "test8", "test9", "test10", "test11", "test12", "test13", "test14");
 			PDFUtil.close();
 			
 			/*PDFUtil.create("/home/pasquale/ProgettoSicurezza/test_pdf.pdf");
 			PDFUtil.extractImages(path, "/home/pasquale/ProgettoSicurezza/Img%s.%s");
 			PDFUtil.close();*/
 		}
-		//PDFUtil.create("/home/pasquale/ProgettoSicurezza/test_pdf.pdf");
-		PDFUtil.extractImages(path, "/home/pasquale/ProgettoSicurezza/img/Img%s.%s");
-		//PDFUtil.close();
+		//PDFUtil.extractImages(path_test, "/home/pasquale/ProgettoSicurezza/img/Img%s.%s");
 		
 	}
 

@@ -3,6 +3,8 @@
  */
 package usersManagement;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -24,6 +26,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 
 import entities.Settings;
 import util.CryptoUtility;
@@ -43,31 +46,7 @@ public class UserManager {
 	
 	public UserManager(LayoutControl p_control){
 		this.control= p_control;
-	} 
-	//___________________Gestione DB Hibernate______________________________________________	
-/*	public static SessionFactory createSession(){
-
-		try{
-			Configuration configuration= new Configuration();
-			configuration.configure();
-			ServiceRegistry serviceRegistry= new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
-			return configuration.buildSessionFactory(serviceRegistry);
-		}
-		catch(Throwable e){
-			System.err.println("Unable to create a session " + e);
-			throw new ExceptionInInitializerError(e);
-		}
-	}
-	
-	public static SessionFactory getSessionFactory(){
-		return null;
-	}
-	
-	public static void closeSession(){
-		getSessionFactory().close();
-	}*/
-	//___________________________________________________________________________________
-	
+	} 	
 	//===================LOGIN==================
 	public boolean checkForLogin(String[] arg){
 		String name= arg[0];
@@ -259,16 +238,14 @@ public class UserManager {
 			
 			//TODO UserManager: encode del file serializzato
 			
-			String registration_summary= "|NAME: " + name + "\t | \tSURNAME: " + surname + "\t |\n" + 
+			createPdfResume(name, surname, password, code, mail, city, country, country_code, organization, 
+							dir_def, dir_out, dir_in, public_key, private_key);
+			
+			/*String registration_summary= "|NAME: " + name + "\t | \tSURNAME: " + surname + "\t |\n" + 
 										 "|PASSWORD: " + password + "\t | \tCODE: " + code + "\t |\n" +
-										 "|MAIL: " + mail + "\t |";
-			PDFUtil.create(dir_def + "/" + code + ".pdf");
-			if(PDFUtil.open()){
-				PDFUtil.addCredentials(code, "Credentials", "Registration", 
-										"ProgettoSicurezza", "ProgettoSicurezza");
-				PDFUtil.addText(registration_summary, 40, 500, 0);
-				PDFUtil.close();
-			}
+										 "|MAIL: " + mail + "\t |";*/
+			String registration_summary= "E' stato creato un pdf contenente i dati inseriti in " + dir_def + "/" + code + ".pdf";
+			
 			//stampa del contenuto del PDF a schermo
 			control.setErrorLayout("Registration summary:\n" + registration_summary, "HOME");
 
@@ -428,8 +405,25 @@ public class UserManager {
 							actualUser.getDir_def() + " " + actualUser.getDir_in() + " " + actualUser.getDir_out());
 	}
 	
-	public void createPdfResume(String name, String surname, String password, String code, String mail){
+	public void createPdfResume(String name, String surname, String password, String code, String mail, String city, 
+			String country, String country_code, String organization, String dir_def, String dir_out, 
+			String dir_in, String public_key, String private_key){
 		
+		try {
+			PDFUtil.create(dir_def + "/" + code + ".pdf");
+			if(PDFUtil.open()){
+				PDFUtil.addCredentials(code, "Credentials", "Registration", 
+										"ProgettoSicurezza", "ProgettoSicurezza");
+				try {
+					PDFUtil.createResumeTable(name, surname, password, code, mail, city, country, country_code, organization, dir_def, dir_out, dir_in, public_key, private_key);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				PDFUtil.close();
+			}
+		} catch (FileNotFoundException | DocumentException e) {
+			e.printStackTrace();
+		}
 	}
 /*
 	public static void main(String[] args){

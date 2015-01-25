@@ -104,7 +104,7 @@ public class LayoutControl {
 			mainFrame.setSize(600, HEIGHT);
 		}
 		else if(layout == 7){
-
+			ReceiverLayout();
 			mainFrame.setSize(800, 700);
 		}
 		
@@ -401,11 +401,11 @@ public class LayoutControl {
 	public void draw(String path, String backTo){
 		File f = new File(path);
 		if(isImage(f)){
-			//addImageChoice(path);
+			addImageChoice(path);
 			drawImage(f, backTo);
 		}
 		else if(isText(f)){
-			//addFileChoice(path);
+			addFileChoice(path);
 			drawFile(f);
 		}
 	}

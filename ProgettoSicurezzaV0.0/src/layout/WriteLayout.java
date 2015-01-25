@@ -119,14 +119,14 @@ public class WriteLayout implements GeneralLayout{
 				//utente specifico
 				if(choice == JOptionPane.YES_OPTION){
 					setReceiverSetted(true);
-					//control.setLayout("RECEIVER");
-					//control.setReceiverSingleUSer(true);
+					control.setLayout("RECEIVER");
+					control.setReceiverSingleUSer(true);
 				}
 				//gruppo di utenti
 				else if(choice == JOptionPane.NO_OPTION){
 					setReceiverSetted(true);
-					//control.setLayout("RECEIVER");
-					//control.setReceiverSingleUSer(false);
+					control.setLayout("RECEIVER");
+					control.setReceiverSingleUSer(false);
 				}
 			}
 		});
