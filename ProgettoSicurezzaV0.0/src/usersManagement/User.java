@@ -265,4 +265,16 @@ public class User implements Serializable{
 	public void setTrustLevel(Integer trustLevel) {
 		this.trustLevel = trustLevel;
 	}
+
+	@Override
+	public String toString() {
+		return "User [ID=" + ID + ", name=" + name + ", surname=" + surname
+				+ ", mail=" + mail + ", code=" + code + ", city=" + city
+				+ ", country=" + country + ", country_code=" + country_code
+				+ ", organization=" + organization + ", dir_def=" + dir_def
+				+ ", dir_in=" + dir_in + ", dir_out=" + dir_out
+				+ ", publicKey=" + publicKey + ", privateKey=" + privateKey
+				+ ", password=" + password + ", trustLevel=" + trustLevel
+				+ ", publicKeyKnown=" + publicKeyKnown + "]";
+	}
 }

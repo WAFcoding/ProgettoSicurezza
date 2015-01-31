@@ -3,6 +3,7 @@ package connection;
 import java.io.IOException;
 
 import usersManagement.User;
+import util.CryptoUtility;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -21,7 +22,9 @@ public class RegistrationClient extends ClientConnection {
 		usr.addProperty("organization", u.getOrganization());
 		usr.addProperty("public_key", u.getPublicKey());
 		
+		System.out.println("waiting-->:"+usr.toString());
 		String response = super.sendCommand(usr.toString());
+		System.out.println(response);
 		JsonParser parser = new JsonParser();
 		JsonObject object = parser.parse(response).getAsJsonObject();
 		
@@ -38,6 +41,7 @@ public class RegistrationClient extends ClientConnection {
 		req.addProperty("type", "RETRIEVE");
 		req.addProperty("id", secId);
 		
+		System.out.println("waiting-->:"+req.toString());
 		String response = super.sendCommand(req.toString());
 		JsonParser parser = new JsonParser();
 		JsonObject object = parser.parse(response).getAsJsonObject();
@@ -46,7 +50,7 @@ public class RegistrationClient extends ClientConnection {
 			return bean;
 		
 		bean.setTrustLevel(object.get("trustLevel").getAsInt());
-		bean.setCertificateData(object.get("cert").getAsString().getBytes());
+		bean.setCertificateData(CryptoUtility.fromBase64(object.get("cert").getAsString()));
 
 		return bean;
 	}

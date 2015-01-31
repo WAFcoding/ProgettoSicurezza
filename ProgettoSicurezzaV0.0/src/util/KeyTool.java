@@ -13,6 +13,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.util.Arrays;
+
 /**
  * Questa classe definisce una serie di funzioni di utilità 
  * per gestire il tool KeyTool da codice e memorizzare quindi 
@@ -216,11 +218,40 @@ public class KeyTool {
 	 * @param password	La password con cui proteggere la chiave privata.
 	 * @throws KeyStoreException
 	 */
+	public static void addNewPrivateKey(KeyStore ks, PrivateKey pk, X509Certificate cert, String alias, char[] password) throws KeyStoreException {
+		if(ks==null || pk==null || alias == null  || password==null || alias.isEmpty() || password.length==0) 
+			return;
+		KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(password);
+		Certificate[] chain = new Certificate[1];
+		chain[0] = cert;
+
+		KeyStore.PrivateKeyEntry keyEntry = new KeyStore.PrivateKeyEntry(pk, chain);
+		ks.setEntry(alias, keyEntry , protParam);
+	}
+	
 	public static void addPrivateKey(KeyStore ks, PrivateKey pk, String alias, char[] password) throws KeyStoreException {
 		if(ks==null || pk==null || alias == null  || password==null || alias.isEmpty() || password.length==0) 
 			return;
 		KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(password);
-		KeyStore.PrivateKeyEntry keyEntry = new KeyStore.PrivateKeyEntry(pk, ks.getCertificateChain(alias));
+		Certificate[] chain = ks.getCertificateChain(alias);
+
+		KeyStore.PrivateKeyEntry keyEntry = new KeyStore.PrivateKeyEntry(pk, chain);
+		ks.setEntry(alias, keyEntry , protParam);
+	}
+	
+	
+	public static void addCertificateToPKCertChain(KeyStore ks, PrivateKey pk, X509Certificate cert, String alias, char[] password) throws KeyStoreException {
+		if(ks==null || pk==null || alias == null  || password==null || alias.isEmpty() || password.length==0) 
+			return;
+		KeyStore.ProtectionParameter protParam = new KeyStore.PasswordProtection(password);
+		Certificate[] chain = ks.getCertificateChain(alias);
+		Certificate[] newChain = new Certificate[chain.length+1];
+		int i=0;
+		for(Certificate c : chain) {
+			newChain[i++] = c;
+		}
+		newChain[i]=cert;
+ 		KeyStore.PrivateKeyEntry keyEntry = new KeyStore.PrivateKeyEntry(pk, newChain);
 		ks.setEntry(alias, keyEntry , protParam);
 	}
 	

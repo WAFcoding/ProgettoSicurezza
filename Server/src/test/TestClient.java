@@ -38,6 +38,7 @@ public class TestClient {
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(ks, "progettoSII".toCharArray());
 		
+		
 		sc.init(kmf.getKeyManagers(), null, null);
 
 		SSLSocketFactory f = (SSLSocketFactory) sc.getSocketFactory();
