@@ -1,8 +1,7 @@
-package request_man.factory;
+package request_man;
 
 import java.util.List;
 
-import request_man.Result;
 import bean.UserCertificateBean;
 
 public class ResultListUser extends Result {

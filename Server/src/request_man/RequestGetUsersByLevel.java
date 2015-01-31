@@ -1,11 +1,8 @@
-package request_man.factory;
+package request_man;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import request_man.Request;
-import request_man.RequestStatus;
-import request_man.Result;
 import bean.UserCertificateBean;
 import db.dao.UserCertificateDAO;
 import db.dao.UserCertificateDaoImpl;
