@@ -44,18 +44,20 @@ public class WriteLayout implements GeneralLayout{
 	private String name_file;
 	private File currentFile;
 	private boolean isAlreadyConfigured;
+	private boolean receiverSetted;
 
 	public WriteLayout(LayoutControl control, Container pane){
 		setControl(control);
 		setPane(pane);
-		text= "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec malesuada enim, at elementum urna. Mauris bibendum massa nec tincidunt dapibus. Suspendisse malesuada sed risus auctor vestibulum. Cras rutrum, dui sed tristique ullamcorper, tortor felis pulvinar mi, pretium suscipit libero purus non urna. Phasellus congue venenatis libero, eget feugiat ipsum commodo eget. Sed elementum, nulla eu gravida vehicula, nunc enim iaculis enim, eget mattis enim mi at risus. Vestibulum vulputate quam fringilla, sollicitudin elit et, pharetra tortor. Sed elementum, quam a dignissim tempus, lectus justo aliquet augue, nec convallis est metus ac lectus."+
+		/*text= "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec malesuada enim, at elementum urna. Mauris bibendum massa nec tincidunt dapibus. Suspendisse malesuada sed risus auctor vestibulum. Cras rutrum, dui sed tristique ullamcorper, tortor felis pulvinar mi, pretium suscipit libero purus non urna. Phasellus congue venenatis libero, eget feugiat ipsum commodo eget. Sed elementum, nulla eu gravida vehicula, nunc enim iaculis enim, eget mattis enim mi at risus. Vestibulum vulputate quam fringilla, sollicitudin elit et, pharetra tortor. Sed elementum, quam a dignissim tempus, lectus justo aliquet augue, nec convallis est metus ac lectus."+
 
 "Donec gravida lorem elit, eu tempus eros aliquet in. Nulla facilisi. Aenean sed dictum urna. Aenean vehicula purus vitae lacus egestas, et dignissim libero egestas. Nunc nec rhoncus est. Duis tempus nisi nec est elementum sodales. Fusce vitae nisl id justo porta facilisis id non tortor. Vivamus eleifend eleifend neque, ut ultrices justo dictum non. Integer nec eros condimentum, mattis ipsum id, dignissim nibh. Pellentesque non ante nisi. Curabitur pellentesque turpis dignissim massa pretium malesuada. Curabitur fringilla felis vitae laoreet pharetra. Pellentesque ut libero hendrerit tellus sagittis dictum." + 
 
 "Morbi dictum aliquam lobortis. Suspendisse scelerisque quam sit amet sem gravida malesuada. Phasellus eu enim sagittis, adipiscing magna a, condimentum risus. Quisque vitae mi sed turpis ultricies fringilla. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer placerat dui ut facilisis rutrum. Donec a nibh vitae ipsum eleifend cursus in pellentesque nunc. Integer placerat ipsum vel risus facilisis rhoncus. Duis augue dolor, imperdiet sed sollicitudin quis, feugiat tempor nulla. Integer commodo auctor elit, nec consequat est auctor vel. Ut a ante mi.";
-		area= new JTextArea(text);
+		*/area= new JTextArea("");
 		area.setVisible(true);
 		this.isAlreadyConfigured= false;
+		this.receiverSetted= false;
 	}
 	
 	@Override
@@ -101,55 +103,93 @@ public class WriteLayout implements GeneralLayout{
 			}
 		});
 		pane.add(button, c);
-		//7.1 - CRIPTA
-		button= new JButton("CRIPTA");
+		//7.1 - SELEZIONA DESTINATARIO
+		button= new JButton("DESTINATARIO");
 		posy++;
-		c.fill = GridBagConstraints.NONE;
 		c.gridx= posx;c.gridy= posy;
-		c.ipadx= 0;c.ipady= 0;
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		button.addActionListener(new ActionListener() {
 			
 			@Override
+			public void actionPerformed(ActionEvent e) {
+				String[] options= {"Utente specifico", "Gruppo di utenti"};
+				int choice= JOptionPane.showOptionDialog(pane, "Come criptare il documento", "Attenzione", JOptionPane.YES_NO_OPTION, 
+						JOptionPane.QUESTION_MESSAGE, null, options, "Seleziona");
+				//utente specifico
+				if(choice == JOptionPane.YES_OPTION){
+					setReceiverSetted(true);
+					control.setLayout("RECEIVER");
+					control.setReceiverSingleUSer(true);
+				}
+				//gruppo di utenti
+				else if(choice == JOptionPane.NO_OPTION){
+					setReceiverSetted(true);
+					control.setLayout("RECEIVER");
+					control.setReceiverSingleUSer(false);
+				}
+			}
+		});
+		pane.add(button, c);
+		
+		//7.1 - CRIPTA
+		button= new JButton("CRIPTA");
+		posy++;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx= posx;c.gridy= posy;
+		c.ipadx= 0;c.ipady= 0;
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		button.addActionListener(new ActionListener() {
+
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String selected_text= area.getSelectedText();
-				int cursor_position= area.getCaretPosition() - selected_text.length();
-				System.out.println(selected_text);
-				selected_text= cursor_position + "_" + selected_text;
-				System.out.println(selected_text);
-				System.out.println("La posizione del cursore nel testo è: " + cursor_position);
-				selected_text= cursor_position + "_" + selected_text;
-				if(selected_text != null){
-					int start= area.getSelectionStart();
-					int end= area.getSelectionEnd();
-					String txt= area.getText();
-					String left_part= txt.substring(0, start);
-					String right_part= txt.substring(end);
-					String middle_part= "##########";
-						
-					setAreaText(left_part + middle_part + right_part); 
-					
-					try {
-						byte[] encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, selected_text, "giovannino");
-						String enc= new String(encripted);
-						System.out.println("Selezione criptata: " + enc);
-						
-						QRCode qr = new QRCode();
-						qr.writeQRCode(enc, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
-						configurePath();
-						//--------------------------------------------------------------
-						String qrcode_file= getOutput_folder()+"/"+getNameFile()+".jpg";
-						int i=1;
-						while(checkExists(qrcode_file)){
-							qrcode_file= qrcode_file.substring(0, qrcode_file.lastIndexOf("_")+1);
-							qrcode_file= qrcode_file + i + ".jpg";
-							i++;
+				if(receiverSetted){
+					String selected_text= area.getSelectedText();
+					int cursor_position= area.getCaretPosition() - selected_text.length();
+					System.out.println(selected_text);
+					selected_text= cursor_position + "_" + selected_text;
+					System.out.println(selected_text);
+					System.out.println("La posizione del cursore nel testo è: " + cursor_position);
+					if(selected_text != null){
+						int start= area.getSelectionStart();
+						int end= area.getSelectionEnd();
+						int text_lenght= end - start;
+						System.out.println("text_lengt = " + text_lenght);
+
+						String txt= area.getText();
+						String left_part= txt.substring(0, start);
+						String right_part= txt.substring(end);
+						String middle_part= "##########";
+
+						setAreaText(left_part + middle_part + right_part); 
+
+						try {
+							byte[] encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, selected_text, "giovannino");
+							String enc= new String(encripted);
+							System.out.println("lunghezza criptata = " + enc.length());
+							System.out.println("Selezione criptata: " + enc);
+
+							QRCode qr = new QRCode();
+							qr.writeQRCode(enc, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
+							configurePath();
+							//--------------------------------------------------------------
+							//String qrcode_file= getOutput_folder()+"/"+getNameFile()+".jpg";
+							String qrcode_file= "/home/pasquale/ProgettoSicurezza"+"/"+getNameFile()+".jpg";
+							int i=1;
+							while(checkExists(qrcode_file)){
+								qrcode_file= qrcode_file.substring(0, qrcode_file.lastIndexOf("_")+1);
+								qrcode_file= qrcode_file + i + ".jpg";
+								i++;
+							}
+							qr.saveQRCodeToFile(qrcode_file);
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-						qr.saveQRCodeToFile(qrcode_file);
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
+				}
+				else{
+					JOptionPane.showMessageDialog(pane, "Prima selezionare il destinatario", "attenzione", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}
 		});
@@ -208,10 +248,10 @@ public class WriteLayout implements GeneralLayout{
 					QRCode.saveFile(path, area.getText());//funzione di utilità sta in QRCode solo per comodità
 					try {
 						String pat_pdf= getOutput_folder() + name_file + ".pdf";
-						Document doc= PDFUtil.create(pat_pdf);
-						if(PDFUtil.open(doc)){
-							PDFUtil.addText(doc, area.getText());
-							PDFUtil.close(doc);
+						PDFUtil.create(pat_pdf);
+						if(PDFUtil.open()){
+							PDFUtil.addText(area.getText(), 40, 400, 0);
+							PDFUtil.close();
 						}
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
@@ -343,5 +383,13 @@ public class WriteLayout implements GeneralLayout{
 			}
 			setAlreadyConfigured(true);
 		}
+	}
+
+	public boolean isReceiverSetted() {
+		return receiverSetted;
+	}
+
+	public void setReceiverSetted(boolean receiverSetted) {
+		this.receiverSetted = receiverSetted;
 	}
 }

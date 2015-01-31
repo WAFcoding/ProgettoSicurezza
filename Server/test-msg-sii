@@ -1,0 +1,18 @@
+{type:"submit", name:"Giovanni", surname:"Rossi",city:"Rome", country:"Italy", country_code:"IT", organization:"Ve.Ro.", public_key:"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjSYjfQvw5PI+MJQLVw9zOO0+ye725zpHfkrjfpPHDFLIaX/TRBnQGVewiqk6xsnYFwc5nMfTf/XNT4UYA1Fjt1Lt/ytmZcyXljgnYrZjDgGyfVt6SewLFMx/chEnZkLkA1StJcgeXWQGaeddrFaEkuGXxKyCvmmdSv5glpvUfwwIDAQAB"}
+
+{type:"RETRIEVE", id:"F56BFC8EED878E52FAE666DE87F8CCBB"}
+
+-------------------
+{type:"submit", name:"Pasquale", surname:"Verlotta",city:"Rome", country:"Italy", country_code:"IT", organization:"Ve.Ro.", public_key:"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrNZsfGlZadl29W530cIMVlKTZlJEluUN9W1IyOhhLu7CEeee9VoJw+7LFf2VGMb3u0frZlx1IAZLUGUM+QZEk59WKIJ9y3QOiIPIHKjO12xL6i/X1UO1Suzp0IG3fnmOkvU9E72qwXjT+qKT6er9D7YEjm+I6iN0xUWbZH+O4MwIDAQAB"}
+
+{type:"RETRIEVE", id:"0CCDB4DA6E24340DDBC5A808493B6769"}
+
+-------------------
+{type:"submit", name:"Giorgio", surname:"Bianchi",city:"Rome", country:"Italy", country_code:"IT", organization:"Ve.Ro.", public_key:"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCDRxgVJ0WOIg2P/bQ3y7Qef5iWGtx/iXwJo8fQzPeKWnZjnD9ycQY6y9AMKeUJikRdVTqSjEgrkqodANwt8ZtEbMcPZw5BkPuPbZ9OOfJdwPcQ4/x+4ikv7pTYPtEYg/FZz+Rpf4cuKSZap3sXFf1DiTCx3s30lfvtdCD2gKa+IQIDAQAB"}
+
+{type:"RETRIEVE", id:"A925273EE43C4D801F703EAD1905810F"}
+
+-------------------
+{type:"submit", name:"Gianluca", surname:"Blu",city:"Rome", country:"Italy", country_code:"IT", organization:"Ve.Ro.", public_key:"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCGwUAxSJqiUllfsEGfPSODSIDo0N6E2+/zDXFWTYan5nEXNQgG6o16pj0uek7k0guIjuM0TfRfPE+mj5GTFpHvKS5chooCf3SBjt4vFXQbh+YyQ0H14c0sND7z5eEVuKjNhVS4BZ0cYFTeYO/T6aB2NI/iB6Z0xTRkutZeOxwlHQIDAQAB"}
+
+{type:"RETRIEVE", id:"2F6864BB88B80D75432864E7D2671897"}

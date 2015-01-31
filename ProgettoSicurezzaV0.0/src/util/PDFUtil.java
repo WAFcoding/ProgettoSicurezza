@@ -5,15 +5,32 @@ package util;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.itextpdf.text.Anchor;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Font.FontFamily;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.parser.ImageRenderInfo;
+import com.itextpdf.text.pdf.parser.PdfImageObject;
+import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
+import com.itextpdf.text.pdf.parser.RenderListener;
+import com.itextpdf.text.pdf.parser.TextRenderInfo;
 
 /**
  * Classe di utilità per la creazione dei pdf
@@ -23,20 +40,49 @@ import com.itextpdf.text.pdf.PdfWriter;
  */
 public class PDFUtil {
 
+	private static final Rectangle PAGESIZE= PageSize.A4;
+	private static final float LOGOWIDTH= 109;
+	private static final float LOGOHEIGHT= 130;
+	private static final float LOGOX= 10;
+	private static final float LOGOY= PAGESIZE.getHeight() - 10;
+	private static final float TITLEX= LOGOX + LOGOWIDTH + 20;
+	private static final float TITLEY= PAGESIZE.getHeight() - 30 - 10;
+	private static final float AUTHORX= TITLEX;
+	private static final float AUTHORY= TITLEY - 20 - 10;
+	private static final float INFOX= TITLEX + 50;
+	private static final float INFOY= AUTHORY - 10 - 10;
+	private static final float DEFSIZETEXT= 11;
+	private static final float DEFSIZELINE= 0.05f;
+
+	public static final String LOGO_PATH= "/home/pasquale/Developing/WorkSpace/Java/ProgettoSicurezza/ProgettoSicurezzaV0.0/files/logoroma_torvergata.jpg";
+	
+	private static PdfWriter pdfwr;
+	private static Document doc;
+	private static String filepath;
+	private static PdfContentByte pdfcb;
+	private static Font font; 
+	private static BaseFont bf_helv;
+
 	/**
 	 * crea un nuovo documento pdf
 	 * @param doc Document
 	 * @param file_path String il percorso dove salvare
-	 * @return il Document relativo
 	 * @see Document
 	 * @throws FileNotFoundException
 	 * @throws DocumentException
 	 */
-	public static Document create(String file_path) throws FileNotFoundException, DocumentException{
-		Document doc= new Document(PageSize.A4);
-		PdfWriter.getInstance(doc, new FileOutputStream(file_path));
-		
-		return doc;
+	public static boolean create(String file_path) throws FileNotFoundException, DocumentException{
+		doc= new Document(PAGESIZE);
+		filepath= file_path;
+		pdfwr= PdfWriter.getInstance(doc, new FileOutputStream(file_path));
+		if(open()){
+			pdfcb= pdfwr.getDirectContent();
+			font= new Font(FontFamily.HELVETICA, 12);
+			bf_helv = font.getCalculatedBaseFont(false);
+			return true;
+		}
+
+		return false;
 	}
 	/**
 	 * Crea ed apre un documento pdf
@@ -46,7 +92,8 @@ public class PDFUtil {
 	 * @throws FileNotFoundException
 	 * @throws DocumentException
 	 */
-	public static boolean open(Document doc) throws FileNotFoundException, DocumentException{
+	public static boolean open() throws FileNotFoundException, DocumentException{
+		
 		doc.open();
 		
 		if(doc.isOpen()) return true;
@@ -58,7 +105,7 @@ public class PDFUtil {
 	 * @param doc Document
 	 * @return true se il documento era aperto, false altrimenti
 	 */
-	public static boolean close(Document doc){
+	public static boolean close(){
 		if(doc.isOpen()){
 			doc.close();
 			return true;
@@ -75,7 +122,7 @@ public class PDFUtil {
 	 * @param author String l'autore
 	 * @param creator String il creatore
 	 */
-	public static void addCredentials(Document doc, String title, String subject, String keywords, 
+	public static void addCredentials(String title, String subject, String keywords, 
 									  String author, String creator){
 		if(doc.isOpen()){
 			if(title != null) doc.addTitle(title);
@@ -90,25 +137,17 @@ public class PDFUtil {
 	}
 	/**
 	 * aggiunge il testo passato in un nuovo paragrafo
-	 * @param doc Document
 	 * @param text String
 	 * @throws DocumentException
 	 */
-	public static void addText(Document doc, String text) throws DocumentException{
-		if(doc.isOpen()){
-			doc.add(new Paragraph(text));
-		}
-	}
-	/**
-	 * aggiunge al documento passato una frase
-	 * @param doc Document
-	 * @param phrase String
-	 * @throws DocumentException
-	 */
-	public static void addPhrase(Document doc, String phrase) throws DocumentException{
-		if(doc.isOpen()){
-			doc.add(new Phrase(phrase));
-		}
+	public static void addText(String text, float x, float y, float textSize) throws DocumentException{
+		pdfcb.beginText();
+		if(textSize == 0) textSize= DEFSIZETEXT;
+		pdfcb.setFontAndSize(bf_helv, textSize);
+		//TODO PDFUtil: cambiare i valori della posizione del titolo
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, text, x, y, 0);
+		pdfcb.endText();
+		//pdfcb.saveState();
 	}
 	/**
 	 * aggiunge un link in una phrase e poi al documento
@@ -118,7 +157,8 @@ public class PDFUtil {
 	 * @param ref String il percorso del link
 	 * @throws DocumentException
 	 */
-	public static void addLink(Document doc, String text, String name, String ref) throws DocumentException{
+	//TODO PDFUtil: da modificare
+	public static void addLink(String text, String name, String ref) throws DocumentException{
 		if(doc.isOpen()){
 			Anchor anc= new Anchor(text);
 			anc.setName(name);
@@ -134,7 +174,7 @@ public class PDFUtil {
 	 * @param nline int
 	 * @throws DocumentException
 	 */
-	public static void addEmptyLine(Document doc, int nline) throws DocumentException{
+	public static void addEmptyLine(int nline) throws DocumentException{
 		Paragraph par= new Paragraph(" ");
 		for(int i=0;i<nline;i++){
 			par.add(" ");
@@ -144,6 +184,205 @@ public class PDFUtil {
 		}
 		else
 			System.out.println("Aprire prima il file");
+	}
+	
+	public static void addImage(String path, float x, float y) throws MalformedURLException, IOException, DocumentException{
+		Image img = Image.getInstance(path);
+		img.scaleAbsolute(100, 100);
+		//img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getHeight());
+		img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getScaledHeight());
+		doc.add(img);
+	}
+	/**
+	 * Aggiunge una linea orizzontale
+	 * @param x1
+	 * @param x2
+	 * @param y
+	 */
+	public static void addLineHorizontal(float x, float y, float lenght){
+		pdfcb.saveState();
+		pdfcb.setLineWidth(DEFSIZELINE);
+		pdfcb.moveTo(x, PAGESIZE.getHeight() - y);
+		if(lenght == 0) lenght= PAGESIZE.getWidth() - (2*x);
+		pdfcb.lineTo(x + lenght, PAGESIZE.getHeight() - y);
+		pdfcb.stroke();
+		pdfcb.restoreState();
+	}
+	/**
+	 * Aggiunge una linea verticale
+	 * @param y1
+	 * @param y2
+	 * @param x
+	 */
+	public static void addLineVertical(float x, float y, float lenght){
+		pdfcb.saveState();
+		pdfcb.setLineWidth(DEFSIZELINE);
+		pdfcb.moveTo(x, PAGESIZE.getHeight() - y);
+		pdfcb.lineTo(x, PAGESIZE.getHeight() - y - lenght);
+		pdfcb.stroke();
+		pdfcb.restoreState();
+	}
+	/**
+	 * Aggiunge il titolo del pdf in cima ad esso
+	 * @param title
+	 */
+	public static void addTitle(String title){
+
+		pdfcb.beginText();
+		pdfcb.setFontAndSize(bf_helv, 30);
+		//TODO PDFUtil: cambiare i valori della posizione del titolo
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, title, TITLEX, TITLEY, 0);
+		pdfcb.endText();
+	}
+	
+	public static void addAuthor(String author){
+
+		pdfcb.beginText();
+		pdfcb.setFontAndSize(bf_helv, 20);
+		//TODO PDFUtil: cambiare i valori della posizione del titolo
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, author, AUTHORX, AUTHORY, 0);
+		pdfcb.endText();
+	}
+	
+	public static void addSubtitleInfo(String date, String pagenumber, String info, String receiver){
+
+		pdfcb.beginText();
+		pdfcb.setFontAndSize(bf_helv, 10);
+		String allInfo= date + " - " + pagenumber + " - " + info + " - " + receiver;
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, allInfo, INFOX, INFOY, 0);
+		pdfcb.endText();
+		//TODO PDFUtil: aggiungere linea orizzontale
+	}
+	/**
+	 * Aggiunge il logo al pdf nell'angolo in alto a sinistra
+	 * @param imagePath il percorso dell'immagine da aggiungere
+	 * @throws IOException 
+	 * @throws MalformedURLException 
+	 * @throws DocumentException 
+	 */
+	public static void addLogo(String imagePath) throws MalformedURLException, IOException, DocumentException{
+		Image img = Image.getInstance(imagePath);
+		img.scaleAbsolute(LOGOWIDTH, LOGOHEIGHT);
+		//System.out.println("larghezza = " + img.getWidth() + "altezza= " + img.getHeight());
+		img.setAbsolutePosition(LOGOX, LOGOY - img.getScaledHeight());
+		doc.add(img);
+	}
+	
+	public static Document getDocument(){
+		return doc;
+	}
+	
+	public static void readPDF() throws IOException{
+		PdfReader reader= new PdfReader(filepath);
+		System.out.println("letto");
+	}
+	/**
+	 * Estrae le immagini da un file pdf
+	 * @param source
+	 * @param destination
+	 * @throws IOException
+	 * @throws DocumentException
+	 */
+	public static void extractImages(String source, String destination) throws IOException, DocumentException{
+		PdfReader reader= new PdfReader(source);
+		PdfReaderContentParser parser= new PdfReaderContentParser(reader);
+		ImageRenderListener listener= new ImageRenderListener(destination);
+
+        for (int i = 1; i <= reader.getNumberOfPages(); i++) {
+            parser.processContent(i, listener);
+        }
+        reader.close();
+	}
+	
+	public static void createResumeTable(String text1, String text2, String text3, String text4, String text5,
+										 String text6, String text7, String text8, String text9, String text10,
+										 String text11, String text12, String text13, String text14) throws DocumentException, MalformedURLException, IOException{
+		addLogo(LOGO_PATH);
+		addTitle("Registration resume");
+		PDFUtil.addLineHorizontal(10, 150, 0);
+		
+		PdfPTable table= new PdfPTable(2);
+		table.setTotalWidth(PAGESIZE.getWidth() - 40);
+
+		table.addCell("Name");
+		table.addCell(text1);
+		table.addCell("Surname");
+		table.addCell(text2);
+		table.addCell("Password");
+		table.addCell(text3);
+		table.addCell("Code");
+		table.addCell(text4);
+		table.addCell("Mail");
+		table.addCell(text5);
+		table.addCell("City");
+		table.addCell(text6);
+		table.addCell("Country");
+		table.addCell(text7);
+		table.addCell("Contry Code");
+		table.addCell(text8);
+		table.addCell("Organization");
+		table.addCell(text9);
+		table.addCell("Default Directory");
+		table.addCell(text10);
+		table.addCell("Output Direcotory");
+		table.addCell(text11);
+		table.addCell("Input Directory");
+		table.addCell(text12);
+		table.addCell("Public Key");
+		table.addCell(text13);
+		table.addCell("Private Key");
+		table.addCell(text14);
+		table.writeSelectedRows(0, 14, 20, PAGESIZE.getHeight() - 170, pdfcb);
+		
+		//doc.add(table);
+	}
+	
+	private static class ImageRenderListener implements RenderListener{
+		
+		protected String path;
+		
+		public ImageRenderListener(String p){
+			path= p;
+		}
+
+
+		@Override
+		public void beginTextBlock() {
+			
+		}
+
+
+		@Override
+		public void endTextBlock() {
+			
+		}
+
+
+		@Override
+		public void renderImage(ImageRenderInfo renderInfo) {
+			 try {
+		            String filename;
+		            FileOutputStream os;
+		            PdfImageObject image = renderInfo.getImage();
+		            if (image == null) {
+		                return;
+		            }
+		            filename = String.format(path, renderInfo.getRef().getNumber(), image.getFileType());
+		            //System.out.println("Writing image to file: " + filename);
+		            os = new FileOutputStream(filename);
+		            os.write(image.getImageAsBytes());
+		            os.flush();
+		            os.close();
+		        } catch (IOException e) {
+		            Logger.getLogger(ImageRenderListener.class.getName()).log(Level.SEVERE, null, e);
+		        }
+		}
+
+		@Override
+		public void renderText(TextRenderInfo arg0) {
+			
+		}
+		
 	}
 
 }

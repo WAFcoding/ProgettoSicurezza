@@ -3,6 +3,7 @@
  */
 package layout;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,13 +11,18 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
+import entities.Settings;
+import entities.SettingsControl;
 import sun.security.action.GetLongAction;
 
 /**
@@ -32,9 +38,11 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	private Container pane;
 	private LayoutControl control;
 	private String file_choosed;
+	private JTextField fieldDefault, fieldInput, fieldOutput;
 	
 	public SettingsLayout(LayoutControl control, Container pane){
 		setPane(pane);
@@ -49,66 +57,81 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		GridBagConstraints c = new GridBagConstraints();
 		
 		JButton button;
-		JTextArea area1= new JTextArea();
-		JTextArea area2= new JTextArea();
-		JTextArea area3= new JTextArea();
+		fieldDefault= new JTextField();
+		fieldInput= new JTextField();
+		fieldOutput= new JTextField();
 		
 		JLabel label;
 		
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor= GridBagConstraints.CENTER;
-		
-		//0.0
-		button= new JButton("APRI");
-		c.gridx= 0;c.gridy= 0;c.weightx = 0.5;c.ipady=0;c.ipadx=0;
-		c.insets= new Insets(10, 0, 0, 10);
-		button.addActionListener(new OpenAction(area1));
-		pane.add(button, c);
 		//1.0
-		label= new JLabel("Percorso della cartella di default");
-		c.gridx= 1;c.gridy= 0;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
+		int posx=1, posy=0;
+		label= new JLabel("Default directory");
+		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
 		pane.add(label, c);
+		//0.1
+		posx--;posy++;
+		button= new JButton("APRI");
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
+		c.insets= new Insets(0, 10, 10, 10);
+		button.addActionListener(new OpenAction(fieldDefault));
+		pane.add(button, c);
 		//1.1
-		area1.setEditable(true);area1.setAutoscrolls(true);area1.setColumns(15);
-		c.gridx= 1;c.gridy= 1;c.weightx = 0.5;c.ipadx= area1.getColumns();c.ipady= area1.getHeight();
-		c.insets= new Insets(0, 10, 10, 10);
-		pane.add(area1, c);
-		
-		//0.2
-		button= new JButton("APRI");
-		c.gridx= 0;c.gridy= 2;c.weightx = 0.5;c.ipady=0;c.ipadx=0;
-		c.insets= new Insets(10, 0, 0, 10);
-		button.addActionListener(new OpenAction(area2));
-		pane.add(button, c);
+		posx++;
+		fieldDefault.setEditable(true);fieldDefault.setAutoscrolls(true);fieldDefault.setColumns(15);fieldDefault.setText(control.getSettingsDefault());
+		c.gridx= posx;c.gridy= posy;c.weightx = 0.5;c.ipadx= fieldDefault.getColumns();
+		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
+		pane.add(fieldDefault, c);
 		//1.2
-		label= new JLabel("Percorso della cartella di input");
-		c.gridx= 1;c.gridy= 2;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
+		posy++;
+		label= new JLabel("Input directory");
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
 		pane.add(label, c);
-		//1.3
-		area2.setEditable(true);area2.setAutoscrolls(true);area2.setColumns(15);
-		c.gridx= 1;c.gridy= 3;c.weightx = 0.5;c.ipadx= area2.getColumns();c.ipady= area2.getHeight();
-		c.insets= new Insets(0, 10, 10, 10);
-		pane.add(area2, c);
-		
-		//0.4
+		//0.3
+		posx--;posy++;
 		button= new JButton("APRI");
-		c.gridx= 0;c.gridy= 4;c.weightx = 0.5;c.ipady=0;c.ipadx=0;
-		c.insets= new Insets(10, 0, 0, 10);
-		button.addActionListener(new OpenAction(area3));
-		pane.add(button, c);
-		//1.4
-		label= new JLabel("Percorso della cartella di output");
-		c.gridx= 1;c.gridy= 4;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
-		pane.add(label, c);
-		//1.5
-		area3.setEditable(true);area3.setAutoscrolls(true);area3.setColumns(15);
-		c.gridx= 1;c.gridy= 5;c.weightx = 0.5;c.ipadx= area3.getColumns();c.ipady= area3.getHeight();
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
 		c.insets= new Insets(0, 10, 10, 10);
-		pane.add(area3, c);
+		button.addActionListener(new OpenAction(fieldInput));
+		pane.add(button, c);
+		//1.3
+		posx++;
+		fieldInput.setEditable(true);fieldInput.setAutoscrolls(true);fieldInput.setColumns(15);fieldInput.setText(control.getSettingsInput());
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= fieldInput.getColumns();
+		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
+		pane.add(fieldInput, c);
+		//1.4
+		posy++;
+		label= new JLabel("Output directory");
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
+		pane.add(label, c);
+		//0.5
+		posx--;posy++;
+		button= new JButton("APRI");
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipady=30;c.ipadx=0;
+		c.insets= new Insets(10, 10, 0, 10);
+		button.addActionListener(new OpenAction(fieldOutput));
+		pane.add(button, c);
+		//1.5
+		posx++;
+		fieldOutput.setEditable(true);fieldOutput.setAutoscrolls(true);fieldOutput.setColumns(15);fieldOutput.setText(control.getSettingsOutput());
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= fieldOutput.getColumns();
+		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
+		pane.add(fieldOutput, c);
 		
-		//menu sotto parte da 0.6
+		//0.6 - BACK
+		posx--;posy++;
 		button= new JButton("BACK");
-		c.gridx= 0;c.gridy= 6;c.weightx = 0.5;c.insets= new Insets(10, 10, 10, 10);
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 10, 10);
 		c.ipady=30;c.ipadx=0;
 		button.addActionListener(new ActionListener() {
 			
@@ -117,6 +140,15 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 				getControl().setLayout("PRIMARY");
 			}
 		});
+		pane.add(button, c);
+		//1.6- SALVA
+		posx++;
+		button= new JButton("SALVA");
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 10, 10);
+		c.ipady=30;c.ipadx=0;
+		button.addActionListener(new SaveAction());
 		pane.add(button, c);
 	}
 
@@ -146,8 +178,8 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 
 	private class OpenAction implements ActionListener{
 		
-		private JTextArea m_area;
-		public OpenAction(JTextArea area){
+		private JTextField m_area;
+		public OpenAction(JTextField area){
 			this.m_area= area;
 		}
 
@@ -165,5 +197,21 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 			}
 		}
     }
+	
+	private class SaveAction implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+			String tmp_default, tmp_input, tmp_output;
+			tmp_default= fieldDefault.getText();
+			tmp_input= fieldInput.getText();
+			tmp_output= fieldOutput.getText();
+			control.setActualSettings(tmp_default, tmp_input, tmp_output, tmp_default);
+			control.saveSettings();
+			control.updateSettingsOnDb();
+		}
+		
+	}
 
 }

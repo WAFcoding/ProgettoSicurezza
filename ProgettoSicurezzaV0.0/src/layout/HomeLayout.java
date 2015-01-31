@@ -27,10 +27,10 @@ import javax.swing.JTextField;
  */
 public class HomeLayout implements GeneralLayout{
 
-
     private Container pane;
     private LayoutControl control;
-    private JTextField login_user;
+    private JTextField login_firstname;
+    private JTextField login_secondname;
     private JPasswordField login_pwd;
     private JTextField login_code;
     
@@ -52,7 +52,7 @@ public class HomeLayout implements GeneralLayout{
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor= GridBagConstraints.WEST;
 		c.fill = GridBagConstraints.NONE;
-		c.insets= new Insets(10, 10, 10, 10);
+		c.insets= new Insets(20, 10, 20, 10);
 		
 		//0.0
 		InnerPanelLogin login= new InnerPanelLogin();
@@ -62,17 +62,6 @@ public class HomeLayout implements GeneralLayout{
 		c.gridx=posx;c.gridy=posy;c.weightx=1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		pane.add(login, c);
-		
-		//1.0
-		posx++;
-		InnerPanelRegistration resgistration= new InnerPanelRegistration();
-		resgistration.setBackground(Color.ORANGE);
-		resgistration.setBorder(BorderFactory.createLineBorder(Color.blue));
-		c.gridx=posx;c.gridy=posy;c.weightx=1;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		pane.add(resgistration, c);
-		
-		
 	}
 
 	public Container getPane() {
@@ -106,31 +95,52 @@ public class HomeLayout implements GeneralLayout{
 			GridBagConstraints c = new GridBagConstraints();
 			c.anchor= GridBagConstraints.NORTH;
 			c.fill = GridBagConstraints.BOTH;
+			c.ipady= 30;
 			c.insets= new Insets(10, 5, 10, 5);
 			
 			JButton button;
 			
-			//0.0 - USER
-			c.gridx=posx;c.gridy=posy;c.weightx=1;c.gridwidth=2;
-			login_user= new JTextField("User");
-			login_user.addFocusListener(new FocusListener(){
+			//0.0 - FIRSTNAME
+			c.gridx=posx;c.gridy=posy;c.weightx=1;c.gridwidth=1;
+			login_firstname= new JTextField("First Name");
+			login_firstname.addFocusListener(new FocusListener(){
 				
 		        @Override
 		        public void focusGained(FocusEvent e){
-		        	if(login_user.getText().equals("User"))
-		        		login_user.setText("");
+		        	if(login_firstname.getText().equals("First Name"))
+		        		login_firstname.setText("");
 		        }
 
 				@Override
 				public void focusLost(FocusEvent arg0) {
-					if(login_user.getText().equals(""))
-						login_user.setText("User");
+					if(login_firstname.getText().equals(""))
+						login_firstname.setText("First Name");
 				}
 		    });
-			this.add(login_user, c);
+			this.add(login_firstname, c);
+			
+			//1.0 - SECONDNAME
+			posx++;
+			c.gridx=posx;c.gridy=posy;c.weightx=1;c.gridwidth=1;
+			login_secondname= new JTextField("Second Name");
+			login_secondname.addFocusListener(new FocusListener(){
+				
+		        @Override
+		        public void focusGained(FocusEvent e){
+		        	if(login_secondname.getText().equals("Second Name"))
+		        		login_secondname.setText("");
+		        }
+
+				@Override
+				public void focusLost(FocusEvent arg0) {
+					if(login_secondname.getText().equals(""))
+						login_secondname.setText("Second Name");
+				}
+		    });
+			this.add(login_secondname, c);
 			
 			//0.1 - PASSWORD
-			posy++;
+			posx=0;posy++;
 			c.gridx=posx;c.gridy=posy;c.weightx=1;c.gridwidth=2;
 			login_pwd= new JPasswordField("Password");
 			login_pwd.addFocusListener(new FocusListener(){
@@ -178,35 +188,70 @@ public class HomeLayout implements GeneralLayout{
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
+					String name= login_firstname.getText();
+					String surname= login_secondname.getText();
+					String password=new String(login_pwd.getPassword());
+					String code= login_code.getText();
+					String[] login= {name, surname, password, code};
+
+					/*if(control.getUser_manager().login(login)){
+						
+						getControl().setLayout("PRIMARY");
+					}*/
+
 					getControl().setLayout("PRIMARY");
 				}
 			});
+			button.setBackground(Color.BLUE);
+			button.setForeground(Color.WHITE);
 			this.add(button, c);
 			
 			//1.3 - CANCEL
 			posx++;
 			c.gridx= posx;
 			button= new JButton("CANCEL");
+			button.setBackground(Color.BLUE);
+			button.setForeground(Color.WHITE);
+			button.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					login_firstname.setText("User");
+					login_pwd.setText("password");
+					login_code.setText("Code");
+				}
+			});
 			this.add(button, c);
 			
 			//0.4
-			posx=0;posy=4;
+			/*posx=0;posy=4;
 			c.gridx=posx;c.gridy=posy;c.gridwidth=4;
 			JLabel label= new JLabel("Clicca login per entrare (ora non fa nulla serve giusto per vedere come viene)");
+			this.add(label, c);*/
+			
+			//0.5
+			posx--;posy++;
+			c.gridx= posx;c.gridy=posy;c.gridwidth=4;
+			c.insets= new Insets(10, 5, 1, 5);
+			JLabel label= new JLabel("Se e' il primo avvio registrati");
+			label.setForeground(Color.BLUE);
 			this.add(label, c);
 			
-		}
-	}
-	
-	private class InnerPanelRegistration extends JPanel implements GeneralLayout{
-		
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		@Override
-		public void addComponentsToPane() {
-			// TODO Auto-generated method stub
+			//0.6 - REGISTRATION
+			posy++;
+			c.gridy=posy;c.gridwidth=1;
+			c.insets= new Insets(1, 5, 10, 5);
+			button= new JButton("REGISTRATION");
+			button.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					getControl().setLayout("REGISTRATION");
+				}
+			});
+			button.setBackground(Color.BLUE);
+			button.setForeground(Color.WHITE);
+			this.add(button, c);
 			
 		}
 	}

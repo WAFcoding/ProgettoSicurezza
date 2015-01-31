@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+
+import entities.Settings;
+import entities.SettingsControl;
+import usersManagement.UserManager;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -17,8 +21,8 @@ import javax.swing.JFrame;
 
 public class LayoutControl {
 	
-	private final static int WIDTH= 400;
-	private final static int HEIGHT= 400;
+	private final static int WIDTH= 600;
+	private final static int HEIGHT= 600;
 	
 	private JFrame mainFrame;
 	private SettingsLayout s_layout;
@@ -26,14 +30,20 @@ public class LayoutControl {
 	private EncodeLayout e_layout;
 	private WriteLayout w_layout;
 	private HomeLayout h_layout;
+	private RegistrationLayout r_layout;
+	private ErrorLayout err_layout;
+	private ReceiverSettingsLayout rec_layout;
 	private ArrayList<String> choosed_images;
+	private SettingsControl set_ctrl;
 
 	private ArrayList<String> choosed_files;
 	private String[] image_types= {"gif", "jpg", "png", "bmp"};
 	private String[] text_types= {"txt"};
 	
+	private UserManager user_manager;
+	
 	private enum LAYOUT{
-		PRIMARY, ENCODE, SETTINGS, HOME, WRITE
+		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER
 	}
 	
 	public LayoutControl(){
@@ -46,6 +56,11 @@ public class LayoutControl {
 		mainFrame.setVisible(true);
 		mainFrame.setLocation(150, 100);
 		setLayout("HOME");
+		
+		user_manager= new UserManager(this);
+		
+		set_ctrl= new SettingsControl(this);
+		set_ctrl.readSettings();
 	}
 	
 	public void createLayout(){
@@ -55,10 +70,11 @@ public class LayoutControl {
 	//=================GESTIONE LAYOUT=========================================
 	/**
 	 * Imposta il layout da visualizzare
-	 * @param layout int 0=Primary, 1=Encode, 2=Settings
+	 * @param layout int 0=Primary, 1=Encode, 2=Settings, 
 	 */
 	public void setLayout(String name_layout){
 		int layout= getLayoutByName(name_layout);
+		
 		if(layout == 0){
 			PrimaryLayout();
 			mainFrame.setSize(WIDTH, HEIGHT);
@@ -74,9 +90,22 @@ public class LayoutControl {
 		else if(layout == 3){
 			WriteLayout();
 			mainFrame.setSize(800, 600);
-		}else if(layout == 4){
+		}
+		else if(layout == 4){
 			HomeLayout();
-			mainFrame.setSize(800, 600);
+			mainFrame.setSize(WIDTH, HEIGHT);
+		}
+		else if(layout == 5){
+			RegistrationLayout();
+			mainFrame.setSize(800, 700);
+		}
+		else if(layout == 6){
+
+			mainFrame.setSize(600, HEIGHT);
+		}
+		else if(layout == 7){
+			ReceiverLayout();
+			mainFrame.setSize(800, 700);
 		}
 		
 		//mainFrame.pack();
@@ -98,9 +127,30 @@ public class LayoutControl {
 				return 3;
 			case HOME:
 				return 4;
+			case REGISTRATION:
+				return 5;
+			case ERROR:
+				return 6;
+			case RECEIVER:
+				return 7;
 		}
 		
 		return -1;
+	}
+	
+	public void setErrorLayout(String error_message, String backTo){
+
+		if(err_layout == null){
+			err_layout= new ErrorLayout(this, mainFrame.getContentPane(), error_message, backTo);
+			err_layout.addComponentsToPane();
+		}
+		else{
+			err_layout.setError_message(error_message);
+			err_layout.setBackTo(backTo);
+			err_layout.addComponentsToPane();
+		}
+		
+		setLayout("ERROR");
 	}
 
 	public void PrimaryLayout(){
@@ -149,8 +199,28 @@ public class LayoutControl {
 			h_layout.addComponentsToPane();
 		}
 		else{
-			w_layout.addComponentsToPane();
+			h_layout.addComponentsToPane();
 		}
+	}
+	
+	public void RegistrationLayout(){
+		if(r_layout == null){
+			r_layout= new RegistrationLayout(this, mainFrame.getContentPane());
+			r_layout.addComponentsToPane();
+		}
+		else{
+			r_layout.addComponentsToPane();
+		}
+	}
+	
+	public void ReceiverLayout(){
+		if(rec_layout == null){
+			rec_layout= new ReceiverSettingsLayout(this, mainFrame.getContentPane(), true);
+		}
+	}
+	
+	public void setReceiverSingleUSer(boolean b){
+		rec_layout.setSingleUser(b);
 	}
 	
 	/**
@@ -331,12 +401,84 @@ public class LayoutControl {
 	public void draw(String path, String backTo){
 		File f = new File(path);
 		if(isImage(f)){
-			//addImageChoice(path);
+			addImageChoice(path);
 			drawImage(f, backTo);
 		}
 		else if(isText(f)){
-			//addFileChoice(path);
+			addFileChoice(path);
 			drawFile(f);
 		}
+	}
+
+	public UserManager getUser_manager() {
+		return user_manager;
+	}
+
+	public void setUser_manager(UserManager user_manager) {
+		this.user_manager = user_manager;
+	}
+	/**
+	 * 
+	 * @return il percorso assoluto della cartella di default
+	 */
+	public String getSettingsDefault(){
+		return set_ctrl.getActualSettingsDefault();
+	}
+	/**
+	 * 
+	 * @return il percorso assoluto della cartella di input
+	 */
+	public String getSettingsInput(){
+		return set_ctrl.getActualSettingsInput();
+	}
+	/**
+	 * 
+	 * @return il percorso assoluto della cartella di output
+	 */
+	public String getSettingsOutput(){
+		return set_ctrl.getActualSettingsOutput();
+	}
+	/**
+	 * Imposta i percorsi delle carte e li salva su file, eseguendo un hash prima
+	 * @param def percorso assoluto della cartella di default
+	 * @param in percorso assoluto della cartella di input
+	 * @param out percorso assoluto della cartella di output
+	 * @param dbPath percorso del database
+	 */
+	public void setActualSettings(String def, String in, String out, String dbPath){
+		
+		set_ctrl.setActualDirSettings(def, in, out);
+		set_ctrl.setActualDbPath(dbPath);
+	}
+	public boolean IsSettingsPathNull(){
+		return set_ctrl.isNull();
+	}
+	public String getActualDbPath(){
+		return set_ctrl.getActualDbPath();
+	}
+	public void setActualDbPath(String dbPath){
+		set_ctrl.setActualDbPath(dbPath);
+	}
+	public void updateSettingsOnDb(){
+		set_ctrl.updateDb();
+	}
+	public void setActualUserCode(String userCode){
+		set_ctrl.setActualUserCode(userCode);
+	}
+	public void saveSettings(){
+		set_ctrl.setPathToSave("./set.ser");
+		set_ctrl.saveSetting();
+	}
+	public void addSettings(){
+		set_ctrl.addActualSettings();
+	}
+	public Settings getSettingsByCode(String code){
+		return set_ctrl.getSettingsByCode(code);
+	}
+	public void setActualSettings(Settings settings){
+		set_ctrl.setActualSettings(settings);
+	}
+	public SettingsControl getSettingsControl(){
+		return set_ctrl;
 	}
 }

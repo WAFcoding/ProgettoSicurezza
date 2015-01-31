@@ -54,7 +54,8 @@ public class PrimaryLayout implements GeneralLayout{
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor= GridBagConstraints.CENTER;
 		c.ipady= 40;
-		c.insets= new Insets(10, 10, 10, 10);
+		c.insets= new Insets(10, 5, 10, 5);
+		
 		//0.0 - APRI DA FILE
 		button = new JButton("APRI DA FILE");
 		c.gridx = 0;c.gridy = 0;c.weightx = 0.5;
@@ -62,6 +63,7 @@ public class PrimaryLayout implements GeneralLayout{
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
+		
 		//1.0 - SCRIVI
 		button = new JButton("SCRIVI");
 		c.gridx = 1;c.gridy = 0;c.weightx = 0.5;
@@ -76,6 +78,7 @@ public class PrimaryLayout implements GeneralLayout{
 			}
 		});
 		pane.add(button, c);
+		
 		//0.1 - ENCODE
 		button = new JButton("ENCODE");
 		c.gridx = 0;c.gridy = 1;c.weightx = 0.5;
@@ -91,12 +94,14 @@ public class PrimaryLayout implements GeneralLayout{
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
+		
 		//1.1 - DECODE
 		button = new JButton("DECODE");
 		c.gridx = 1;c.gridy = 1;c.weightx = 0.5;
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
+		
 		//0.2 - SETTINGS
 		button = new JButton("SETTINGS");
 		c.gridx = 0;c.gridy = 2;c.weightx = 0.5;c.gridwidth= 2;
