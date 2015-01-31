@@ -33,6 +33,7 @@ public class User implements Serializable{
 	private String publicKey;
 	private String privateKey;
 	private String password;
+	private Integer trustLevel;
 	
 	private Set<UserPublicKeyKnown> publicKeyKnown= new HashSet<UserPublicKeyKnown>(0);
 	
@@ -254,5 +255,14 @@ public class User implements Serializable{
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	@Column(name = "trust_level", nullable= false, length= 1024 )
+	public Integer getTrustLevel() {
+		return trustLevel;
+	}
+
+	public void setTrustLevel(Integer trustLevel) {
+		this.trustLevel = trustLevel;
 	}
 }

@@ -6,6 +6,11 @@ import java.util.List;
 
 import usersManagement.User;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 public class KeyDistributionClient extends ClientConnection {
 	private static final String GETPKEY = "GET";
 	private static final String GETLEVEL = "GETLEVEL";
@@ -20,19 +25,36 @@ public class KeyDistributionClient extends ClientConnection {
 		return super.sendCommand(GETLEVEL + " " + level);
 	}
 	
+	private List<User> parseJson(String json) {
+		List<User> users= new LinkedList<User>();
+		JsonParser parser = new JsonParser();
+		JsonObject object = parser.parse(json).getAsJsonObject();
+		
+		if(object.has("type"))
+			return users;
+		
+		JsonArray usrArray = object.getAsJsonArray("users");
+		
+		for(JsonElement obj : usrArray) {
+			User u = new User();
+			u.setName(obj.getAsJsonObject().get("name").getAsString());
+			u.setSurname(obj.getAsJsonObject().get("surname").getAsString());
+			u.setPublicKey(obj.getAsJsonObject().get("pkey").getAsString());
+			u.setTrustLevel(obj.getAsJsonObject().get("trustLevel").getAsInt());
+			users.add(new User());
+		}
+		return users;
+	}
+	
 	public List<User> getUsersByLevel(int level)  throws IOException {
 		String usrList = super.sendCommand(GETUSERSBYLEVEL + " " + level);
-		List<User> users= new LinkedList<User>();
-		//TODO: from JSON to List di USERS
 		
-		return users;
+		return parseJson(usrList);
 	}
 
 	public List<User> getAllUsers()  throws IOException {
 		String usrList = super.sendCommand(GETALLUSERS);
-		List<User> users= new LinkedList<User>();
-		//TODO: from JSON to List di USERS
-		
-		return users;
+
+		return parseJson(usrList);
 	}
 }

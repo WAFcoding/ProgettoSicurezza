@@ -10,7 +10,7 @@ public class ResultInvalidJson extends Result {
 	
 	@Override
 	public String toSendFormat() {
-		return "{type:\"error\",description:\""+this.description+"\"}";
+		return "{\"type\":\"error\",\"description\":\""+this.description+"\"}";
 	}
 
 }
