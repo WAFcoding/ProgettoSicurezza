@@ -17,10 +17,10 @@ public class TestKeyTool {
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
 		String name = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
-		KeyStore ks = KeyTool.loadKeystore(/*"/home/giovanni/Scrivania/test_ks.jks"*/name, "pasqualino");
-		Certificate cert = KeyTool.getCertificate(ks, "client1_key");
+		KeyStore ks = KeyTool.loadKeystore(/*"/home/giovanni/Scrivania/test_ks.jks"*/name, "progettoSII");
+		Certificate cert = KeyTool.getCertificate(ks, "server");
 		System.out.println(cert.toString() + cert.getClass());
-		PrivateKey pk = KeyTool.getPrivateKey(ks, "server_key", "pasqualino");
+		PrivateKey pk = KeyTool.getPrivateKey(ks, "server", "progettoSII");
 		System.out.println(pk);
 		
 		Date nb = new Date();
@@ -45,13 +45,13 @@ public class TestKeyTool {
 		System.out.println(certgen5);
 		System.out.println(certgen6);
 		
-		CertData cdata = new CertData((X509Certificate)certgen2);
+		CertData cdata = new CertData((X509Certificate)certgen5);
 		System.out.println(cdata.getIssuerDN() + " " + cdata.getSubjectDN() + " " + cdata.getSignatureAlgo());
-		System.out.println(cdata.getIssuerParams() + "\n" + cdata.getSubjectParams());
-		System.out.println(CertData.getParameter(CertData.TYPE.UID, cdata.getIssuerParams()));
 		
-		KeyTool.addCertificate(ks, certgen, "giovanni_key");
-		KeyTool.storeKeystore(ks, name , "pasqualino");
+		
+		
+		//KeyTool.addCertificate(ks, certgen, "giovanni_key");
+		KeyTool.storeKeystore(ks, name , "progettoSII");
 	}
 
 }

@@ -16,12 +16,12 @@ package test;
 
 import java.io.UnsupportedEncodingException;
 
-import org.bouncycastle.util.Arrays;
-
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.jpountz.lz4.LZ4SafeDecompressor;
+
+import org.bouncycastle.util.Arrays;
 
 public class TestLz4 {
 

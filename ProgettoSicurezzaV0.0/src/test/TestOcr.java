@@ -5,11 +5,10 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
-import com.recognition.software.jdeskew.ImageDeskew;
-import com.recognition.software.jdeskew.ImageUtil;
-
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.vietocr.ImageHelper;
+
+import com.recognition.software.jdeskew.ImageDeskew;
 
 /**
  * Guida per l'utilizzo di Tesseract e l'esecuzione di questo esempio.

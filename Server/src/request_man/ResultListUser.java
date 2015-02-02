@@ -35,11 +35,12 @@ public class ResultListUser extends Result {
 			b.append("\"name\":\""+u.getName() + "\",");
 			b.append("\"surname\":\""+u.getSurname() + "\",");
 			b.append("\"trustLevel\":"+u.getTrustLevel() + ",");
-			b.append("\"pkey\":\""+u.getPublicKey() + "\"");
+			b.append("\"pkey\":\""+u.getPublicKey().replace("\n", "") + "\"");
 			b.append("}");
 			first = false;
 		}
 		b.append("]}");
+		
 		return b.toString();
 	}
 

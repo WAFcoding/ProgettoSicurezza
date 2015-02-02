@@ -61,24 +61,11 @@ public abstract class SecRequestFactory {
 			
 			//solo test
 			System.out.println(data.getIssuerDN() + " " + data.getSubjectDN() + " " + data.getSignatureAlgo());
-			
 
 			UserDAO udao = new UserDaoImpl();
-			trustedUser = udao.findUserByUsername(data.getSubjectParameter(TYPE.UID));
-
-			/*if(trustedUser != null) {
-				//chiave pubblica utente
-				PublicKey clientPublicKey;
-				KeyFactory factory = KeyFactory.getInstance("RSA"); 
-				clientPublicKey =  factory.generatePublic( new X509EncodedKeySpec(CryptoUtility.fromBase64(trustedUser.getPublicKey())));
-				if(!CryptoUtility.verifyCertificate(cert, clientPublicKey))
-					return null;
-			} else {
-				return null;
-			}*/
-
-
+			trustedUser = udao.findUserByUsername(data.getSubjectParameter(TYPE.Name)+ "_" + data.getSubjectParameter(TYPE.UID));
 		} catch(Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 		

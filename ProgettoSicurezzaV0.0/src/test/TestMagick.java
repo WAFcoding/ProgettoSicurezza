@@ -2,12 +2,11 @@ package test;
 
 import java.awt.Color;
 
-import exceptions.MagickImageNullException;
-
 import magick.MagickException;
 import magick.MagickImage;
 import util.CryptoUtility;
 import util.MagickUtility;
+import exceptions.MagickImageNullException;
 
 /**
  * 

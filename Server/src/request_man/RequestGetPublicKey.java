@@ -18,7 +18,7 @@ public class RequestGetPublicKey extends Request {
 		User user = dao.findUserByUsername(this.user);
 
 		if(user==null)
-			return new ResultGetPublicKey("PK not found for " + this.user);
+			return new ResultInvalid("404 - PK not found for " + this.user);
 		
 		System.out.println(user.toString());
 		return new ResultGetPublicKey(user.getPublicKey());

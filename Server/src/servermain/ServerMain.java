@@ -70,8 +70,11 @@ public class ServerMain {
 			
 		} else {
 			System.err.println("No console found: cannot run!");
-			System.exit(1);
+			//System.exit(1);
 		}
+		
+		ServerMasterData.passphrase = "progettoSII".toCharArray();//pwd;
+		ServerMasterData.keyStorePath = conf.getProperty(ServerConfig.KEYSTORE_PATH);
 		
 		try {
 			new SecServerController().startServer();

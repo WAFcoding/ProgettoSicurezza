@@ -13,7 +13,7 @@ public class ResultInvalid extends Result {
 
 	@Override
 	public String toSendFormat() {
-		return message==null ? "Error during request processing" : this.message;
+		return message==null ? "ERROR:Error during request processing" : "ERROR:"+this.message;
 	}
 
 }

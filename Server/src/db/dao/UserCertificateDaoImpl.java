@@ -92,6 +92,9 @@ public class UserCertificateDaoImpl implements UserCertificateDAO {
 		UserCertificateBean user = (UserCertificateBean) queryResult;	
 		tx.commit();
 		
+		if(user==null)
+			return null;
+		
 		UserDAO udao = new UserDaoImpl();
 		User u = udao.findUserByUsername(user.getUID());
 		if (u != null)

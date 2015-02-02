@@ -23,22 +23,22 @@ public class RequestGetLevelX extends Request {
 		User user = daoU.findUserByUsername(trustedUser);
 
 		if(user==null)
-			return new ResultGetLevelX("404 - User " + trustedUser + " not found");
+			return new ResultInvalid("404 - User " + trustedUser + " not found");
 		if(user.getTrustLevel() < level)
-			return new ResultGetLevelX("403 - Unauthorized");
+			return new ResultInvalid("403 - Unauthorized");
 		
 
 		LevelKeyDAO daoL = new LevelKeyDaoImpl();
 		LevelKey lkey = daoL.findKeyByLevel(level);
 		
 		if(lkey==null)
-			return new ResultGetLevelX("404 - Key not found for level " + this.level);
+			return new ResultInvalid("404 - Key not found for level " + this.level);
 		
 		try {
 			return new ResultGetLevelX(lkey.getClearKey());
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResultGetLevelX("500 - Security Exception");
+			return new ResultInvalid("500 - Security Exception");
 		}
 	}
 

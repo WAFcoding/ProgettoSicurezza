@@ -6,7 +6,7 @@
 		<property name="dialect"> org.hibernate.dialect.MySQL5InnoDBDialect</property>
 		<property name="current_session_context_class">thread</property>
 		<property name="cache.providerclass">org.hibernate.NoCacheProvider</property>
-		<property name="hibernate.hbm2ddl.auto">update</property>
+	 	<property name="hibernate.hbm2ddl.auto">update</property>
 		
 		<!-- _________ Defining the Mapping Files ___________ -->
 		<mapping resource="resources/LevelKey.hbm.xml" />

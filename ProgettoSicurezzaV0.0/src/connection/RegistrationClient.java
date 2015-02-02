@@ -9,9 +9,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import entities.RegistrationBean;
+import exceptions.ServerGenericErrorException;
 
 public class RegistrationClient extends ClientConnection {
-	public String submitRegistration(User u) throws IOException {
+	public String submitRegistration(User u) throws IOException, ServerGenericErrorException {
 		JsonObject usr = new JsonObject();
 		usr.addProperty("type", "SUBMIT");
 		usr.addProperty("name", u.getName());
@@ -22,32 +23,35 @@ public class RegistrationClient extends ClientConnection {
 		usr.addProperty("organization", u.getOrganization());
 		usr.addProperty("public_key", u.getPublicKey());
 		
-		System.out.println("waiting-->:"+usr.toString());
+		//System.out.println("waiting-->:"+usr.toString());
 		String response = super.sendCommand(usr.toString());
-		System.out.println(response);
+		//System.out.println(response);
 		JsonParser parser = new JsonParser();
 		JsonObject object = parser.parse(response).getAsJsonObject();
 		
 		String type=object.get("type").getAsString();
 		if(type.compareTo("submit-ok")==0)
 			return object.get("id").getAsString(); //sec identifier
-		return "";
+
+		throw new ServerGenericErrorException(object.get("description").getAsString());
 	}
 	
-	public RegistrationBean retrieveRegistrationDetails(String secId) throws IOException{
+	public RegistrationBean retrieveRegistrationDetails(String secId) throws IOException, ServerGenericErrorException{
 		RegistrationBean bean = new RegistrationBean();
 		
 		JsonObject req = new JsonObject();
 		req.addProperty("type", "RETRIEVE");
 		req.addProperty("id", secId);
 		
-		System.out.println("waiting-->:"+req.toString());
+		//System.out.println("waiting-->:"+req.toString());
 		String response = super.sendCommand(req.toString());
 		JsonParser parser = new JsonParser();
 		JsonObject object = parser.parse(response).getAsJsonObject();
 		
-		if(object.has("type"))
-			return bean;
+		//errore
+		if(object.has("type")) {
+			throw new ServerGenericErrorException(object.get("description").getAsString());
+		}
 		
 		bean.setTrustLevel(object.get("trustLevel").getAsInt());
 		bean.setCertificateData(CryptoUtility.fromBase64(object.get("cert").getAsString()));

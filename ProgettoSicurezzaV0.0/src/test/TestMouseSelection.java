@@ -7,10 +7,24 @@ package test;
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
  *
  */
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 /** Getting a Rectangle of interest on the screen.
 Requires the MotivatedEndUser API - sold separately. */

@@ -17,6 +17,11 @@ public class LevelKey implements Serializable{
 	
 	public LevelKey() {
 	}
+	
+	public LevelKey(int level, String key) throws Exception {
+		this.level = level;
+		setKey(key);
+	}
 
 	public String getKey() throws Exception {
 		byte[] fb64 = CryptoUtility.fromBase64(key);

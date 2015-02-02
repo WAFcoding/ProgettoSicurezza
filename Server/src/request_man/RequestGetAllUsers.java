@@ -13,7 +13,6 @@ public class RequestGetAllUsers extends Request {
 		UserCertificateDAO dao = new UserCertificateDaoImpl();
 		
 		List<UserCertificateBean> users = dao.findByStatus(RequestStatus.ACCEPTED);
-		
 		return new ResultListUser(users);
 	}
 
