@@ -297,7 +297,7 @@ public class AdminLayout implements GeneralLayout {
 		//pannello controlli
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
-		JButton update = new JButton("Update");
+		JButton update = new JButton("Refresh List");
 		pbuttons.add(update);
 		
 		update.addMouseListener(new MouseAdapter() {
@@ -398,7 +398,7 @@ public class AdminLayout implements GeneralLayout {
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
 		
-		JButton update = new JButton("Update");
+		JButton update = new JButton("Refresh List");
 		pbuttons.add(update);
 		
 		update.addMouseListener(new MouseAdapter() {
@@ -497,7 +497,7 @@ public class AdminLayout implements GeneralLayout {
 		JPanel pbuttons = new JPanel();
 		pbuttons.setLayout(new BoxLayout(pbuttons, BoxLayout.LINE_AXIS));
 		
-		JButton update = new JButton("Update");
+		JButton update = new JButton("Refresh List");
 		pbuttons.add(update);
 		
 		update.addMouseListener(new MouseAdapter() {
