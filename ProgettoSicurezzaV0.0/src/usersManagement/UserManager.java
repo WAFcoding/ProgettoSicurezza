@@ -6,6 +6,7 @@ package usersManagement;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyPair;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.ArrayList;
@@ -28,9 +29,13 @@ import org.hibernate.service.ServiceRegistry;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 
+import connection.ClientConfig;
+import connection.ConnectionFactory;
+import connection.RegistrationClient;
 import entities.Settings;
 import util.CryptoUtility;
 import util.HibernateUtil;
+import util.KeyTool;
 import util.PDFUtil;
 import util.CryptoUtility.HASH_ALGO;
 
@@ -43,6 +48,8 @@ public class UserManager {
 	//private static final SessionFactory factory= createSession();
 	private LayoutControl control;
 	private User actualUser;
+	private final static String keystore_pwd= "progettoSII";
+	private final static String url= "localhost";//TODO UserManager: inserire il url nei settings
 	
 	public UserManager(LayoutControl p_control){
 		this.control= p_control;
@@ -177,6 +184,7 @@ public class UserManager {
 		KeyPair key;
 		String public_key= "";
 		String private_key= "";
+		String secid= "";
 		try {
 			key = getKey();
 			public_key= CryptoUtility.toBase64(key.getPublic().getEncoded()).replace("\n", "");
@@ -225,6 +233,7 @@ public class UserManager {
 			user.setPublicKey(public_key);
 			user.setPrivateKey(private_key);
 			user.setPassword(hash_password);
+			user.setTrustLevel(-1);
 			
 			session.save(user);
 			tx.commit();
@@ -233,17 +242,28 @@ public class UserManager {
 			control.setActualSettings(dir_def, dir_in, dir_out, dir_def);
 			control.addSettings();
 			control.saveSettings();
-			//for(Settings s : control.getSettingsControl().getAl_settings())
-				//s.PrintIt();
+			
+			try(RegistrationClient reg = ConnectionFactory.getRegistrationServerConnection(url, keystore_pwd)) {
+				secid = reg.submitRegistration(user);
+				
+				System.out.println("secureIdentifier:" + secid);
+			} catch(Exception e) {
+				//chiudera' automaticamente gli stream in caso di eccezione perchè RegistrationClient implementa "Closeable"
+				e.printStackTrace();
+			}
+			/*
+			//creo il keystore
+			KeyStore ks = KeyTool.loadKeystore(ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
+			KeyTool.addNewPrivateKey(ks, privateKey, cert, "giorgio_1", password.toCharArray());
+
+			KeyTool.storeKeystore(ks, ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), password);
+			*/
 			
 			//TODO UserManager: encode del file serializzato
 			
 			createPdfResume(name, surname, password, code, mail, city, country, country_code, organization, 
-							dir_def, dir_out, dir_in, public_key, private_key);
+							dir_def, dir_out, dir_in, public_key, private_key, secid);
 			
-			/*String registration_summary= "|NAME: " + name + "\t | \tSURNAME: " + surname + "\t |\n" + 
-										 "|PASSWORD: " + password + "\t | \tCODE: " + code + "\t |\n" +
-										 "|MAIL: " + mail + "\t |";*/
 			String registration_summary= "E' stato creato un pdf contenente i dati inseriti in " + dir_def + "/" + code + ".pdf";
 			
 			//stampa del contenuto del PDF a schermo
@@ -407,7 +427,7 @@ public class UserManager {
 	
 	public void createPdfResume(String name, String surname, String password, String code, String mail, String city, 
 			String country, String country_code, String organization, String dir_def, String dir_out, 
-			String dir_in, String public_key, String private_key){
+			String dir_in, String public_key, String private_key, String secid){
 		
 		try {
 			PDFUtil.create(dir_def + "/" + code + ".pdf");
@@ -415,7 +435,7 @@ public class UserManager {
 				PDFUtil.addCredentials(code, "Credentials", "Registration", 
 										"ProgettoSicurezza", "ProgettoSicurezza");
 				try {
-					PDFUtil.createResumeTable(name, surname, password, code, mail, city, country, country_code, organization, dir_def, dir_out, dir_in, public_key, private_key);
+					PDFUtil.createResumeTable(name, surname, password, code, mail, city, country, country_code, organization, dir_def, dir_out, dir_in, public_key, private_key, secid);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
