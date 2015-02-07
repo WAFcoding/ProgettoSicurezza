@@ -1,5 +1,7 @@
 package db.dao;
 
+import java.util.List;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -53,6 +55,22 @@ public class LevelKeyDaoImpl implements LevelKeyDAO {
 		LevelKey lkey = (LevelKey) queryResult;	
 		tx.commit();
 		return lkey;
+	}
+
+	@Override
+	public List<LevelKey> getAllKeysToLevel(int level) {
+		Session s = getSession();
+		Transaction tx = s.beginTransaction();
+
+		String queryString = "from LevelKey where level <= :level";
+		Query query = s.createQuery(queryString);
+		query.setInteger("level", level);
+		
+		@SuppressWarnings("unchecked")
+		List<LevelKey> results = (List<LevelKey>)query.list();
+		tx.commit();
+		
+		return results;
 	}
 
 }

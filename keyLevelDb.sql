@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Ago 08, 2014 alle 19:49
--- Versione del server: 5.5.38-0ubuntu0.14.04.1
--- PHP Version: 5.5.9-1ubuntu4.3
+-- Generation Time: Feb 07, 2015 alle 15:16
+-- Versione del server: 5.5.41-0ubuntu0.14.04.1
+-- PHP Version: 5.5.9-1ubuntu4.5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -36,10 +36,13 @@ CREATE TABLE IF NOT EXISTS `key_table` (
 --
 
 INSERT INTO `key_table` (`level`, `lkey`) VALUES
-(1, 'tG8QHnaDzPqDdcEn1yE16g=='),
-(2, 'j7xPqAeVJPf6yI/Eox1hxw=='),
-(3, '+kiv32b3O3T4P78zoZn22kg5Gdt/r+pfljNeSe6V9ds='),
-(4, 'vUGUd2TwLmhv8ddImgoEzQ3+xaz26i2ANk6rgmDHl4Y=');
+(1, 'wFnEIRfqW3veVfJ7zAsrKk2cZtd8Sd90zV/C27F7We7Tc6nKLKROnYpzb1u4hqZO7aP+fehq5tKY\nMyUW8njYmA=='),
+(2, 'kSqk7xbOtlKUnSL8PupcB6j53DQCmdAYAsbqxVWgCkapvRFYdtPl7TzDG8lB5WCZVtTBWXjnEMaI\nj3RmRwW4Dw=='),
+(3, 'QMFO4eVIPeUyc9jHeIEm34nDOfKa9G22S1pKqVCtVY+yMT4AjiEesLECmBjDsTxxrnaQ9IHH4CMH\n2z32JoIvLw=='),
+(4, '91oVl7YqhUCpMvjyBCb1ouUOxjH8ROIgs8D9i9qBFoASsGdhq6Mrzc9MjRrHIDhMISunpBlsUkmT+BnBieuzxA=='),
+(5, 'BpfR2WX5n9e0dH2ThIjHm+ltKG5aA9HgvC3LRlHI76Jh4NHYNHZ35s7oPNQhQVzMILeQs0mgyN2o5Kex2mebwQ=='),
+(6, 'q+SOqyI4KEYo8sggg7zOxjNjUYjHM5Z8lm3fENC0GXaGNCxlbcQ/ZIf2x+XKWXbRjHQHLskHBEan\ne4YeUrm6Iw=='),
+(7, '8E7ImG9yxsJAIRiKlz1Sw+qvLTeLlSY5I1cNLbpXauk+lf+6H/nYlqtot8AugLRvs2zGOC3J7iirVbyy9T+nLA==');
 
 --
 -- Indexes for dumped tables

@@ -10,7 +10,7 @@ import db.dao.LevelKeyDaoImpl;
 public class TestLevelKey {
 
 	public static void main(String[] args) throws Exception {
-		LevelKeyDAO dao = new LevelKeyDaoImpl();
+		//LevelKeyDAO dao = new LevelKeyDaoImpl();
 		
 		byte[] key = "progettoSII".getBytes();
 		ServerMasterData.passphrase = "progettoSII".toCharArray(); 
@@ -40,14 +40,14 @@ public class TestLevelKey {
 		String bk6 = CryptoUtility.toBase64(ek6);
 		String bk7 = CryptoUtility.toBase64(ek7);
 		
-		dao.updateKey(new LevelKey(1, bk1));
-		dao.updateKey(new LevelKey(2, bk2));
-		dao.updateKey(new LevelKey(3, bk3));
-		dao.updateKey(new LevelKey(4, bk4));
-		dao.updateKey(new LevelKey(5, bk5));
-		dao.updateKey(new LevelKey(6, bk6));
-		dao.updateKey(new LevelKey(7, bk7));
-		
+		//dao.updateKey(new LevelKey(1, bk1));
+		//dao.updateKey(new LevelKey(2, bk2));
+		//dao.updateKey(new LevelKey(3, bk3));
+//		dao.updateKey(new LevelKey(4, bk4));
+//		dao.updateKey(new LevelKey(5, bk5));
+//		dao.updateKey(new LevelKey(6, bk6));
+//		dao.updateKey(new LevelKey(7, bk7));
+//		
 		System.out.println(bk1 + "\n" + bk2 + "\n" + bk3 + "\n" + bk4+ "\n" + bk5+ "\n" + bk6+ "\n" + bk7);
 		System.out.println("======================");
 		
