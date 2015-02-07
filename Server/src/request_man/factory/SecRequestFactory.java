@@ -1,8 +1,5 @@
 package request_man.factory;
 
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.StringTokenizer;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -10,6 +7,7 @@ import javax.net.ssl.SSLSession;
 import javax.security.cert.X509Certificate;
 
 import request_man.Request;
+import request_man.RequestGetAllLevelKeys;
 import request_man.RequestGetAllUsers;
 import request_man.RequestGetLevelX;
 import request_man.RequestGetPublicKey;
@@ -17,7 +15,6 @@ import request_man.RequestGetUsersByLevel;
 import request_man.RequestInvalid;
 import util.CertData;
 import util.CertData.TYPE;
-import util.CryptoUtility;
 import bean.User;
 import db.dao.UserDAO;
 import db.dao.UserDaoImpl;
@@ -42,6 +39,11 @@ public abstract class SecRequestFactory {
 	private static final String GETLEVELX = "GETLEVEL";
 	
 	/**
+	 * Definisce il comando per recuperare tutte le chiavi di livello (fino al livello di sicurezza dell'utente).
+	 */
+	private static final String GETALLLEVELSKEY = "GETALLLEVEL";
+	
+	/**
 	 * Definisce il comando per recuperare una lista di utenti di un certo livello di fiducia.
 	 */
 	private static final String GETUSERSBYLEVEL = "GETUSERSBYLEVEL";
@@ -64,6 +66,8 @@ public abstract class SecRequestFactory {
 
 			UserDAO udao = new UserDaoImpl();
 			trustedUser = udao.findUserByUsername(data.getSubjectParameter(TYPE.Name)+ "_" + data.getSubjectParameter(TYPE.UID));
+			
+			System.out.println(data.getSubjectParameter(TYPE.Name)+ "_" + data.getSubjectParameter(TYPE.UID));
 		} catch(Exception e) {
 			e.printStackTrace();
 			return null;
@@ -92,6 +96,8 @@ public abstract class SecRequestFactory {
 		if(tokCount < 2) {
 			if(request.equalsIgnoreCase(GETALLUSERS))
 				return new RequestGetAllUsers();
+			if(request.equalsIgnoreCase(GETALLLEVELSKEY))
+				return new RequestGetAllLevelKeys(u.getTrustLevel());
 		}
 		if(tokCount == 2) {
 			String reqType = tok.nextToken();

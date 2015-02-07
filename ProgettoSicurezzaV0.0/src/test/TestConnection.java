@@ -9,6 +9,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.List;
+import java.util.Map;
 
 import usersManagement.User;
 import util.CryptoUtility;
@@ -97,11 +98,13 @@ public class TestConnection {
 	public static void testUsage() throws Exception{
 		
 		try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, "giorgio_1", password)) {
-			String key = cli.getLevelKey(6);
+			String key = cli.getLevelKey(2);
 			String pkey = cli.getUserPublicKey("Giorgio_1");
 			List<User> users = cli.getAllUsers();
+			Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
 			System.out.println("key: "+key);
 			System.out.println("pkey: "+pkey);
+			System.out.println("allKeys: " + levelKey.toString());
 			System.out.println(users);
 
 		} catch (Exception e) {

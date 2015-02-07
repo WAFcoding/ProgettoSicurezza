@@ -60,7 +60,7 @@ public class TestOcr {
 		 * FIXME
 		 * Il percorso del file immagine va cambiato (mando anche queste immagini per email)
 		 */
-		File f = new File("/home/giovanni/NetBeansProjects/Tess4J/eurotext_deskew.png");
+		File f = new File("/home/giovanni/Scrivania/test.png");
 		BufferedImage img = ImageIO.read(f);
 		
 		Tesseract ts = Tesseract.getInstance();
