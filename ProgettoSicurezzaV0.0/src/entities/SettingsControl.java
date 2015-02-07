@@ -253,4 +253,8 @@ public class SettingsControl {
 		
 		return null;
 	}
+	
+	public void setActualUrl(String url){
+		actualSettings.setUrl(url);
+	}
 }

@@ -137,7 +137,7 @@ public class UserManager {
 							System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
 							if(u.getPassword().equals(hash_password)){
 								System.out.println(name + " " + surname + " is logging in.");
-								control.setActualSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def());
+								control.setActualSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def(), url);
 								actualUser= u;
 								toReturn= true;
 							}
@@ -234,15 +234,7 @@ public class UserManager {
 			user.setPrivateKey(private_key);
 			user.setPassword(hash_password);
 			user.setTrustLevel(-1);
-			
-			session.save(user);
-			tx.commit();
-			
-			control.setActualUserCode(hash_code);
-			control.setActualSettings(dir_def, dir_in, dir_out, dir_def);
-			control.addSettings();
-			control.saveSettings();
-			
+
 			try(RegistrationClient reg = ConnectionFactory.getRegistrationServerConnection(url, keystore_pwd)) {
 				secid = reg.submitRegistration(user);
 				
@@ -251,6 +243,15 @@ public class UserManager {
 				//chiudera' automaticamente gli stream in caso di eccezione perchè RegistrationClient implementa "Closeable"
 				e.printStackTrace();
 			}
+			user.setSecureId(secid);
+			
+			session.save(user);
+			tx.commit();
+			
+			control.setActualUserCode(hash_code);
+			control.setActualSettings(dir_def, dir_in, dir_out, dir_def, url);
+			control.addSettings();
+			control.saveSettings();
 			/*
 			//creo il keystore
 			KeyStore ks = KeyTool.loadKeystore(ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);

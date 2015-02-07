@@ -34,6 +34,7 @@ public class User implements Serializable{
 	private String privateKey;
 	private String password;
 	private Integer trustLevel;
+	private String secureId;
 	
 	private Set<UserPublicKeyKnown> publicKeyKnown= new HashSet<UserPublicKeyKnown>(0);
 	
@@ -266,6 +267,21 @@ public class User implements Serializable{
 		this.trustLevel = trustLevel;
 	}
 
+	/**
+	 * @return the secureId
+	 */
+	@Column(name = "secure_id", nullable= true, length= 1024 )
+	public String getSecureId() {
+		return secureId;
+	}
+
+	/**
+	 * @param secureId the secureId to set
+	 */
+	public void setSecureId(String secureId) {
+		this.secureId = secureId;
+	}
+
 	@Override
 	public String toString() {
 		return "User [ID=" + ID + ", name=" + name + ", surname=" + surname
@@ -275,6 +291,7 @@ public class User implements Serializable{
 				+ ", dir_in=" + dir_in + ", dir_out=" + dir_out
 				+ ", publicKey=" + publicKey + ", privateKey=" + privateKey
 				+ ", password=" + password + ", trustLevel=" + trustLevel
-				+ ", publicKeyKnown=" + publicKeyKnown + "]";
+				+ ", secureId=" + secureId + ", publicKeyKnown="
+				+ publicKeyKnown + "]";
 	}
 }

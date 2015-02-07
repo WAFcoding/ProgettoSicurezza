@@ -2,17 +2,30 @@ package layout;
 
 import java.awt.Dimension;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import connection.ClientConfig;
+import connection.ConnectionFactory;
+import connection.RegistrationClient;
+import entities.RegistrationBean;
 import entities.Settings;
 import entities.SettingsControl;
 import usersManagement.UserManager;
+import util.CryptoUtility;
+import util.KeyTool;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -23,6 +36,8 @@ public class LayoutControl {
 	
 	private final static int WIDTH= 600;
 	private final static int HEIGHT= 600;
+	public final static String keystore_pwd= "progettoSII";
+	public final static String url= "localhost";//TODO UserManager: inserire il url nei settings
 	
 	private JFrame mainFrame;
 	private SettingsLayout s_layout;
@@ -437,10 +452,11 @@ public class LayoutControl {
 	 * @param out percorso assoluto della cartella di output
 	 * @param dbPath percorso del database
 	 */
-	public void setActualSettings(String def, String in, String out, String dbPath){
+	public void setActualSettings(String def, String in, String out, String dbPath, String url){
 		
 		set_ctrl.setActualDirSettings(def, in, out);
 		set_ctrl.setActualDbPath(dbPath);
+		set_ctrl.setActualUrl(url);
 	}
 	public boolean IsSettingsPathNull(){
 		return set_ctrl.isNull();
@@ -472,5 +488,36 @@ public class LayoutControl {
 	}
 	public SettingsControl getSettingsControl(){
 		return set_ctrl;
+	}
+	/**
+	 * restituisce il certificato dal server una volta che l'utente e' stato autenticato
+	 * @param secureId
+	 * @param privateKey
+	 */
+	public boolean CertificateFromServer(String username, String secureId, String privKey){
+		
+		boolean toReturn= true;
+
+		try(RegistrationClient reg = ConnectionFactory.getRegistrationServerConnection(url, keystore_pwd)) {
+
+			PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(privKey)));
+
+			RegistrationBean bean = reg.retrieveRegistrationDetails(secureId);
+
+			System.out.println("trustLevel:" + bean.getTrustLevel());
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+			X509Certificate cert = (X509Certificate)certFactory.generateCertificate(new ByteArrayInputStream(bean.getCertificateData()));
+
+			KeyStore ks = KeyTool.loadKeystore(ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
+			KeyTool.addNewPrivateKey(ks, privateKey, cert, username, keystore_pwd.toCharArray());
+
+			KeyTool.storeKeystore(ks, ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
+		
+		} catch (Exception e) {
+			toReturn= false;
+			e.printStackTrace();
+		}
+		
+		return toReturn;
 	}
 }

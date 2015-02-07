@@ -42,7 +42,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 	private Container pane;
 	private LayoutControl control;
 	private String file_choosed;
-	private JTextField fieldDefault, fieldInput, fieldOutput;
+	private JTextField fieldDefault, fieldInput, fieldOutput, fieldUrl;
 	
 	public SettingsLayout(LayoutControl control, Container pane){
 		setPane(pane);
@@ -60,6 +60,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		fieldDefault= new JTextField();
 		fieldInput= new JTextField();
 		fieldOutput= new JTextField();
+		fieldUrl= new JTextField();
 		
 		JLabel label;
 		
@@ -125,6 +126,17 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= fieldOutput.getColumns();
 		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
 		pane.add(fieldOutput, c);
+		//1.6
+		posy++;
+		label= new JLabel("Url");
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 0, 10);
+		pane.add(label, c);
+		//1.7
+		posy++;
+		fieldUrl.setEditable(true);fieldUrl.setAutoscrolls(true);fieldUrl.setColumns(15);fieldUrl.setText(control.getSettingsOutput());
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= fieldUrl.getColumns();
+		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
+		pane.add(fieldUrl, c);
 		
 		//0.6 - BACK
 		posx--;posy++;
@@ -203,11 +215,12 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
-			String tmp_default, tmp_input, tmp_output;
+			String tmp_default, tmp_input, tmp_output, tmp_url;
 			tmp_default= fieldDefault.getText();
 			tmp_input= fieldInput.getText();
 			tmp_output= fieldOutput.getText();
-			control.setActualSettings(tmp_default, tmp_input, tmp_output, tmp_default);
+			tmp_url= fieldUrl.getText();
+			control.setActualSettings(tmp_default, tmp_input, tmp_output, tmp_default, tmp_url);
 			control.saveSettings();
 			control.updateSettingsOnDb();
 		}
