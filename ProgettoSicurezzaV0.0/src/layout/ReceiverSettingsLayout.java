@@ -5,12 +5,16 @@
 package layout;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -27,6 +31,7 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
     private JList<String> list;
     private DefaultListModel<String> list_model;
     private ArrayList<String> list_items;
+    private JScrollPane scroll_pane;
 
 
 	public ReceiverSettingsLayout(LayoutControl control, Container pane, boolean singleUser) {
@@ -50,12 +55,20 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
         pane.removeAll();
 		pane.setLayout(new GridBagLayout());
 		pane.setSize(800, 600);
+        scroll_pane= new JScrollPane(list);
+        scroll_pane.setPreferredSize(new Dimension(300, 300));
+        JButton btn;
 		int posx= 0, posy= 0;
 		GridBagConstraints c = new GridBagConstraints();
+		c.anchor= GridBagConstraints.WEST;
+		c.fill = GridBagConstraints.NONE;
+		c.insets= new Insets(10, 10, 10, 10);
+		c.gridx=posx;c.gridy=posy;
 		
 		if(isSingleUser()){
 
 			//TODO richiesta al db di un utente specifico, se non presente nel db locale richiedere a quello remoto
+			
 			updateList();
 			
 		}

@@ -296,7 +296,7 @@ public class PDFUtil {
 	
 	public static void createResumeTable(String text1, String text2, String text3, String text4, String text5,
 										 String text6, String text7, String text8, String text9, String text10,
-										 String text11, String text12, String text13, String text14) throws DocumentException, MalformedURLException, IOException{
+										 String text11, String text12, String text13, String text14, String text15) throws DocumentException, MalformedURLException, IOException{
 		addLogo(LOGO_PATH);
 		addTitle("Registration resume");
 		PDFUtil.addLineHorizontal(10, 150, 0);
@@ -332,7 +332,9 @@ public class PDFUtil {
 		table.addCell(text13);
 		table.addCell("Private Key");
 		table.addCell(text14);
-		table.writeSelectedRows(0, 14, 20, PAGESIZE.getHeight() - 170, pdfcb);
+		table.addCell("Secure ID");
+		table.addCell(text15);
+		table.writeSelectedRows(0, 15, 20, PAGESIZE.getHeight() - 170, pdfcb);
 		
 		//doc.add(table);
 	}

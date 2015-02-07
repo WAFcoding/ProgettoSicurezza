@@ -186,37 +186,29 @@ public class LayoutControl {
 	public void WriteLayout(){
 		if(w_layout == null){
 			w_layout= new WriteLayout(this, mainFrame.getContentPane());
-			w_layout.addComponentsToPane();
 		}
-		else{
-			w_layout.addComponentsToPane();
-		}
+		w_layout.addComponentsToPane();
 	}
 	
 	public void HomeLayout(){
 		if(h_layout == null){
 			h_layout= new HomeLayout(this, mainFrame.getContentPane());
-			h_layout.addComponentsToPane();
 		}
-		else{
-			h_layout.addComponentsToPane();
-		}
+		h_layout.addComponentsToPane();
 	}
 	
 	public void RegistrationLayout(){
 		if(r_layout == null){
 			r_layout= new RegistrationLayout(this, mainFrame.getContentPane());
-			r_layout.addComponentsToPane();
 		}
-		else{
-			r_layout.addComponentsToPane();
-		}
+		r_layout.addComponentsToPane();
 	}
 	
 	public void ReceiverLayout(){
 		if(rec_layout == null){
 			rec_layout= new ReceiverSettingsLayout(this, mainFrame.getContentPane(), true);
 		}
+		rec_layout.addComponentsToPane();
 	}
 	
 	public void setReceiverSingleUSer(boolean b){

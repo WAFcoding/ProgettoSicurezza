@@ -257,7 +257,7 @@ public class User implements Serializable{
 		this.password = password;
 	}
 
-	@Column(name = "trust_level", nullable= false, length= 1024 )
+	@Column(name = "trust_level", nullable= true, length= 1024 )
 	public Integer getTrustLevel() {
 		return trustLevel;
 	}
