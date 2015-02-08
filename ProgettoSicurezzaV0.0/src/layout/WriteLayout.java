@@ -27,6 +27,7 @@ import javax.swing.ScrollPaneConstants;
 
 import usersManagement.User;
 import util.CryptoUtility;
+import util.CryptoUtility.HASH_ALGO;
 import util.PDFUtil;
 import util.QRCode;
 
@@ -417,11 +418,11 @@ public class WriteLayout implements GeneralLayout{
 				File f= new File(path);
 				f.mkdir();
 				path= getOutput_folder() + name_file +  ".txt";
+				String sign_path= getOutput_folder() + "sign.jpg";
 				System.out.println("Il percorso scelto è: " + path);
 				//QRCode.saveFile(path, area.getText());//funzione di utilità sta in QRCode solo per comodità//
 				//TODO creare il pdf con i dati
 				//TODO creare la signature
-				//TODO prelevare i qrcode da inserire
 				try {
 					String pat_pdf= getOutput_folder() + name_file + ".pdf";
 					PDFUtil.create(pat_pdf);
@@ -430,6 +431,12 @@ public class WriteLayout implements GeneralLayout{
 						String title= field_title.getText();
 						String author= field_author.getText();
 						String text= area.getText();
+						
+						String signature= CryptoUtility.hash(HASH_ALGO.SHA1, text);
+						QRCode qr= new QRCode();
+						qr.writeQRCode(signature, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
+						qr.saveQRCodeToFile(sign_path);
+						
 						String[] info= {field_info.getText(), "", "", ""};
 						String[] qrcodes= {"", "", "", "", "", "", "", "", "", ""};
 						for(int i=0; i<10; i++){
@@ -440,9 +447,11 @@ public class WriteLayout implements GeneralLayout{
 								qrcodes[i]= "";
 						}
 
-						PDFUtil.createDocument(title, author, text, "", info, qrcodes);
+						PDFUtil.createDocument(title, author, text, sign_path, info, qrcodes);
 						PDFUtil.close();
 					}
+					File tmp_sign= new File(sign_path);
+					tmp_sign.delete();
 					for(String s : qrcodes_path){
 						File tmp_file= new File(s);
 						tmp_file.delete();
@@ -450,6 +459,8 @@ public class WriteLayout implements GeneralLayout{
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (DocumentException e) {
+					e.printStackTrace();
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				System.out.println("File salvato in: " + path);
