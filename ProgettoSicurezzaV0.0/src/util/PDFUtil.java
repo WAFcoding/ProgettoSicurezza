@@ -24,6 +24,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
@@ -148,12 +149,15 @@ public class PDFUtil {
 	 * @throws DocumentException
 	 */
 	public static void addText(String text, float x, float y, float textSize) throws DocumentException{
-		pdfcb.beginText();
-		if(textSize == 0) textSize= DEFSIZETEXT;
-		pdfcb.setFontAndSize(bf_helv, textSize);
-		//TODO PDFUtil: cambiare i valori della posizione del titolo
+		/*pdfcb.beginText();
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, text, x, PAGESIZE.getHeight() - y, 0);
-		pdfcb.endText();
+		pdfcb.endText();*/
+		if(textSize == 0) textSize= DEFSIZETEXT;
+		ColumnText ct= new ColumnText(pdfcb);
+		Phrase p= new Phrase(text);
+		p.setFont(new Font(bf_helv, textSize));
+		ct.setSimpleColumn(p, x, PAGESIZE.getHeight() - y, PAGESIZE.getWidth() - 20, PAGESIZE.getHeight() - y - 450, 20, Element.ALIGN_LEFT);
+		ct.go();
 		//pdfcb.saveState();
 	}
 	/**
@@ -323,7 +327,7 @@ public class PDFUtil {
 			addAuthor(author);
 			addSubtitleInfo(subtitleInfo[0], subtitleInfo[1], subtitleInfo[2], subtitleInfo[3]);
 			addRectangle(SIGNATUREX, SIGNATUREY, RECTWIDTH, RECTHEIGHT);
-			if(signaturePath != null){
+			if(signaturePath != null && !signaturePath.equals("")){
 				addQRCodeImage(signaturePath, SIGNATUREX + 1, SIGNATUREY + 1 - RECTHEIGHT);
 			}
 			addLineHorizontal(10, 150, 0);
@@ -338,14 +342,14 @@ public class PDFUtil {
 			int j=0;
 			for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
 				String tmp_qrcodePath= qrCodes[j];
-				if(tmp_qrcodePath != null){
+				if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
 					addQRCodeImage(tmp_qrcodePath, i, 611);
 					j++;
 				}
 			}
 			for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
 				String tmp_qrcodePath= qrCodes[j];
-				if(tmp_qrcodePath != null){
+				if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
 					addQRCodeImage(tmp_qrcodePath, i, 721);
 					j++;
 				}

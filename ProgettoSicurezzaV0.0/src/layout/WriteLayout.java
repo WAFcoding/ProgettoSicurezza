@@ -11,14 +11,18 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
 import usersManagement.User;
@@ -38,6 +42,7 @@ public class WriteLayout implements GeneralLayout{
 	private Container pane;
 
 	private JTextArea area;
+	private JTextField field_title, field_author, field_receiver, field_info;
 	private String text;
 	private String output_folder;
 	private String name_file;
@@ -45,6 +50,8 @@ public class WriteLayout implements GeneralLayout{
 	private boolean isAlreadyConfigured;
 	private boolean receiverSetted;
 	private User user;
+	private ArrayList<String> qrcodes_path;
+	private int current_qrcode= 0;
 
 	public WriteLayout(LayoutControl control, Container pane){
 		setControl(control);
@@ -55,6 +62,11 @@ public class WriteLayout implements GeneralLayout{
 		this.receiverSetted= false;
 		
 		this.user= control.getUser_manager().getActualUser();
+		
+		qrcodes_path= new ArrayList<String>(10);
+		for(int i=0; i<10; i++){
+			qrcodes_path.add("");
+		}
 	}
 	
 	@Override
@@ -76,10 +88,34 @@ public class WriteLayout implements GeneralLayout{
 		
 		int posx= 0, posy= 0;
 		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.NONE;
 		c.anchor= GridBagConstraints.WEST;
 		c.insets= new Insets(10, 10, 10, 10);
-		// 0.0 - text area
+		//0.0 - title
+		field_title= new JTextField("Title");
+		field_title.addFocusListener(new FocusOnClick(field_title, "Title"));
+		c.gridx= posx;c.gridy= posy;c.gridheight= 1;c.gridwidth= 3;c.weightx= 1;c.weighty=0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		pane.add(field_title, c);
+		//0.1 - author
+		posy++;
+		field_author= new JTextField("Author");
+		field_author.addFocusListener(new FocusOnClick(field_author, "Author"));
+		c.gridx= posx;c.gridy= posy;c.gridheight= 1;c.gridwidth= 6;c.weightx= 1;c.weighty=0;
+		pane.add(field_author, c);
+		//0.2 - receiver
+		posy++;
+		field_receiver= new JTextField("Receiver");
+		field_receiver.addFocusListener(new FocusOnClick(field_receiver, "Receiver"));
+		c.gridx= posx;c.gridy= posy;c.gridheight= 1;c.gridwidth= 6;c.weightx= 1;c.weighty=0;
+		pane.add(field_receiver, c);
+		//0.3 - info
+		posy++;
+		field_info= new JTextField("Info");
+		field_info.addFocusListener(new FocusOnClick(field_info, "Info"));
+		c.gridx= posx;c.gridy= posy;c.gridheight= 1;c.gridwidth= 6;c.weightx= 1;c.weighty=0;
+		pane.add(field_info, c);
+		// 0.2 - text area
+		posy++;
 		c.gridx= posx;c.gridy= posy;c.gridheight= 8;c.gridwidth= 6;c.weightx= 1;c.weighty=1;
 		c.fill = GridBagConstraints.BOTH;
 		pane.add(scroll_pane, c);
@@ -284,9 +320,11 @@ public class WriteLayout implements GeneralLayout{
 	}
 
 	private class EncodeAction implements ActionListener {
+		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(receiverSetted){
+			//if(receiverSetted){
+			if(true){
 				String selected_text= area.getSelectedText();
 				int cursor_position= area.getCaretPosition() - selected_text.length();
 				System.out.println(selected_text);
@@ -315,11 +353,12 @@ public class WriteLayout implements GeneralLayout{
 
 						QRCode qr = new QRCode();
 						qr.writeQRCode(enc, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
-						configurePath();
-						//--------------------------------------------------------------
+						//configurePath();
+
 						//String qrcode_file= getOutput_folder()+"/"+getNameFile()+".jpg";
 						//TODO prendere il percorso per salvare dalle preferenze dell'utente
-						String qrcode_file= "/home/pasquale/ProgettoSicurezza"+"/"+getNameFile()+".jpg";
+					//String qrcode_file= "/home/pasquale/ProgettoSicurezza"+"/"+getNameFile()+".jpg";
+						String qrcode_file= "/home/pasquale/ProgettoSicurezza/qrcode_0.jpg";
 						int i=1;
 						while(checkExists(qrcode_file)){
 							qrcode_file= qrcode_file.substring(0, qrcode_file.lastIndexOf("_")+1);
@@ -327,6 +366,8 @@ public class WriteLayout implements GeneralLayout{
 							i++;
 						}
 						qr.saveQRCodeToFile(qrcode_file);
+						qrcodes_path.set(current_qrcode, qrcode_file);
+						current_qrcode++;
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -365,7 +406,7 @@ public class WriteLayout implements GeneralLayout{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-
+			//TODO prendere la cartella dalle preferenze dell'utente loggato
 			JFileChooser file_chooser= new JFileChooser(getOutput_folder());
 			file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int choose= file_chooser.showDialog(null, "SELEZIONA");
@@ -377,14 +418,34 @@ public class WriteLayout implements GeneralLayout{
 				f.mkdir();
 				path= getOutput_folder() + name_file +  ".txt";
 				System.out.println("Il percorso scelto è: " + path);
-				QRCode.saveFile(path, area.getText());//funzione di utilità sta in QRCode solo per comodità
+				//QRCode.saveFile(path, area.getText());//funzione di utilità sta in QRCode solo per comodità//
 				//TODO creare il pdf con i dati
+				//TODO creare la signature
+				//TODO prelevare i qrcode da inserire
 				try {
 					String pat_pdf= getOutput_folder() + name_file + ".pdf";
 					PDFUtil.create(pat_pdf);
 					if(PDFUtil.open()){
-						PDFUtil.addText(area.getText(), 40, 400, 0);
+						
+						String title= field_title.getText();
+						String author= field_author.getText();
+						String text= area.getText();
+						String[] info= {field_info.getText(), "", "", ""};
+						String[] qrcodes= {"", "", "", "", "", "", "", "", "", ""};
+						for(int i=0; i<10; i++){
+							String tmp_path= qrcodes_path.get(i);
+							if(tmp_path != null)
+								qrcodes[i]= tmp_path;
+							else
+								qrcodes[i]= "";
+						}
+
+						PDFUtil.createDocument(title, author, text, "", info, qrcodes);
 						PDFUtil.close();
+					}
+					for(String s : qrcodes_path){
+						File tmp_file= new File(s);
+						tmp_file.delete();
 					}
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -398,6 +459,30 @@ public class WriteLayout implements GeneralLayout{
 				System.out.println("annullato");
 			}
 		}
+	}
+	
+	private class FocusOnClick implements FocusListener{
+		
+		private JTextField field;
+		private String text;
+
+		public FocusOnClick(JTextField f, String t){
+			this.field= f;
+			this.text= t;
+		}
+		
+		@Override
+		public void focusGained(FocusEvent e) {
+        	if(field.getText().equals(text))
+        		field.setText("");
+		}
+
+		@Override
+		public void focusLost(FocusEvent e) {
+			if(field.getText().equals(""))
+				field.setText(text);
+		}
+		
 	}
 		
 }
