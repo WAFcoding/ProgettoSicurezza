@@ -211,6 +211,7 @@ public class UserManager {
 		Session session= HibernateUtil.getSessionFactory().openSession();
 		//genero il codice
 		String code= generateCode(session, public_key);
+		code= code.replace("/", "0");
 		Transaction tx= null;
 		try{
 			//hash del code per autenticazione forte

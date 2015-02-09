@@ -13,8 +13,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -69,6 +72,25 @@ public class WriteLayout implements GeneralLayout{
 		for(int i=0; i<10; i++){
 			qrcodes_path.add("");
 		}
+		setOutput_folder(control.getUser_manager().getActualUser().getDir_out() +  "/");
+		setCurrentFile(new File(control.getWLayoutCurrentFilePath()));
+		try {
+			BufferedReader buff= new BufferedReader(new FileReader(currentFile.getAbsolutePath()));
+			String tmp= buff.readLine();
+			String text= "";
+			while(tmp != null){
+				text= text + tmp;
+				tmp= buff.readLine();
+				//System.out.println(text);
+			}
+			setAreaText(text);
+			buff.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	@Override
@@ -82,7 +104,6 @@ public class WriteLayout implements GeneralLayout{
 		scroll_pane.setMaximumSize(new Dimension(600, 400));
 		scroll_pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
-        
         //inserimento pulsanti
         pane.removeAll();
 		pane.setLayout(new GridBagLayout());
@@ -173,7 +194,6 @@ public class WriteLayout implements GeneralLayout{
 		button.setForeground(Color.WHITE);
 		button.addActionListener(new SaveAction());
 		pane.add(button, c);
-		
 	}
 	
 	/**
@@ -279,8 +299,8 @@ public class WriteLayout implements GeneralLayout{
 	public void configurePath(){
 
 		if(!isAlreadyConfigured()){
-			System.out.println("output folder= " + getOutput_folder());
-			System.out.println("output file name= " + getNameFile());
+			//System.out.println("output folder= " + getOutput_folder());
+			//System.out.println("output file name= " + getNameFile());
 			setOutput_folder(getOutput_folder() + getNameFile() + "/");
 			System.out.println("output folder= " + getOutput_folder());
 			File f= new File(getOutput_folder());
@@ -325,8 +345,8 @@ public class WriteLayout implements GeneralLayout{
 		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if(receiverSetted){
-			//if(true){
+			//if(receiverSetted){
+			if(true){
 				String selected_text= area.getSelectedText();
 				int cursor_position= area.getCaretPosition() - selected_text.length();
 				System.out.println(selected_text);
@@ -409,22 +429,19 @@ public class WriteLayout implements GeneralLayout{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			//TODO prendere la cartella dalle preferenze dell'utente loggato
-			JFileChooser file_chooser= new JFileChooser(getOutput_folder());
-			file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			int choose= file_chooser.showDialog(null, "SELEZIONA");
-			String path="";
-			if(choose == JFileChooser.APPROVE_OPTION){
-				String name_file= JOptionPane.showInputDialog(getPane(), "inserisci il nome del file\nsenza estensione", getNameFile());
-				setOutput_folder(file_chooser.getSelectedFile().getAbsolutePath() +  "/");
-				File f= new File(path);
-				f.mkdir();
-				path= getOutput_folder() + name_file +  ".txt";
+			//JFileChooser file_chooser= new JFileChooser(getOutput_folder());
+			//file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			//int choose= file_chooser.showDialog(null, "SELEZIONA");
+			//String path="";
+			//if(choose == JFileChooser.APPROVE_OPTION){
+			if(true){
+				String name_file= JOptionPane.showInputDialog(getPane(), "inserisci il nome del file\nsenza estensione", "");
+				//setOutput_folder(file_chooser.getSelectedFile().getAbsolutePath() +  "/");
+				//path= getOutput_folder() + name_file +  ".pdf";
+				//File f= new File(path);
+				//f.mkdir();
 				String sign_path= getOutput_folder() + "sign.jpg";
-				System.out.println("Il percorso scelto è: " + path);
-				//QRCode.saveFile(path, area.getText());//funzione di utilità sta in QRCode solo per comodità//
-				//TODO creare il pdf con i dati
-				//TODO creare la signature
+				//System.out.println("Il percorso scelto è: " + path);
 				try {
 					String pat_pdf= getOutput_folder() + name_file + ".pdf";
 					PDFUtil.create(pat_pdf);
@@ -441,7 +458,7 @@ public class WriteLayout implements GeneralLayout{
 						qr.writeQRCode(new String(enc), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
 						qr.saveQRCodeToFile(sign_path);
 						
-						String[] info= {field_info.getText(), "", "", ""};
+						String[] info= {field_info.getText(), "", "", field_receiver.getText()};
 						String[] qrcodes= {"", "", "", "", "", "", "", "", "", ""};
 						for(int i=0; i<10; i++){
 							String tmp_path= qrcodes_path.get(i);
@@ -469,10 +486,8 @@ public class WriteLayout implements GeneralLayout{
 						tmp_file.delete();
 					}
 				}
-				System.out.println("File salvato in: " + path);
-
 			}
-			else if(choose == JFileChooser.CANCEL_OPTION){
+			else if(false){
 				System.out.println("annullato");
 			}
 		}

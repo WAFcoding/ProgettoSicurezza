@@ -52,8 +52,9 @@ public class LayoutControl {
 	private SettingsControl set_ctrl;
 
 	private ArrayList<String> choosed_files;
-	private String[] image_types= {"gif", "jpg", "png", "bmp"};
+	private String[] image_types= {"gif", "jpg", "png", "bmp", "pdf"};
 	private String[] text_types= {"txt"};
+	private String w_layout_currentFilePath;
 	
 	private UserManager user_manager;
 	
@@ -120,7 +121,7 @@ public class LayoutControl {
 		}
 		else if(layout == 7){
 			ReceiverLayout();
-			mainFrame.setSize(800, 700);
+			mainFrame.setSize(500, 500);
 		}
 		
 		//mainFrame.pack();
@@ -270,8 +271,8 @@ public class LayoutControl {
 		return null;
 	}
 	
-	public void addImageChoice(String path){
-		if(!this.choosed_images.contains(path) && isImage(path)){
+	public void addDecodeChoice(String path){
+		if(!this.choosed_images.contains(path) && isToDecode(path)){
 			this.choosed_images.add(path);
 		}
 		else{
@@ -282,7 +283,7 @@ public class LayoutControl {
 			e_layout.updateList();
 	}
 	
-	public void addFileChoice(String path){
+	public void addEncodeChoice(String path){
 		if(!this.choosed_files.contains(path) && isText(path)){
 			this.choosed_files.add(path);
 		}
@@ -306,11 +307,11 @@ public class LayoutControl {
 	 * @param path String il percorso del file
 	 * @return false se non è un'immagine
 	 */
-	public boolean isImage(String path){
-		return isImage(new File(path));
+	public boolean isToDecode(String path){
+		return isToDecode(new File(path));
 	}
 	
-	public boolean isImage(File f){
+	public boolean isToDecode(File f){
 		for(String s : image_types){
 			if(f.getAbsolutePath().endsWith(s)){
 				return true;
@@ -339,40 +340,15 @@ public class LayoutControl {
 	 * Disegna l'immagine scelta nella finestra dell'applicazione
 	 * @param path String il percorso dell'imagine da disegnare
 	 */
-	public void drawImage(File f, String backTo){
+	public void drawDecode(String file, String backTo){
 
-		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane(), backTo);
-		try {
-			img_layout.setViewer(f.getAbsolutePath());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		img_layout.addComponentsToPane();
-		
-		mainFrame.setSize(new Dimension(900, 600));
-		mainFrame.repaint();
-		mainFrame.validate();
-		/*
-		if(img_layout.getImgWidth() >= 800 || img_layout.getImgHeight() >= 600){
-			mainFrame.setSize(new Dimension(1000, 700));
-			mainFrame.repaint();
-			mainFrame.validate();
-		}
-		else if(img_layout.getImgWidth() <= 400 || img_layout.getImgHeight() <= 400){
-
-			mainFrame.setSize(new Dimension(500, 400));
-			mainFrame.repaint();
-			mainFrame.validate();
-		}
-		else{
-			mainFrame.setSize(new Dimension(img_layout.getImgWidth()+100, img_layout.getImgHeight()+50));
-			mainFrame.repaint();
-			mainFrame.validate();
-		}*/
+		//TODO aprire decode layout
 	}
 	
-	public void drawFile(File f){
-
+	public void drawEncode(String f){
+		
+		setLayout("ENCODE");
+/*
 		if(w_layout == null){
 			w_layout= new WriteLayout(this, mainFrame.getContentPane());
 			w_layout.addComponentsToPane();
@@ -396,24 +372,26 @@ public class LayoutControl {
 			w_layout.setAreaText(text);
 			/*String path= f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf("/")+1);
 			w_layout.setOutput_folder(path);*/
-			buff.close();
+		/*	buff.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		*/
 	}
 	
 	public void draw(String path, String backTo){
 		File f = new File(path);
-		if(isImage(f)){
-			addImageChoice(path);
-			drawImage(f, backTo);
+		if(isToDecode(f)){
+			addDecodeChoice(path);
+			drawDecode(path, backTo);
+			//setLayout("DECODE");
 		}
 		else if(isText(f)){
-			addFileChoice(path);
-			drawFile(f);
+			addEncodeChoice(path);
+			//drawEncode(path);
+			setLayout("ENCODE");
 		}
 	}
 
@@ -503,7 +481,7 @@ public class LayoutControl {
 			PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(privKey)));
 
 			RegistrationBean bean = reg.retrieveRegistrationDetails(secureId);
-			int trustLevel= bean.getTrustLevel();
+			//int trustLevel= bean.getTrustLevel();
 			//getUser_manager().updateActualUserTrustLevel(trustLevel);
 
 			System.out.println("trustLevel:" + bean.getTrustLevel());
@@ -523,5 +501,11 @@ public class LayoutControl {
 		return toReturn;
 	}
 	
-	//
+	public void setWriteLayoutCurrentFile(String path){
+		this.w_layout_currentFilePath= path;
+	}
+	
+	public String getWLayoutCurrentFilePath(){
+		return this.w_layout_currentFilePath;
+	}
 }

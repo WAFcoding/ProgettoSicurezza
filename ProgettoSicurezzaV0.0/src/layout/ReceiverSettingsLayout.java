@@ -59,9 +59,7 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
 
 		list_items= new ArrayList<String>();
 		if(isSingleUser()){
-
-			//TODO richiesta al db di un utente specifico, se non presente nel db locale richiedere a quello remoto
-			//FIXME fare i metodi statici per url e keystore_pwd		
+	
 			String username= control.getUser_manager().getActualUser().getName() + "_" + control.getUser_manager().getActualUser().getID();
 			String pwd= control.getUser_manager().getActualUser().getPassword();
 			try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, username, keystore_pwd, pwd)) {
@@ -94,7 +92,7 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
 		//inserimento pulsanti
         pane.removeAll();
 		pane.setLayout(new GridBagLayout());
-		pane.setSize(800, 600);
+		//pane.setSize(800, 600);
         scroll_pane= new JScrollPane(list);
         scroll_pane.setPreferredSize(new Dimension(300, 300));
         JButton button;

@@ -196,8 +196,8 @@ public class PrimaryLayout implements GeneralLayout{
 			int choose= file_chooser.showDialog(null, "apri");
 			
 			if(choose == JFileChooser.APPROVE_OPTION){
-				File file= file_chooser.getSelectedFile();
-				setFile_choosed(file.getAbsolutePath());
+				String file= file_chooser.getSelectedFile().getAbsolutePath();
+				setFile_choosed(file);
 				System.out.println("Il file scelto è: " + getFile_choosed());
 				
 				//control.addImageChoice(getFile_choosed());
