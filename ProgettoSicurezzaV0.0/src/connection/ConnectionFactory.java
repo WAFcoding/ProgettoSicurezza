@@ -11,7 +11,8 @@ public class ConnectionFactory {
 	
 	public static KeyDistributionClient getKeyDistributionServerConnection(String url, String clientAlias, String keystorePwd, String userPassword) throws Exception {
 		KeyDistributionClient client = new KeyDistributionClient();
-		client.openNeedClientAuthConnection(url, 8888, clientAlias, keystorePwd, userPassword);
+		System.out.println("User involved:"+clientAlias.toLowerCase() + " url:"+url +" password:" + keystorePwd);
+		client.openNeedClientAuthConnection(url, 8888, clientAlias.toLowerCase(), keystorePwd, userPassword);
 		return client;
 	}
 }

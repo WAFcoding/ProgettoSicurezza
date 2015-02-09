@@ -47,7 +47,7 @@ public class AdminController {
 			ks = KeyTool.loadKeystore(ServerMasterData.keyStorePath, ServerMasterData.passphrase);
 			PrivateKey serverPrivateKey = KeyTool.getPrivateKey(ks, "server", ServerMasterData.passphrase) ; 
 			
-			System.out.println(serverPrivateKey.getClass());
+			//System.out.println(serverPrivateKey.getClass());
 			
 			//chiave pubblica utente
 			PublicKey clientPublicKey;

@@ -62,7 +62,7 @@ public class PDFUtil {
 	private static final float SIGNATUREY= 10 + RECTWIDTH;
 	
 
-	public static final String LOGO_PATH= "/home/pasquale/Developing/WorkSpace/Java/ProgettoSicurezza/ProgettoSicurezzaV0.0/files/logoroma_torvergata.jpg";
+	public static final String LOGO_PATH= "/home/giovanni/workspaceSII/ProgettoSicurezza/ProgettoSicurezzaV0.0/files/logoroma_torvergata.jpg";
 	
 	private static PdfWriter pdfwr;
 	private static Document doc;

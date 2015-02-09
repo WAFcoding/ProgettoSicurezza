@@ -171,14 +171,15 @@ public abstract class ClientConnection implements Closeable {
         }
 
         public PrivateKey getPrivateKey(String alias) {
-        	PrivateKey pkey = null;
+        	/*PrivateKey pkey = null;
         	try {
 				pkey = KeyTool.getPrivateKey(ks, alias, password);
 			} catch (NoSuchAlgorithmException | UnrecoverableEntryException
 					| KeyStoreException e) {
 				e.printStackTrace();
-			}
-            return pkey;//baseKM.getPrivateKey(alias);
+			}*/
+            //return pkey;//
+        	return baseKM.getPrivateKey(alias);
         }
 
         public String[] getServerAliases(String keyType, Principal[] issuers) {

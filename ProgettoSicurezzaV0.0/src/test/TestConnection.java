@@ -97,9 +97,9 @@ public class TestConnection {
 	
 	public static void testUsage() throws Exception{
 		
-		try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, "giorgio_1", password, password)) {
+		try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, "giovanni_1", password, password)) {
 			String key = cli.getLevelKey(2);
-			String pkey = cli.getUserPublicKey("Giorgio_1");
+			String pkey = cli.getUserPublicKey("Giovanni_1");
 			List<User> users = cli.getAllUsers();
 			Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
 			System.out.println("key: "+key);
