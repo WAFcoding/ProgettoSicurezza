@@ -98,7 +98,7 @@ public class UserManager {
 			
 			if(control.IsSettingsPathNull()){
 				JFileChooser chooser= new JFileChooser();
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				chooser.showOpenDialog(null);
 				dbPath= chooser.getSelectedFile().getAbsolutePath();
 				control.setActualDbPath(dbPath);
@@ -445,6 +445,50 @@ public class UserManager {
 		} catch (FileNotFoundException | DocumentException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void updateActualUserTrustLevel(int trustLevel){
+		
+		if(!HibernateUtil.isCreated()){
+			HibernateUtil.setDbPath(getActualUser().getDir_def());
+			HibernateUtil.decryptDb(getActualUser().getPassword());
+			HibernateUtil.createSession();
+		}
+		
+		Session session= HibernateUtil.getSessionFactory().openSession();
+		
+		Transaction tx= null;
+		try{
+			
+			tx= session.beginTransaction();
+			String hql= "from User where iD = :id";
+			Query query= session.createQuery(hql);
+			query.setParameter("id", getActualUser().getID());
+			List<User> result= query.list();
+			
+			if(result != null){
+				User tmp_user= result.get(0);
+				System.out.println("result not null");
+				tmp_user.setTrustLevel(trustLevel);
+				session.update(tmp_user);
+			}
+			else{
+				System.out.println("result is null");
+			}
+			
+			tx.commit();
+			
+		}
+		catch(Exception e){
+			if(tx != null) tx.rollback();
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+			HibernateUtil.shutdown();
+			HibernateUtil.encryptDb(getActualUser().getPassword());
+		}
+		
 	}
 /*
 	public static void main(String[] args){

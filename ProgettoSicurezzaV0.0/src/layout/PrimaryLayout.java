@@ -126,7 +126,8 @@ public class PrimaryLayout implements GeneralLayout{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				
-				boolean ok= control.CertificateFromServer(control.getUser_manager().getActualUser().getName(), 
+				boolean ok= control.CertificateFromServer(control.getUser_manager().getActualUser().getName() + "_" + control.getUser_manager().getActualUser().getID(),
+											  control.getUser_manager().getActualUser().getPassword(),
 											  control.getUser_manager().getActualUser().getSecureId(), 
 											  control.getUser_manager().getActualUser().getPrivateKey());
 				

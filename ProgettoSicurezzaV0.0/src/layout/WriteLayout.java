@@ -27,6 +27,7 @@ import javax.swing.ScrollPaneConstants;
 
 import usersManagement.User;
 import util.CryptoUtility;
+import util.CryptoUtility.CRYPTO_ALGO;
 import util.CryptoUtility.HASH_ALGO;
 import util.PDFUtil;
 import util.QRCode;
@@ -324,12 +325,13 @@ public class WriteLayout implements GeneralLayout{
 		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			//if(receiverSetted){
-			if(true){
+			if(receiverSetted){
+			//if(true){
 				String selected_text= area.getSelectedText();
 				int cursor_position= area.getCaretPosition() - selected_text.length();
 				System.out.println(selected_text);
-				selected_text= cursor_position + "_" + selected_text;
+				//format for text in qrcode= progressiveNumber_cursorPosition_text
+				selected_text= current_qrcode + "_" + cursor_position + "_" + selected_text;
 				System.out.println(selected_text);
 				System.out.println("La posizione del cursore nel testo è: " + cursor_position);
 				if(selected_text != null){
@@ -358,8 +360,8 @@ public class WriteLayout implements GeneralLayout{
 
 						//String qrcode_file= getOutput_folder()+"/"+getNameFile()+".jpg";
 						//TODO prendere il percorso per salvare dalle preferenze dell'utente
-					//String qrcode_file= "/home/pasquale/ProgettoSicurezza"+"/"+getNameFile()+".jpg";
-						String qrcode_file= "/home/pasquale/ProgettoSicurezza/qrcode_0.jpg";
+						//String qrcode_file= "/home/pasquale/ProgettoSicurezza/qrcode_0.jpg";
+						String qrcode_file= control.getUser_manager().getActualUser().getDir_out() + "qrcode_0.jpg";
 						int i=1;
 						while(checkExists(qrcode_file)){
 							qrcode_file= qrcode_file.substring(0, qrcode_file.lastIndexOf("_")+1);
@@ -431,10 +433,12 @@ public class WriteLayout implements GeneralLayout{
 						String title= field_title.getText();
 						String author= field_author.getText();
 						String text= area.getText();
-						
+						//hash del testo criptato
 						String signature= CryptoUtility.hash(HASH_ALGO.SHA1, text);
+						//firma dell'hash
+						byte[] enc= CryptoUtility.encrypt(CRYPTO_ALGO.AES, signature, control.getUser_manager().getActualUser().getPrivateKey());
 						QRCode qr= new QRCode();
-						qr.writeQRCode(signature, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
+						qr.writeQRCode(new String(enc), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
 						qr.saveQRCodeToFile(sign_path);
 						
 						String[] info= {field_info.getText(), "", "", ""};
@@ -450,18 +454,20 @@ public class WriteLayout implements GeneralLayout{
 						PDFUtil.createDocument(title, author, text, sign_path, info, qrcodes);
 						PDFUtil.close();
 					}
-					File tmp_sign= new File(sign_path);
-					tmp_sign.delete();
-					for(String s : qrcodes_path){
-						File tmp_file= new File(s);
-						tmp_file.delete();
-					}
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (DocumentException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
+				}
+				finally{
+					File tmp_sign= new File(sign_path);
+					tmp_sign.delete();
+					for(String s : qrcodes_path){
+						File tmp_file= new File(s);
+						tmp_file.delete();
+					}
 				}
 				System.out.println("File salvato in: " + path);
 

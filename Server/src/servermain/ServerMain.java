@@ -85,8 +85,8 @@ public class ServerMain {
 			e.printStackTrace();
 		}
 		
-		//new LayoutController();
-		openConsoleSession();
+		new LayoutController();
+		//openConsoleSession();
 	}
 
 	/**

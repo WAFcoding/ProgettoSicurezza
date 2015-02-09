@@ -494,7 +494,7 @@ public class LayoutControl {
 	 * @param secureId
 	 * @param privateKey
 	 */
-	public boolean CertificateFromServer(String username, String secureId, String privKey){
+	public boolean CertificateFromServer(String username, String password, String secureId, String privKey){
 		
 		boolean toReturn= true;
 
@@ -503,13 +503,15 @@ public class LayoutControl {
 			PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(privKey)));
 
 			RegistrationBean bean = reg.retrieveRegistrationDetails(secureId);
+			int trustLevel= bean.getTrustLevel();
+			//getUser_manager().updateActualUserTrustLevel(trustLevel);
 
 			System.out.println("trustLevel:" + bean.getTrustLevel());
 			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
 			X509Certificate cert = (X509Certificate)certFactory.generateCertificate(new ByteArrayInputStream(bean.getCertificateData()));
 
 			KeyStore ks = KeyTool.loadKeystore(ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
-			KeyTool.addNewPrivateKey(ks, privateKey, cert, username, keystore_pwd.toCharArray());
+			KeyTool.addNewPrivateKey(ks, privateKey, cert, username, password.toCharArray());
 
 			KeyTool.storeKeystore(ks, ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
 		
@@ -520,4 +522,6 @@ public class LayoutControl {
 		
 		return toReturn;
 	}
+	
+	//
 }

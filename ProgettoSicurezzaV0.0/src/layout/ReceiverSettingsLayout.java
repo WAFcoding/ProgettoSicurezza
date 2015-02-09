@@ -40,6 +40,8 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
     private DefaultListModel<String> list_model;
     private ArrayList<String> list_items;
     private JScrollPane scroll_pane;
+	public final static String keystore_pwd= "progettoSII";
+	public final static String url= "localhost";//TODO UserManager: inserire il url nei settings
 
 
 	public ReceiverSettingsLayout(LayoutControl control, Container pane, boolean singleUser) {
@@ -59,16 +61,18 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
 		if(isSingleUser()){
 
 			//TODO richiesta al db di un utente specifico, se non presente nel db locale richiedere a quello remoto
-//FIXME fare i metodi statici per url e keystore_pwd			
-			try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(control.url, "giorgio_1", control.keystore_pwd)) {
+			//FIXME fare i metodi statici per url e keystore_pwd		
+			String username= control.getUser_manager().getActualUser().getName() + "_" + control.getUser_manager().getActualUser().getID();
+			String pwd= control.getUser_manager().getActualUser().getPassword();
+			try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, username, keystore_pwd, pwd)) {
 				if(cli != null){
-				List<User> users = cli.getAllUsers();
+					List<User> users = cli.getAllUsers();
 					if(users == null) 
 						System.out.println("users is null");
-				System.out.println(users);
-				for(User u : users){
-					list_items.add(u.getName() + " " + u.getSurname() + " - " + u.getTrustLevel());
-				}
+					System.out.println(users);
+					for(User u : users){
+						list_items.add(u.getName() + " " + u.getSurname() + " - " + u.getTrustLevel());
+					}
 				}
 				else 
 					System.out.println("cli is null");
