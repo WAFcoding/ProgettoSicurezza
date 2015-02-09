@@ -58,12 +58,12 @@ public class QRCode {
 	/**
 	 * Larghezza di default.
 	 */
-	public static final int DEFAULT_WIDTH = 200;
+	public static final int DEFAULT_WIDTH = 100;
 	
 	/**
 	 * Altezza di default.
 	 */
-	public static final int DEFAULT_HEIGHT = 200;
+	public static final int DEFAULT_HEIGHT = 100;
 
 	/**
 	 * Genera un QR Code vuoto con la risoluzione desiderata.

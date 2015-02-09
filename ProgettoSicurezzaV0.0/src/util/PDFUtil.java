@@ -3,6 +3,7 @@
  */
 package util;
 
+import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.itextpdf.text.Anchor;
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -22,6 +24,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
@@ -53,6 +56,11 @@ public class PDFUtil {
 	private static final float INFOY= AUTHORY - 10 - 10;
 	private static final float DEFSIZETEXT= 11;
 	private static final float DEFSIZELINE= 0.05f;
+	private static final float RECTWIDTH= 101;
+	private static final float RECTHEIGHT= 101;
+	private static final float SIGNATUREX= PAGESIZE.getWidth() - 10 - RECTWIDTH;
+	private static final float SIGNATUREY= 10 + RECTWIDTH;
+	
 
 	public static final String LOGO_PATH= "/home/pasquale/Developing/WorkSpace/Java/ProgettoSicurezza/ProgettoSicurezzaV0.0/files/logoroma_torvergata.jpg";
 	
@@ -141,12 +149,15 @@ public class PDFUtil {
 	 * @throws DocumentException
 	 */
 	public static void addText(String text, float x, float y, float textSize) throws DocumentException{
-		pdfcb.beginText();
+		/*pdfcb.beginText();
+		pdfcb.showTextAligned(Element.ALIGN_LEFT, text, x, PAGESIZE.getHeight() - y, 0);
+		pdfcb.endText();*/
 		if(textSize == 0) textSize= DEFSIZETEXT;
-		pdfcb.setFontAndSize(bf_helv, textSize);
-		//TODO PDFUtil: cambiare i valori della posizione del titolo
-		pdfcb.showTextAligned(Element.ALIGN_LEFT, text, x, y, 0);
-		pdfcb.endText();
+		ColumnText ct= new ColumnText(pdfcb);
+		Phrase p= new Phrase(text);
+		p.setFont(new Font(bf_helv, textSize));
+		ct.setSimpleColumn(p, x, PAGESIZE.getHeight() - y, PAGESIZE.getWidth() - 20, PAGESIZE.getHeight() - y - 450, 20, Element.ALIGN_LEFT);
+		ct.go();
 		//pdfcb.saveState();
 	}
 	/**
@@ -186,11 +197,11 @@ public class PDFUtil {
 			System.out.println("Aprire prima il file");
 	}
 	
-	public static void addImage(String path, float x, float y) throws MalformedURLException, IOException, DocumentException{
+	public static void addQRCodeImage(String path, float x, float y) throws MalformedURLException, IOException, DocumentException{
 		Image img = Image.getInstance(path);
-		img.scaleAbsolute(100, 100);
-		//img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getHeight());
-		img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getScaledHeight());
+		//img.scaleAbsolute(100, 100);
+		img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getHeight());
+		//img.setAbsolutePosition(x, PAGESIZE.getHeight() - y - img.getScaledHeight());
 		doc.add(img);
 	}
 	/**
@@ -223,6 +234,21 @@ public class PDFUtil {
 		pdfcb.restoreState();
 	}
 	/**
+	 * aggiunge un rettagolo alla pagina
+	 * @param x
+	 * @param y
+	 * @param w
+	 * @param h
+	 */
+	public static void addRectangle(float x, float y, float w, float h){
+		pdfcb.saveState();
+		pdfcb.setColorStroke(BaseColor.BLACK);
+		pdfcb.setLineWidth(DEFSIZELINE);
+		pdfcb.rectangle(x,PAGESIZE.getHeight() - y, w, h); 
+		pdfcb.stroke();
+		pdfcb.restoreState();
+	}
+	/**
 	 * Aggiunge il titolo del pdf in cima ad esso
 	 * @param title
 	 */
@@ -251,7 +277,6 @@ public class PDFUtil {
 		String allInfo= date + " - " + pagenumber + " - " + info + " - " + receiver;
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, allInfo, INFOX, INFOY, 0);
 		pdfcb.endText();
-		//TODO PDFUtil: aggiungere linea orizzontale
 	}
 	/**
 	 * Aggiunge il logo al pdf nell'angolo in alto a sinistra
@@ -282,6 +307,7 @@ public class PDFUtil {
 	 * @param destination
 	 * @throws IOException
 	 * @throws DocumentException
+			addRectangle(10, 710, 100, 100);
 	 */
 	public static void extractImages(String source, String destination) throws IOException, DocumentException{
 		PdfReader reader= new PdfReader(source);
@@ -294,6 +320,67 @@ public class PDFUtil {
         reader.close();
 	}
 	
+	public static void createDocument(String title, String author, String text, String signaturePath, String[] subtitleInfo, String[] qrCodes){
+		try {
+			addLogo(LOGO_PATH);
+			addTitle(title);
+			addAuthor(author);
+			addSubtitleInfo(subtitleInfo[0], subtitleInfo[1], subtitleInfo[2], subtitleInfo[3]);
+			addRectangle(SIGNATUREX, SIGNATUREY, RECTWIDTH, RECTHEIGHT);
+			if(signaturePath != null && !signaturePath.equals("")){
+				addQRCodeImage(signaturePath, SIGNATUREX + 1, SIGNATUREY + 1 - RECTHEIGHT);
+			}
+			addLineHorizontal(10, 150, 0);
+			addText(text, 10, 170, 0);
+			addLineHorizontal(10, 600, 0);
+			for(float i=20; i<466; i= i + RECTWIDTH + 10){
+				addRectangle(i, 710, RECTWIDTH, RECTHEIGHT);
+			}
+			for(float i=20; i<466; i= i + RECTWIDTH + 10){
+				addRectangle(i, 820, RECTWIDTH, RECTHEIGHT);
+			}
+			int j=0;
+			for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
+				String tmp_qrcodePath= qrCodes[j];
+				if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
+					addQRCodeImage(tmp_qrcodePath, i, 611);
+					j++;
+				}
+			}
+			for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
+				String tmp_qrcodePath= qrCodes[j];
+				if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
+					addQRCodeImage(tmp_qrcodePath, i, 721);
+					j++;
+				}
+			}
+			
+		} catch (IOException | DocumentException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	/**
+	 * crea la tabella riassuntiva della registrazione
+	 * @param text1
+	 * @param text2
+	 * @param text3
+	 * @param text4
+	 * @param text5
+	 * @param text6
+	 * @param text7
+	 * @param text8
+	 * @param text9
+	 * @param text10
+	 * @param text11
+	 * @param text12
+	 * @param text13
+	 * @param text14
+	 * @param text15
+	 * @throws DocumentException
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 */
 	public static void createResumeTable(String text1, String text2, String text3, String text4, String text5,
 										 String text6, String text7, String text8, String text9, String text10,
 										 String text11, String text12, String text13, String text14, String text15) throws DocumentException, MalformedURLException, IOException{

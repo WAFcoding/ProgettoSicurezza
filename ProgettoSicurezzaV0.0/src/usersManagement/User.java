@@ -18,7 +18,7 @@ import javax.persistence.*;
 public class User implements Serializable{
 	private static final long serialVersionUID = 1L;
 
-	private Integer ID;
+	private Integer iD;
 	private String name; 
 	private String surname;
 	private String mail;
@@ -34,6 +34,7 @@ public class User implements Serializable{
 	private String privateKey;
 	private String password;
 	private Integer trustLevel;
+	private String secureId;
 	
 	private Set<UserPublicKeyKnown> publicKeyKnown= new HashSet<UserPublicKeyKnown>(0);
 	
@@ -63,14 +64,14 @@ public class User implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name= "ID_user", unique= true, nullable= false)
 	public Integer getID() {
-		return ID;
+		return iD;
 	}
 
 	/**
 	 * @param iD the iD to set
 	 */
 	public void setID(Integer iD) {
-		ID = iD;
+		this.iD = iD;
 	}
 	/**
 	 * @return the name
@@ -266,15 +267,31 @@ public class User implements Serializable{
 		this.trustLevel = trustLevel;
 	}
 
+	/**
+	 * @return the secureId
+	 */
+	@Column(name = "secure_id", nullable= true, length= 1024 )
+	public String getSecureId() {
+		return secureId;
+	}
+
+	/**
+	 * @param secureId the secureId to set
+	 */
+	public void setSecureId(String secureId) {
+		this.secureId = secureId;
+	}
+
 	@Override
 	public String toString() {
-		return "User [ID=" + ID + ", name=" + name + ", surname=" + surname
+		return "User [ID=" + iD + ", name=" + name + ", surname=" + surname
 				+ ", mail=" + mail + ", code=" + code + ", city=" + city
 				+ ", country=" + country + ", country_code=" + country_code
 				+ ", organization=" + organization + ", dir_def=" + dir_def
 				+ ", dir_in=" + dir_in + ", dir_out=" + dir_out
 				+ ", publicKey=" + publicKey + ", privateKey=" + privateKey
 				+ ", password=" + password + ", trustLevel=" + trustLevel
-				+ ", publicKeyKnown=" + publicKeyKnown + "]";
+				+ ", secureId=" + secureId + ", publicKeyKnown="
+				+ publicKeyKnown + "]";
 	}
 }

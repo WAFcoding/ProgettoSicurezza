@@ -11,7 +11,7 @@ public class Settings implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String defaultDirectory, inputDirectory, outputDirectory, dbPath, userCode;
+	private String defaultDirectory, inputDirectory, outputDirectory, dbPath, userCode, url;
 	
 	public Settings(){
 		setDefaultDirectory("");
@@ -69,6 +69,20 @@ public class Settings implements Serializable{
 		this.userCode = idUser;
 	}
 	
+	/**
+	 * @return the url
+	 */
+	public String getUrl() {
+		return url;
+	}
+
+	/**
+	 * @param url the url to set
+	 */
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	public void PrintIt(){
 		System.out.println(defaultDirectory + " - " + dbPath + " " + userCode);
 	}

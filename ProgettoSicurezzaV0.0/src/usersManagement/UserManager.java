@@ -98,7 +98,7 @@ public class UserManager {
 			
 			if(control.IsSettingsPathNull()){
 				JFileChooser chooser= new JFileChooser();
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				chooser.showOpenDialog(null);
 				dbPath= chooser.getSelectedFile().getAbsolutePath();
 				control.setActualDbPath(dbPath);
@@ -137,7 +137,7 @@ public class UserManager {
 							System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
 							if(u.getPassword().equals(hash_password)){
 								System.out.println(name + " " + surname + " is logging in.");
-								control.setActualSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def());
+								control.setActualSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def(), url);
 								actualUser= u;
 								toReturn= true;
 							}
@@ -234,15 +234,7 @@ public class UserManager {
 			user.setPrivateKey(private_key);
 			user.setPassword(hash_password);
 			user.setTrustLevel(-1);
-			
-			session.save(user);
-			tx.commit();
-			
-			control.setActualUserCode(hash_code);
-			control.setActualSettings(dir_def, dir_in, dir_out, dir_def);
-			control.addSettings();
-			control.saveSettings();
-			
+
 			try(RegistrationClient reg = ConnectionFactory.getRegistrationServerConnection(url, keystore_pwd)) {
 				secid = reg.submitRegistration(user);
 				
@@ -251,6 +243,15 @@ public class UserManager {
 				//chiudera' automaticamente gli stream in caso di eccezione perchè RegistrationClient implementa "Closeable"
 				e.printStackTrace();
 			}
+			user.setSecureId(secid);
+			
+			session.save(user);
+			tx.commit();
+			
+			control.setActualUserCode(hash_code);
+			control.setActualSettings(dir_def, dir_in, dir_out, dir_def, url);
+			control.addSettings();
+			control.saveSettings();
 			/*
 			//creo il keystore
 			KeyStore ks = KeyTool.loadKeystore(ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
@@ -444,6 +445,50 @@ public class UserManager {
 		} catch (FileNotFoundException | DocumentException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void updateActualUserTrustLevel(int trustLevel){
+		
+		if(!HibernateUtil.isCreated()){
+			HibernateUtil.setDbPath(getActualUser().getDir_def());
+			HibernateUtil.decryptDb(getActualUser().getPassword());
+			HibernateUtil.createSession();
+		}
+		
+		Session session= HibernateUtil.getSessionFactory().openSession();
+		
+		Transaction tx= null;
+		try{
+			
+			tx= session.beginTransaction();
+			String hql= "from User where iD = :id";
+			Query query= session.createQuery(hql);
+			query.setParameter("id", getActualUser().getID());
+			List<User> result= query.list();
+			
+			if(result != null){
+				User tmp_user= result.get(0);
+				System.out.println("result not null");
+				tmp_user.setTrustLevel(trustLevel);
+				session.update(tmp_user);
+			}
+			else{
+				System.out.println("result is null");
+			}
+			
+			tx.commit();
+			
+		}
+		catch(Exception e){
+			if(tx != null) tx.rollback();
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+			HibernateUtil.shutdown();
+			HibernateUtil.encryptDb(getActualUser().getPassword());
+		}
+		
 	}
 /*
 	public static void main(String[] args){

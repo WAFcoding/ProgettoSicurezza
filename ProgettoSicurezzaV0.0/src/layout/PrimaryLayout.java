@@ -104,7 +104,7 @@ public class PrimaryLayout implements GeneralLayout{
 		
 		//0.2 - SETTINGS
 		button = new JButton("SETTINGS");
-		c.gridx = 0;c.gridy = 2;c.weightx = 0.5;c.gridwidth= 2;
+		c.gridx = 0;c.gridy = 2;c.weightx = 0.5;c.gridwidth= 1;
 		button.addActionListener(new ActionListener() {
 			
 			@Override
@@ -112,6 +112,31 @@ public class PrimaryLayout implements GeneralLayout{
 				
 				getControl().setLayout("SETTINGS");
 				System.out.println("SETTINGS");		
+			}
+		});
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		pane.add(button, c);
+		
+		//0.2 - CERTIFY
+		button = new JButton("CERTIFY");
+		c.gridx = 1;c.gridy = 2;c.weightx = 0.5;c.gridwidth= 1;
+		button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				boolean ok= control.CertificateFromServer(control.getUser_manager().getActualUser().getName() + "_" + control.getUser_manager().getActualUser().getID(),
+											  control.getUser_manager().getActualUser().getPassword(),
+											  control.getUser_manager().getActualUser().getSecureId(), 
+											  control.getUser_manager().getActualUser().getPrivateKey());
+				
+				if(ok){
+					control.setErrorLayout("L'utente è autorizzato sul server", "PRIMARY");
+				}
+				else{
+					control.setErrorLayout("L'utente non è autorizzato sul server", "PRIMARY");
+				}
 			}
 		});
 		button.setBackground(Color.BLUE);

@@ -9,9 +9,9 @@ public class ConnectionFactory {
 		return client;
 	}
 	
-	public static KeyDistributionClient getKeyDistributionServerConnection(String url, String clientAlias, String keystorePwd) throws Exception {
+	public static KeyDistributionClient getKeyDistributionServerConnection(String url, String clientAlias, String keystorePwd, String userPassword) throws Exception {
 		KeyDistributionClient client = new KeyDistributionClient();
-		client.openNeedClientAuthConnection(url, 8888, clientAlias, keystorePwd);
+		client.openNeedClientAuthConnection(url, 8888, clientAlias, keystorePwd, userPassword);
 		return client;
 	}
 }

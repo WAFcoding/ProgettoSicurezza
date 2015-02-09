@@ -65,7 +65,7 @@ public abstract class ClientConnection implements Closeable {
 		}
 	}
 	
-	public boolean openNeedClientAuthConnection(String url, int servPort, String clientAlias, String keystorePassword) throws Exception {
+	public boolean openNeedClientAuthConnection(String url, int servPort, String clientAlias, String keystorePassword, String userPassword) throws Exception {
 		try {
 			String password = keystorePassword;
 			System.setProperty("javax.net.ssl.trustStore", ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH) );
