@@ -1,5 +1,6 @@
 package usermanagement.controller;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -41,11 +42,11 @@ public class AdminController {
 			return;
 		
 		X509Certificate certUser;
-		KeyStore ks;
+		//KeyStore ks;
 		try {
 			//chiave privata server
-			ks = KeyTool.loadKeystore(ServerMasterData.keyStorePath, ServerMasterData.passphrase);
-			PrivateKey serverPrivateKey = KeyTool.getPrivateKey(ks, "server", ServerMasterData.passphrase) ; 
+			//ks = KeyTool.loadKeystore(ServerMasterData.keyStorePath, ServerMasterData.passphrase);
+			PrivateKey serverPrivateKey = KeyTool.getPrivateKey(ServerMasterData.ks, "server", ServerMasterData.passphrase) ; 
 			
 			//System.out.println(serverPrivateKey.getClass());
 			
@@ -74,8 +75,9 @@ public class AdminController {
 					new Date());
 			
 			//aggiunta al keystore del server
-			KeyTool.addCertificate(ks, certUser, user.getUID());
-			KeyTool.storeKeystore(ks, ServerMasterData.keyStorePath , ServerMasterData.passphrase);
+			KeyTool.addCertificate(ServerMasterData.ks, certUser, user.getUID());
+			KeyTool.storeKeystore(ServerMasterData.ks, ServerMasterData.keyStorePath , ServerMasterData.passphrase);
+			ServerMasterData.ks.load(new FileInputStream(ServerMasterData.keyStorePath), ServerMasterData.passphrase);
 			
 			//aggiornamento DB
 			UserCertificateDAO bdao = new UserCertificateDaoImpl();
@@ -118,12 +120,13 @@ public class AdminController {
 		User u = udao.findUserByUsername(user.getUID());
 		udao.deleteUser(u);
 		
-		KeyStore ks;
+		//KeyStore ks;
 		try {
-			ks = KeyTool.loadKeystore(ServerMasterData.keyStorePath, ServerMasterData.passphrase);
-			if(ks!=null && ks.containsAlias(user.getUID())) {
-				KeyTool.removeEntry(ks, user.getUID());
-				KeyTool.storeKeystore(ks, ServerMasterData.keyStorePath, ServerMasterData.passphrase);
+			//ks = KeyTool.loadKeystore(ServerMasterData.keyStorePath, ServerMasterData.passphrase);
+			if(ServerMasterData.ks!=null && ServerMasterData.ks.containsAlias(user.getUID())) {
+				KeyTool.removeEntry(ServerMasterData.ks, user.getUID());
+				KeyTool.storeKeystore(ServerMasterData.ks, ServerMasterData.keyStorePath, ServerMasterData.passphrase);
+				ServerMasterData.ks.load(new FileInputStream(ServerMasterData.keyStorePath), ServerMasterData.passphrase);
 			}
 		} catch (KeyStoreException | NoSuchAlgorithmException
 				| CertificateException | IOException e) {
