@@ -9,8 +9,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.KeyManager;
@@ -19,6 +22,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509KeyManager;
+
+import util.KeyTool;
 
 public abstract class ClientConnection implements Closeable {
 	
@@ -67,6 +72,7 @@ public abstract class ClientConnection implements Closeable {
 			System.setProperty("javax.net.ssl.trustStorePassword", password);
 
 			SSLContext sc = SSLContext.getInstance("TLS");
+			
 
 			// Open the keystore, retrieve the private key, and certificate chain
 			KeyStore ks = KeyStore.getInstance("jks");
@@ -74,11 +80,12 @@ public abstract class ClientConnection implements Closeable {
 
 			KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 			kmf.init(ks, password.toCharArray());
+			
 
 			KeyManager[] kms = kmf.getKeyManagers();
 	        for (int i = 0; i < kms.length; i++) {
 	            if (kms[i] instanceof X509KeyManager) {
-	                kms[i] = new AliasForcingKeyManager((X509KeyManager) kms[i], clientAlias);
+	                kms[i] = new AliasForcingKeyManager((X509KeyManager) kms[i], clientAlias, password, ks);
 	            }
 	        }
 			
@@ -134,10 +141,14 @@ public abstract class ClientConnection implements Closeable {
 
         X509KeyManager baseKM = null;
         String alias = null;
+        KeyStore ks = null;
+        String password = null;
 
-        public AliasForcingKeyManager(X509KeyManager keyManager, String alias) {
+        public AliasForcingKeyManager(X509KeyManager keyManager, String alias, String password, KeyStore ks) {
             baseKM = keyManager;
             this.alias = alias;
+            this.ks = ks;
+            this.password = password;
         }
 
         /*
@@ -160,7 +171,14 @@ public abstract class ClientConnection implements Closeable {
         }
 
         public PrivateKey getPrivateKey(String alias) {
-            return baseKM.getPrivateKey(alias);
+        	PrivateKey pkey = null;
+        	try {
+				pkey = KeyTool.getPrivateKey(ks, alias, password);
+			} catch (NoSuchAlgorithmException | UnrecoverableEntryException
+					| KeyStoreException e) {
+				e.printStackTrace();
+			}
+            return pkey;//baseKM.getPrivateKey(alias);
         }
 
         public String[] getServerAliases(String keyType, Principal[] issuers) {
