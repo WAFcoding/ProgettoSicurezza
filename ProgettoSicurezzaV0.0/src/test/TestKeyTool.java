@@ -16,12 +16,12 @@ public class TestKeyTool {
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
-		String name = "/home/giovanni/workspaceSII/ProgettoSicurezza/Server/srv_keystore.jks";
+		String name = "/home/giovanni/Scrivania/keystore.jks";
 		KeyStore ks = KeyTool.loadKeystore(/*"/home/giovanni/Scrivania/test_ks.jks"*/name, "progettoSII");
-		Certificate cert = KeyTool.getCertificate(ks, "server");
-		System.out.println(cert.toString() + cert.getClass());
-		PrivateKey pk = KeyTool.getPrivateKey(ks, "server", "progettoSII");
-		System.out.println(pk);
+		//Certificate cert = KeyTool.getCertificate(ks, "server");
+		//System.out.println(cert.toString() + cert.getClass());
+		//PrivateKey pk = KeyTool.getPrivateKey(ks, "server", "progettoSII");
+		//System.out.println(pk);
 		
 		Date nb = new Date();
 		Date na = new Date();
@@ -35,7 +35,7 @@ public class TestKeyTool {
 		Certificate certgen2 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withDSA, pairdsa.getPublic(), pairdsa.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		Certificate certgen3 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withECDSA, pairecdsa.getPublic(), pairecdsa.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		Certificate certgen4 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withECDSA, pairecdsa.getPublic(), pairecdsa.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
-		Certificate certgen5 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withRSA, pair.getPublic(), pair.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
+		X509Certificate certgen5 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA1withRSA, pair.getPublic(), pair.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		Certificate certgen6 = CryptoUtility.createX509Certificate2(CERT_SIGALGO.SHA256withRSA, pair.getPublic(), pair.getPrivate(), "gio1", "Giovanni", "Rossi", "IT", "VeRo", "Rome", "IT","gio@email.test", nb, na);
 		
 		System.out.println(certgen);
@@ -45,13 +45,23 @@ public class TestKeyTool {
 		System.out.println(certgen5);
 		System.out.println(certgen6);
 		
-		CertData cdata = new CertData((X509Certificate)certgen5);
-		System.out.println(cdata.getIssuerDN() + " " + cdata.getSubjectDN() + " " + cdata.getSignatureAlgo());
+		//CertData cdata = new CertData((X509Certificate)certgen5);
+		//System.out.println(cdata.getIssuerDN() + " " + cdata.getSubjectDN() + " " + cdata.getSignatureAlgo());
 		
 		
+		KeyTool.addNewPrivateKey(ks, pair.getPrivate(), certgen5, "testtest", "password".toCharArray());
 		
 		//KeyTool.addCertificate(ks, certgen, "giovanni_key");
+		
 		KeyTool.storeKeystore(ks, name , "progettoSII");
+		
+		ks = KeyTool.loadKeystore(name, "progettoSII");
+		
+		System.out.println("Recovered");
+		PrivateKey pkey = KeyTool.getPrivateKey(ks, "testtest", "password".toCharArray());
+		System.out.println(new String(pkey.getEncoded()));
+		
+
 	}
 
 }

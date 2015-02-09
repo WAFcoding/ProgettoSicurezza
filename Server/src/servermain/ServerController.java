@@ -58,12 +58,11 @@ public abstract class ServerController {
 		System.setProperty("javax.net.ssl.trustStorePassword", new String(ServerMasterData.passphrase));
 
 		// recupero keystore
-		KeyStore ks = KeyStore.getInstance("JKS");
-		ks.load(new FileInputStream(ServerMasterData.keyStorePath),
-				ServerMasterData.passphrase);
+		//KeyStore ks = KeyStore.getInstance("JKS");
+		//ks.load(new FileInputStream(ServerMasterData.keyStorePath),ServerMasterData.passphrase);
 
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(ks, ServerMasterData.passphrase);
+		kmf.init(ServerMasterData.ks, ServerMasterData.passphrase);
 
 		// inizializzo contesto SSL
 		SSLContext sc = SSLContext.getInstance("TLS");

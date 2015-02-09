@@ -511,7 +511,7 @@ public class LayoutControl {
 			X509Certificate cert = (X509Certificate)certFactory.generateCertificate(new ByteArrayInputStream(bean.getCertificateData()));
 
 			KeyStore ks = KeyTool.loadKeystore(ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
-			KeyTool.addNewPrivateKey(ks, privateKey, cert, username, password.toCharArray());
+			KeyTool.addNewPrivateKey(ks, privateKey, cert, username, keystore_pwd.toCharArray());
 
 			KeyTool.storeKeystore(ks, ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
 		

@@ -1,7 +1,9 @@
 package servermain;
 import java.io.Console;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -49,8 +51,9 @@ public class ServerMain {
 	/**
 	 * Avvia il server e richiede le credenziali del keystore.
 	 * @param args	Non usati.
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		//caricamento configurazione
 		ServerConfig conf = ServerConfig.getInstance();
@@ -75,6 +78,8 @@ public class ServerMain {
 		
 		ServerMasterData.passphrase = "progettoSII".toCharArray();//pwd;
 		ServerMasterData.keyStorePath = conf.getProperty(ServerConfig.KEYSTORE_PATH);
+		ServerMasterData.ks = KeyStore.getInstance("JKS");
+		ServerMasterData.ks.load(new FileInputStream(ServerMasterData.keyStorePath), ServerMasterData.passphrase);
 		
 		try {
 			new SecServerController().startServer();
