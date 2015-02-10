@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2014.1.24)  10 FEB 2015 12:56
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2014.1.24)  10 FEB 2015 17:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -641,7 +641,8 @@ Package: rotating 2009/03/28 v2.16a rotated objects in LaTeX
 Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
 less on input line 36.
 
-No file Relazione.aux.
+(build/Relazione.aux (build/Capitolo_1.aux) (build/Capitolo_2.aux)
+(build/Capitolo_3.aux) (build/Capitolo_4.aux) (build/Appendice_A.aux))
 \openout1 = `Relazione.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 50.
@@ -660,6 +661,7 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 50.
 LaTeX Font Info:    ... okay on input line 50.
 LaTeX Info: Redefining \it@ocap on input line 50.
 LaTeX Info: Redefining \it@ccap on input line 50.
+
 
 File italian.ldf warning: 
 italian.ldf    With OT1 encoding guillemets are poorly faked
@@ -681,6 +683,8 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 50.
 LaTeX Info: Redefining \pageref on input line 50.
 LaTeX Info: Redefining \nameref on input line 50.
+
+(build/Relazione.out) (build/Relazione.out)
 \@outlinefile=\write3
 \openout3 = `Relazione.out'.
 
@@ -724,7 +728,7 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 61.
 (/usr/local/texlive/2013/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<Immagini/logo_tor_vergata.png, id=6, 1003.75pt x 1156.32pt>
+<Immagini/logo_tor_vergata.png, id=70, 1003.75pt x 1156.32pt>
 File: Immagini/logo_tor_vergata.png Graphic file (type png)
 
 <use Immagini/logo_tor_vergata.png>
@@ -744,13 +748,14 @@ LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <29.86> not available
 LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <29.86> not available
 (Font)              size <24.88> substituted on input line 73.
 
+(build/Relazione.toc)
 \tf@toc=\write4
 \openout4 = `Relazione.toc'.
 
-[1
+ [1
 
 
-]
+] (build/Relazione.lof)
 \tf@lof=\write5
 \openout5 = `Relazione.lof'.
 
@@ -761,22 +766,24 @@ LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <29.86> not available
 
  (./Capitolo_1.tex
 Capitolo 1.
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 13.
-(/usr/local/texlive/2013/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 13.
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.20 
-      [1
+l.17 R
+      iassumendo quindi, per quanto riguarda le funzionalità principali, il...
+[1
 
 
 
-])
+]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 19.
+ (/usr/local/texlive/2013/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 19.
+
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 14.49998pt.
@@ -784,11 +791,25 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [2]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 14.49998pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[3])
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 14.49998pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[4]
 \openout2 = `Capitolo_2.aux'.
 
  (./Capitolo_2.tex
 Capitolo 2.
-) [3
+) [5
 
 
 
@@ -797,7 +818,7 @@ Capitolo 2.
 
  (./Capitolo_3.tex
 Capitolo 3.
-) [4
+) [6
 
 
 
@@ -806,17 +827,26 @@ Capitolo 3.
 
  (./Capitolo_4.tex
 Capitolo 4.
-) [5
+) [7
 
 
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 92.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 92.
+\openout2 = `Appendice_A.aux'.
+
+ (./Appendice_A.tex
+Appendice A.
+) [8
+
+
+
+]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 93.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 93.
  (build/Relazione.aux (build/Capitolo_1.aux) (build/Capitolo_2.aux)
-(build/Capitolo_3.aux) (build/Capitolo_4.aux))
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 92.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 92.
+(build/Capitolo_3.aux) (build/Capitolo_4.aux) (build/Appendice_A.aux))
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 93.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 93.
 Package rerunfilecheck Info: File `Relazione.out' has not changed.
 (rerunfilecheck)             Checksum: <no file>.
 
@@ -824,28 +854,32 @@ Package rerunfilecheck Info: File `Relazione.out' has not changed.
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 4.98pt have occurred.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 10310 strings out of 493308
- 146313 string characters out of 6137822
- 244791 words of memory out of 5000000
- 13552 multiletter control sequences out of 15000+600000
- 10123 words of font info for 38 fonts, out of 8000000 for 9000
+ 10413 strings out of 493308
+ 147709 string characters out of 6137822
+ 248822 words of memory out of 5000000
+ 13610 multiletter control sequences out of 15000+600000
+ 17751 words of font info for 68 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 32i,11n,43p,794b,365s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
-></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><
-/usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></u
-sr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></us
-r/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr
-/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on build/Relazione.pdf (8 pages, 131681 bytes).
+ 33i,11n,43p,794b,452s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
+></usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
+</usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
+usr/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></us
+r/local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/
+local/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/loc
+al/texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/
+texlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl12.pfb></usr/local/t
+exlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/te
+xlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/tex
+live/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texl
+ive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texli
+ve/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on build/Relazione.pdf (11 pages, 233017 bytes).
 PDF statistics:
- 89 PDF objects out of 1000 (max. 8388607)
- 70 compressed objects within 1 object stream
- 23 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 203 PDF objects out of 1000 (max. 8388607)
+ 173 compressed objects within 2 object streams
+ 30 named destinations out of 1000 (max. 500000)
+ 134 words of extra memory for PDF output out of 10000 (max. 10000000)
 

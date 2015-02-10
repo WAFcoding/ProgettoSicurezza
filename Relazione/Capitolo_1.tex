@@ -7,8 +7,14 @@
 \section{Scopo del progetto}
 	\label{sec:scopo}
 
-Il progetto sviluppato in questi mesi per il corso di ``Sicurezza Informatica e Internet'' si propone come scopo quello di realizzare un'applicazione che permetta a due o più utenti di scambiarsi documenti cartacei in modo sicuro. In particolare questo significa che l'utente che utilizza tale sistema deve essere in grado di compilare un foglio con informazioni sensibili e di mandarlo ad un insieme di utenti facendo in modo che nessun altro al di fuori dei destinatari possa leggerne il contenuto. Viceversa i destinatari devono essere altrettanto sicuri del fatto che durante il trasferimento nessuno possa alterare il documento senza che chi lo riceve se ne accorga.
-Quindi, riassumendo, il sistema dovrebbe permettere di:
+Il progetto sviluppato in questi mesi per il corso di ``Sicurezza Informatica e Internet'' si propone come scopo quello di realizzare un'applicazione che permetta a due o più utenti di scambiarsi documenti cartacei in modo sicuro. In particolare questo significa che chi utilizza tale sistema deve essere in grado di compilare un foglio con informazioni sensibili e di mandarlo ad un insieme di utenti facendo in modo che nessun altro al di fuori dei destinatari possa leggerne il contenuto. Viceversa i destinatari devono essere altrettanto sicuri del fatto che durante il trasferimento nessuno possa aver alterato il documento senza che chi lo riceve se ne accorga.
+La sfida più importante è rappresentata dal fatto che le informazioni da proteggere vengono trasportate insieme al documento stampato. Un modo di realizzare questa funzionalità è quello di inserire dei \emph{QR-Code}, contenenti le informazioni cifrate, all'interno della pagina da inviare, in modo tale che i destinatari, purché in possesso delle chiavi, riescano a decifrarlo e a leggerlo agevolmente.
+Tuttavia bisogna garantire anche che il documento in questione non venga contraffatto durante il percorso: se non ci fosse nessuna garanzia su questo, chiunque potrebbe cambiare i QR-Code relativi a certe informazioni (per esempio con un attacco Man~In~The~Middle) e far credere che tutto sia rimasto inalterato ai reali destinatari.
+
+Per lo sviluppo di questo progetto si è deciso di contestualizzare il tutto ad un ambiente di tipo amministrativo dove lo scambio di documenti è molto frequente.
+La contestualizzazione del progetto è molto importante perché da questo dipendono le modalità di utilizzo del servizio stesso, e quindi, di conseguenza l'architettura generale del sistema che cambia in modo considerevole a seconda dei casi. Nei prossimi capitoli sarà spiegato meglio questo punto.  
+
+Riassumendo quindi, per quanto riguarda le funzionalità principali, il sistema dovrebbe permettere di:
 \begin{itemize}
 	\item compilare un documento contenente qualsiasi tipo di informazione;
 	\item cifrare in tutto o in parte il documento appena scritto;
@@ -16,10 +22,48 @@ Quindi, riassumendo, il sistema dovrebbe permettere di:
 	\item firmare il documento in modo tale che il mittente non possa ripudiarne la provenienza e i destinatari possano accorgersi di eventuali manomissioni durante il trasferimento;
 	\item specificare diversi livelli di privilegio gerarchici per la lettura delle informazioni.
 \end{itemize}
-Quest'ultimo punto in particolare rappresenta un requisito importante. Può capitare, infatti, soprattutto in ambienti amministrativi, di voler pubblicare un certo documento pur mantenendo segrete alcune informazioni sensibili. In questo caso la soluzione più ovvia potrebbe essere quella di pubblicare versioni diverse dello stesso documento oscurando opportunamente sulle diverse copie le informazioni che si vogliono tenere segrete a ciascun gruppo. Questo processo può risultare lungo, macchinoso e poco sicuro: è possibile, infatti, che qualche copia possa finire al destinatario sbagliato se non si prendono precauzioni.
-
-\section{Stato dell'arte}
-	\label{sec:statoarte}
+Quest'ultimo punto in particolare rappresenta un requisito importante. Può capitare, infatti, di voler pubblicare un certo documento pur mantenendo segrete alcune informazioni sensibili da lasciare a disposizione di pochi eletti. In questo caso la soluzione più ovvia potrebbe essere quella di pubblicare versioni diverse dello stesso documento oscurando opportunamente sulle diverse copie le informazioni che si vogliono tenere segrete a ciascun gruppo. Questo processo può risultare lungo, macchinoso e poco sicuro: è possibile, infatti, che qualche copia possa finire al destinatario sbagliato se non si prendono opportune precauzioni.
+Ci si è quindi occupato di realizzare un sistema che permettesse di cifrare contenuti particolari, con chiavi speciali (che da ora in poi chiameremo \textbf{chiavi di livello}), le quali distribuite ad utenti opportuni, permettono di nascondere informazioni ad alcuni gruppi di utenti che hanno un \textbf{livello di fiducia} (o \textbf{Trust~Level}) più basso.
 
 \section{Tecnologie Utilizzate}
 	\label{sec:tecnologie}
+Gli obiettivi appena illustrati, danno un'idea delle tante problematiche che l'applicazione deve affrontare. Per questo sono molte le tecnologie che sono state messe in gioco. Di seguito si riportano quelle utilizzate maggiormente.
+
+\subsection{Strumenti di sviluppo}
+Per quanto riguarda gli strumenti, si è fatto uso di
+\begin{itemize}
+		\item \textbf{Eclipse Luna} come IDE per la gestione del progetto e dei file sorgente;
+		\item \textbf{Apache Maven v2.2} per la gestione delle dipendenze e del ciclo di vita dell'applicazione;
+		\item \textbf{Git} per il \emph{versioning} e la condivisione dei sorgenti nel team (in particolare si è usato un repository pubblico\footnote{Per certi versi si è seguito il principio di \emph{Auguste Kerckhoffs} secondo cui ``\emph{in un sistema crittografico è importante tener segreta la chiave, non l'algoritmo di crittazione}''.} su \emph{GitHub} come piattaforma online di condivisione\footnote{Link del repository:\url{https://github.com/WAFcoding/ProgettoSicurezza.git}});
+\end{itemize}
+
+\subsection{Linguaggio e librerie utilizzate}
+In questo progetto è stato utilizzato \texttt{Java} come linguaggio di programmazione principale. I motivi di questa scelta ricadono principalmente su:
+\begin{itemize}
+	\item il paradigma Object-Oriented che ha permesso l'utilizzo di architectural e creational pattern  per risolvere le problematiche più comuni, come Façade, Factory Method, Abstract Factory, DAO e Singleton che sono stati ampiamente utilizzati nello sviluppo;
+	\item l'alta manutenibilità del codice;
+	\item la portabilità su altre piattaforme diverse da quella di sviluppo;
+	\item la grande quantità di librerie presenti a supporto degli obiettivi descritti prima.
+\end{itemize}
+
+Per quanto riguarda invece i singoli moduli del software sviluppato, si sono utilizzati diversi framework e librerie.
+Per la parte di sicurezza c'è:
+\begin{itemize}
+	\item \texttt{JCA/JCE} (Java~Cryptographic~Architecture/Java~Criptographic~Extension) come framework e provider dei principali algoritmi di cifratura, firma e hashing;
+	\item \texttt{BouncyCastle} che si integra con JCA/JCE  e fornisce un maggior numero di algoritmi di cifratura e firma nonché funzioni di generazione di certificati; 
+\end{itemize}
+
+Per il modulo di elaborazione dei documenti:
+\begin{itemize}
+	\item \texttt{ImageMagik} per la manipolazione delle immagini dei documenti acquisiti per la decodifica;
+	\item \texttt{ZXing} per la generazione e lettura di QR-Code (in generale supporta molti tipi di codici a barre sia 1D che 2D);
+	\item \texttt{iTextPDF} per la generazione di documenti ad alta risoluzione ed il posizionamento preciso di testo e QR-Code nel documento;
+	\item \texttt{Tesseract} ed in particolare il wrapper Java \texttt{Tess4J} per il recupero del testo dopo la scansione dei documenti.
+\end{itemize}
+
+Per la parte di persistenza invece si è fatto uso di:
+\begin{itemize}
+	\item \texttt{MySQL} come database relazionale per il sistema di \emph{provisioning} delle chiavi e la gestione degli utenti;
+	\item \texttt{SQLite} per la gestione dei dati locali di ogni singolo utente (sotto forma di database cifrato);
+	\item \texttt{Hibernate} come framework per la gestione dei database (MySQL e SQLite), ed in particolare il modulo \texttt{ORM} (Object-Relational~Mapping).
+\end{itemize}
