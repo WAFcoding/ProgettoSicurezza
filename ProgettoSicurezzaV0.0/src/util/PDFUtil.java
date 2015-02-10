@@ -52,7 +52,7 @@ public class PDFUtil {
 	private static final float TITLEY= PAGESIZE.getHeight() - 30 - 10;
 	private static final float AUTHORX= TITLEX;
 	private static final float AUTHORY= TITLEY - 20 - 10;
-	private static final float INFOX= TITLEX + 50;
+	private static final float INFOX= TITLEX;
 	private static final float INFOY= AUTHORY - 10 - 10;
 	private static final float DEFSIZETEXT= 11;
 	private static final float DEFSIZELINE= 0.05f;
@@ -60,9 +60,11 @@ public class PDFUtil {
 	private static final float RECTHEIGHT= 101;
 	private static final float SIGNATUREX= PAGESIZE.getWidth() - 10 - RECTWIDTH;
 	private static final float SIGNATUREY= 10 + RECTWIDTH;
+	private static final float INFOQRCODEX= SIGNATUREX - 10 - RECTHEIGHT;
+	private static final float INFOQRCODEY= 10 + RECTHEIGHT;
 	
 
-	public static final String LOGO_PATH= "/home/pasquale/Developing/WorkSpace/Java/ProgettoSicurezza/ProgettoSicurezzaV0.0/files/logoroma_torvergata.jpg";
+	public static final String LOGO_PATH= "./files/logoroma_torvergata.jpg";
 	
 	private static PdfWriter pdfwr;
 	private static Document doc;
@@ -270,11 +272,11 @@ public class PDFUtil {
 		pdfcb.endText();
 	}
 	
-	public static void addSubtitleInfo(String date, String pagenumber, String info, String receiver){
+	public static void addSubtitleInfo(String date, String receiver){
 
 		pdfcb.beginText();
 		pdfcb.setFontAndSize(bf_helv, 10);
-		String allInfo= date + " - " + pagenumber + " - " + info + " - " + receiver;
+		String allInfo= receiver + "-" + date;
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, allInfo, INFOX, INFOY, 0);
 		pdfcb.endText();
 	}
@@ -320,16 +322,18 @@ public class PDFUtil {
         reader.close();
 	}
 	
-	public static void createDocument(String title, String author, String text, String signaturePath, String[] subtitleInfo, String[] qrCodes){
+	public static void createDocument(String title, String author, String text, String signaturePath, String infoQrCodePath, String[] subtitleInfo, String[] qrCodes){
 		try {
 			addLogo(LOGO_PATH);
 			addTitle(title);
 			addAuthor(author);
-			addSubtitleInfo(subtitleInfo[0], subtitleInfo[1], subtitleInfo[2], subtitleInfo[3]);
+			addSubtitleInfo(subtitleInfo[0], subtitleInfo[1]);
 			addRectangle(SIGNATUREX, SIGNATUREY, RECTWIDTH, RECTHEIGHT);
 			if(signaturePath != null && !signaturePath.equals("")){
 				addQRCodeImage(signaturePath, SIGNATUREX + 1, SIGNATUREY + 1 - RECTHEIGHT);
 			}
+			addRectangle(INFOQRCODEX, INFOQRCODEY, RECTWIDTH, RECTHEIGHT);
+			addQRCodeImage(infoQrCodePath, INFOQRCODEX + 1, INFOQRCODEY + 1 - RECTHEIGHT); 
 			addLineHorizontal(10, 150, 0);
 			addText(text, 10, 170, 0);
 			addLineHorizontal(10, 600, 0);
@@ -383,7 +387,8 @@ public class PDFUtil {
 	 */
 	public static void createResumeTable(String text1, String text2, String text3, String text4, String text5,
 										 String text6, String text7, String text8, String text9, String text10,
-										 String text11, String text12, String text13, String text14, String text15) throws DocumentException, MalformedURLException, IOException{
+										 String text11, String text12, String text13, String text14, 
+										 String text15, String text16) throws DocumentException, MalformedURLException, IOException{
 		addLogo(LOGO_PATH);
 		addTitle("Registration resume");
 		PDFUtil.addLineHorizontal(10, 150, 0);
@@ -421,7 +426,9 @@ public class PDFUtil {
 		table.addCell(text14);
 		table.addCell("Secure ID");
 		table.addCell(text15);
-		table.writeSelectedRows(0, 15, 20, PAGESIZE.getHeight() - 170, pdfcb);
+		table.addCell("Trust Level");
+		table.addCell(text16);
+		table.writeSelectedRows(0, 16, 20, PAGESIZE.getHeight() - 170, pdfcb);
 		
 		//doc.add(table);
 	}

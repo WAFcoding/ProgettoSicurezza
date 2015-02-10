@@ -13,7 +13,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -39,15 +41,23 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
     private JList<String> list;
     private DefaultListModel<String> list_model;
     private ArrayList<String> list_items;
+    private ArrayList<User> all_user;
+    private ArrayList<String> all_level_key;
     private JScrollPane scroll_pane;
 	public final static String keystore_pwd= "progettoSII";
 	public final static String url= "localhost";//TODO UserManager: inserire il url nei settings
+    private String list_selected;
+    private int pos_list_selected;
+    private User actualUser;
 
 
-	public ReceiverSettingsLayout(LayoutControl control, Container pane, boolean singleUser) {
+	public ReceiverSettingsLayout(LayoutControl control, Container pane) {
+		actualUser= control.getUser_manager().getActualUser();
 		setControl(control);
 		setPane(pane);
-		setSingleUser(singleUser);
+		
+		all_user= new ArrayList<User>();
+		all_level_key= new ArrayList<String>();
         
     	list= new JList<String>();
         list_model= new DefaultListModel<String>();
@@ -58,36 +68,41 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
         list.setSelectedIndex(-1);
 
 		list_items= new ArrayList<String>();
-		if(isSingleUser()){
-	
-			String username= control.getUser_manager().getActualUser().getName() + "_" + control.getUser_manager().getActualUser().getID();
-			String pwd= control.getUser_manager().getActualUser().getPassword();
-			try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, username, keystore_pwd, pwd)) {
-				if(cli != null){
-					List<User> users = cli.getAllUsers();
-					if(users == null) 
-						System.out.println("users is null");
-					System.out.println(users);
-					for(User u : users){
-						list_items.add(u.getName() + " " + u.getSurname() + " - " + u.getTrustLevel());
-					}
-				}
-				else 
-					System.out.println("cli is null");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-		}
-		else{
-
-			//TODO richiesta al server della chiave di livello
-		}
-		updateList();
 	}
 
 	@Override
 	public void addComponentsToPane() {
+
+
+		String username= actualUser.getName() + "_" + actualUser.getID();
+		String pwd= control.getUser_manager().getActualUser().getPassword();
+		try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, username, keystore_pwd, pwd)) {
+			if(isSingleUser()){
+				List<User> users = cli.getAllUsers();
+				list_items.clear();
+				all_user.clear();
+				for(User u : users){
+					all_user.add(u);
+					list_items.add(u.getName() + " " + u.getSurname() + " - " + u.getTrustLevel());
+				}
+			}
+			else{
+				Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
+				list_items.clear();
+				all_level_key.clear();
+				Iterator it = levelKey.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry pairs = (Map.Entry)it.next();
+					list_items.add("[ " +pairs.getKey() + " ] " + pairs.getValue());
+					all_level_key.add((String)pairs.getValue());
+					it.remove(); // avoids a ConcurrentModificationException
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		updateList();
 		
 		//inserimento pulsanti
         pane.removeAll();
@@ -132,8 +147,11 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
+				if(isSingleUser())
+					control.setUserForEncryptOrDecrypt(all_user.get(pos_list_selected));
+				else
+					control.setKeyLevelForEncryptDecrypt(list_items.get(pos_list_selected));
+				control.setLayout("WRITE");
 			}
 		});		
 		pane.add(button, c);
@@ -166,8 +184,38 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
-		
+		if(!e.getValueIsAdjusting()){
+			if(list.getSelectedValuesList().size() > 1){
+				System.out.println("selezione multipla ");
+				for(String s : list.getSelectedValuesList()){
+
+					System.out.println(s);
+				}
+			}
+			else{
+				String selected= list.getSelectedValue();
+				int pos_selected= list.getSelectedIndex();
+				if(selected != null && pos_selected != -1){
+					setList_selected(selected);
+					setPos_list_selected(pos_selected);
+					System.out.println("selezionato " + selected + ", posizione " + pos_selected);
+				}
+			}
+		}
+	}
+	public String getList_selected() {
+		return list_selected;
+	}
+
+	public void setList_selected(String list_selected) {
+		this.list_selected = list_selected;
+	}
+	public int getPos_list_selected() {
+		return pos_list_selected;
+	}
+
+	public void setPos_list_selected(int pos_list_selected) {
+		this.pos_list_selected = pos_list_selected;
 	}
 	
 	public void updateList(){

@@ -361,7 +361,6 @@ public class CryptoUtility {
 
 		return c.doFinal(data);
 	}
-	
 	/**
 	 * Decripta i dati in input usando un cifrario asimmetrico.
 	 * @param algo	L'algoritmo a chiave asimmetrica da usare.

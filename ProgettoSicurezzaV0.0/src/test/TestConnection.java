@@ -99,7 +99,7 @@ public class TestConnection {
 		
 		try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, "simone_1", password, password)) {
 			String key = cli.getLevelKey(2);
-			String pkey = cli.getUserPublicKey("Giovanni_1");
+			String pkey = cli.getUserPublicKey("iole_1");
 			List<User> users = cli.getAllUsers();
 			Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
 			System.out.println("key: "+key);

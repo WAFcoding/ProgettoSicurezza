@@ -186,7 +186,7 @@ public class UserManager {
 		String private_key= "";
 		String secid= "";
 		try {
-			key = getKey();
+			key = CryptoUtility.genKeyPairRSA();
 			public_key= CryptoUtility.toBase64(key.getPublic().getEncoded()).replace("\n", "");
 			private_key= CryptoUtility.toBase64(key.getPrivate().getEncoded()).replace("\n", "");
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
@@ -234,7 +234,8 @@ public class UserManager {
 			user.setPublicKey(public_key);
 			user.setPrivateKey(private_key);
 			user.setPassword(hash_password);
-			user.setTrustLevel(-1);
+			int trustLevel= -1;
+			user.setTrustLevel(trustLevel);
 
 			try(RegistrationClient reg = ConnectionFactory.getRegistrationServerConnection(url, keystore_pwd)) {
 				secid = reg.submitRegistration(user);
@@ -264,7 +265,7 @@ public class UserManager {
 			//TODO UserManager: encode del file serializzato
 			
 			createPdfResume(name, surname, password, code, mail, city, country, country_code, organization, 
-							dir_def, dir_out, dir_in, public_key, private_key, secid);
+							dir_def, dir_out, dir_in, public_key, private_key, secid, String.valueOf(trustLevel));
 			
 			String registration_summary= "E' stato creato un pdf contenente i dati inseriti in " + dir_def + "/" + code + ".pdf";
 			
@@ -429,7 +430,7 @@ public class UserManager {
 	
 	public void createPdfResume(String name, String surname, String password, String code, String mail, String city, 
 			String country, String country_code, String organization, String dir_def, String dir_out, 
-			String dir_in, String public_key, String private_key, String secid){
+			String dir_in, String public_key, String private_key, String secid, String trustLevel){
 		
 		try {
 			PDFUtil.create(dir_def + "/" + code + ".pdf");
@@ -437,7 +438,9 @@ public class UserManager {
 				PDFUtil.addCredentials(code, "Credentials", "Registration", 
 										"ProgettoSicurezza", "ProgettoSicurezza");
 				try {
-					PDFUtil.createResumeTable(name, surname, password, code, mail, city, country, country_code, organization, dir_def, dir_out, dir_in, public_key, private_key, secid);
+					PDFUtil.createResumeTable(name, surname, password, code, mail, city, 
+											  country, country_code, organization, dir_def, 
+											  dir_out, dir_in, public_key, private_key, secid,trustLevel );
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -450,44 +453,36 @@ public class UserManager {
 	
 	public void updateActualUserTrustLevel(int trustLevel){
 		
+		System.out.println("Update DB");
+		
+		User actualUser= control.getUser_manager().getActualUser();
+		
 		if(!HibernateUtil.isCreated()){
-			HibernateUtil.setDbPath(getActualUser().getDir_def());
-			HibernateUtil.decryptDb(getActualUser().getPassword());
+			HibernateUtil.setDbPath(control.getActualDbPath());
+			HibernateUtil.decryptDb(actualUser.getPassword());
 			HibernateUtil.createSession();
 		}
 		
 		Session session= HibernateUtil.getSessionFactory().openSession();
-		
 		Transaction tx= null;
 		try{
-			
 			tx= session.beginTransaction();
-			String hql= "from User where iD = :id";
-			Query query= session.createQuery(hql);
-			query.setParameter("id", getActualUser().getID());
-			List<User> result= query.list();
 			
-			if(result != null){
-				User tmp_user= result.get(0);
-				System.out.println("result not null");
-				tmp_user.setTrustLevel(trustLevel);
-				session.update(tmp_user);
-			}
-			else{
-				System.out.println("result is null");
-			}
+			//control.getUser_manager().printActualUser();
+			actualUser.setTrustLevel(trustLevel);
+			
+			session.update(actualUser);
 			
 			tx.commit();
 			
-		}
-		catch(Exception e){
+		}catch (Exception e) {
 			if(tx != null) tx.rollback();
 			e.printStackTrace();
 		}
 		finally{
 			session.close();
 			HibernateUtil.shutdown();
-			HibernateUtil.encryptDb(getActualUser().getPassword());
+			HibernateUtil.encryptDb(actualUser.getPassword());
 		}
 		
 	}

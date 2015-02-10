@@ -1,12 +1,7 @@
 package layout;
 
-import java.awt.Dimension;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -17,15 +12,16 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import usersManagement.User;
+import usersManagement.UserManager;
+import util.CryptoUtility;
+import util.KeyTool;
 import connection.ClientConfig;
 import connection.ConnectionFactory;
 import connection.RegistrationClient;
 import entities.RegistrationBean;
 import entities.Settings;
 import entities.SettingsControl;
-import usersManagement.UserManager;
-import util.CryptoUtility;
-import util.KeyTool;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -56,8 +52,12 @@ public class LayoutControl {
 	private String[] image_types= {"gif", "jpg", "png", "bmp", "pdf"};
 	private String[] text_types= {"txt"};
 	private String w_layout_currentFilePath;
+	private boolean receiverSingleUser= true;
 	
 	private UserManager user_manager;
+	
+	private User userForEncryptOrDecrypt;
+	private String KeyLevelForEncryptDecrypt;
 	
 	private enum LAYOUT{
 		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER, DECODE
@@ -237,13 +237,14 @@ public class LayoutControl {
 	
 	public void ReceiverLayout(){
 		if(rec_layout == null){
-			rec_layout= new ReceiverSettingsLayout(this, mainFrame.getContentPane(), true);
+			rec_layout= new ReceiverSettingsLayout(this, mainFrame.getContentPane());
 		}
+		rec_layout.setSingleUser(receiverSingleUser);
 		rec_layout.addComponentsToPane();
 	}
 	
 	public void setReceiverSingleUSer(boolean b){
-		rec_layout.setSingleUser(b);
+		this.receiverSingleUser= b;
 	}
 	
 	/**
@@ -496,8 +497,8 @@ public class LayoutControl {
 			PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(privKey)));
 
 			RegistrationBean bean = reg.retrieveRegistrationDetails(secureId);
-			//int trustLevel= bean.getTrustLevel();
-			//getUser_manager().updateActualUserTrustLevel(trustLevel);
+			int trustLevel= bean.getTrustLevel();
+			getUser_manager().updateActualUserTrustLevel(trustLevel);
 
 			System.out.println("trustLevel:" + bean.getTrustLevel());
 			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
@@ -522,5 +523,48 @@ public class LayoutControl {
 	
 	public String getWLayoutCurrentFilePath(){
 		return this.w_layout_currentFilePath;
+	}
+
+	/**
+	 * @return the userForEncryptOrDecrypt
+	 */
+	public User getUserForEncryptOrDecrypt() {
+		return userForEncryptOrDecrypt;
+	}
+
+	/**
+	 * @param userForEncryptOrDecrypt the userForEncryptOrDecrypt to set
+	 */
+	public void setUserForEncryptOrDecrypt(User userForEncryptOrDecrypt) {
+		this.userForEncryptOrDecrypt = userForEncryptOrDecrypt;
+		w_layout.setUser_receiver(userForEncryptOrDecrypt);
+	}
+
+	/**
+	 * @return the keyLevelForEncryptDecrypt
+	 */
+	public String getKeyLevelForEncryptDecrypt() {
+		return KeyLevelForEncryptDecrypt;
+	}
+
+	/**
+	 * @param keyLevelForEncryptDecrypt the keyLevelForEncryptDecrypt to set
+	 */
+	public void setKeyLevelForEncryptDecrypt(String keyLevelForEncryptDecrypt) {
+		KeyLevelForEncryptDecrypt = keyLevelForEncryptDecrypt;
+	}
+
+	/**
+	 * @return the receiverSingleUser
+	 */
+	public boolean isReceiverSingleUser() {
+		return receiverSingleUser;
+	}
+
+	/**
+	 * @param receiverSingleUser the receiverSingleUser to set
+	 */
+	public void setReceiverSingleUser(boolean receiverSingleUser) {
+		this.receiverSingleUser = receiverSingleUser;
 	}
 }

@@ -18,7 +18,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -30,6 +36,7 @@ import javax.swing.ScrollPaneConstants;
 
 import usersManagement.User;
 import util.CryptoUtility;
+import util.CryptoUtility.ASYMMCRYPTO_ALGO;
 import util.CryptoUtility.CRYPTO_ALGO;
 import util.CryptoUtility.HASH_ALGO;
 import util.PDFUtil;
@@ -54,7 +61,9 @@ public class WriteLayout implements GeneralLayout{
 	private File currentFile;
 	private boolean isAlreadyConfigured;
 	private boolean receiverSetted;
-	private User user;
+	private User user_sender;
+	private User user_receiver;
+	private String level_receiver;
 	private ArrayList<String> qrcodes_path;
 	private int current_qrcode= 0;
 
@@ -66,13 +75,18 @@ public class WriteLayout implements GeneralLayout{
 		this.isAlreadyConfigured= false;
 		this.receiverSetted= false;
 		
-		this.user= control.getUser_manager().getActualUser();
+		this.user_sender= control.getUser_manager().getActualUser();
 		
 		qrcodes_path= new ArrayList<String>(10);
 		for(int i=0; i<10; i++){
 			qrcodes_path.add("");
 		}
 		setOutput_folder(control.getUser_manager().getActualUser().getDir_out() +  "/");
+	}
+	
+	@Override
+	public void addComponentsToPane() {
+		
 		setCurrentFile(new File(control.getWLayoutCurrentFilePath()));
 		try {
 			BufferedReader buff= new BufferedReader(new FileReader(currentFile.getAbsolutePath()));
@@ -90,10 +104,7 @@ public class WriteLayout implements GeneralLayout{
 			e.printStackTrace();
 		}
 		
-	}
-	
-	@Override
-	public void addComponentsToPane() {
+		String tmp_user= "";
 		
 		area.setMargin(new Insets(5, 5, 5, 5));
 		area.setWrapStyleWord(true);
@@ -119,21 +130,38 @@ public class WriteLayout implements GeneralLayout{
 		c.fill = GridBagConstraints.HORIZONTAL;
 		pane.add(field_title, c);
 		//0.1 - author
+		tmp_user= control.getUser_manager().getActualUser().getName() + " " + control.getUser_manager().getActualUser().getSurname() + " [ " + control.getUser_manager().getActualUser().getTrustLevel() + " ]";
 		posy++;
-		field_author= new JTextField("Author");
+		field_author= new JTextField(tmp_user);
 		field_author.addFocusListener(new FocusOnClick(field_author, "Author"));
+		field_author.setEditable(false);
 		c.gridx= posx;c.gridy= posy;c.gridheight= 1;c.gridwidth= 6;c.weightx= 1;c.weighty=0;
 		pane.add(field_author, c);
 		//0.2 - receiver
 		posy++;
-		field_receiver= new JTextField("Receiver");
-		field_receiver.addFocusListener(new FocusOnClick(field_receiver, "Receiver"));
+		String tmp_receiver= "";
+		if(control.isReceiverSingleUser()){
+			if(user_receiver == null) tmp_receiver= "Receiver";
+			else tmp_receiver= user_receiver.getName() + " " + user_receiver.getSurname() + " [ " + user_receiver.getTrustLevel() + " ]";
+		}
+		else{
+			level_receiver= control.getKeyLevelForEncryptDecrypt();
+			System.out.println("level= " + level_receiver);
+			tmp_receiver= "Level " + level_receiver.substring(0, level_receiver.lastIndexOf("] ")+1);
+		}
+		field_receiver= new JTextField(tmp_receiver);
+		field_receiver.addFocusListener(new FocusOnClick(field_receiver, tmp_receiver));
+		field_receiver.setEditable(false);
 		c.gridx= posx;c.gridy= posy;c.gridheight= 1;c.gridwidth= 6;c.weightx= 1;c.weighty=0;
 		pane.add(field_receiver, c);
 		//0.3 - info
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		tmp_user= dateFormat.format(date);
 		posy++;
-		field_info= new JTextField("Info");
-		field_info.addFocusListener(new FocusOnClick(field_info, "Info"));
+		field_info= new JTextField(tmp_user);
+		field_info.addFocusListener(new FocusOnClick(field_info, tmp_user));
+		field_info.setEditable(false);
 		c.gridx= posx;c.gridy= posy;c.gridheight= 1;c.gridwidth= 6;c.weightx= 1;c.weighty=0;
 		pane.add(field_info, c);
 		// 0.2 - text area
@@ -274,7 +302,6 @@ public class WriteLayout implements GeneralLayout{
 			f.mkdir();
 		}
 		setNameFile(name);
-		setOutput_folder(path);
 	}
 	
 	/**
@@ -318,6 +345,34 @@ public class WriteLayout implements GeneralLayout{
 		this.receiverSetted = receiverSetted;
 	}
 	
+	/**
+	 * @return the user_sender
+	 */
+	public User getUser_sender() {
+		return user_sender;
+	}
+
+	/**
+	 * @param user_sender the user_sender to set
+	 */
+	public void setUser_sender(User user_sender) {
+		this.user_sender = user_sender;
+	}
+
+	/**
+	 * @return the user_receiver
+	 */
+	public User getUser_receiver() {
+		return user_receiver;
+	}
+
+	/**
+	 * @param user_receiver the user_receiver to set
+	 */
+	public void setUser_receiver(User user_receiver) {
+		this.user_receiver = user_receiver;
+	}
+
 	private class SelectReceiverAction implements ActionListener{
 		
 		@Override
@@ -328,14 +383,14 @@ public class WriteLayout implements GeneralLayout{
 			//utente specifico
 			if(choice == JOptionPane.YES_OPTION){
 				setReceiverSetted(true);
-				control.setLayout("RECEIVER");
 				control.setReceiverSingleUSer(true);
+				control.setLayout("RECEIVER");
 			}
 			//gruppo di utenti
 			else if(choice == JOptionPane.NO_OPTION){
 				setReceiverSetted(true);
-				control.setLayout("RECEIVER");
 				control.setReceiverSingleUSer(false);
+				control.setLayout("RECEIVER");
 			}
 		}
 	}
@@ -344,8 +399,8 @@ public class WriteLayout implements GeneralLayout{
 		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			//if(receiverSetted){
-			if(true){
+			if(receiverSetted){
+			//if(true){
 				String selected_text= area.getSelectedText();
 				int cursor_position= area.getCaretPosition() - selected_text.length();
 				System.out.println(selected_text);
@@ -367,9 +422,20 @@ public class WriteLayout implements GeneralLayout{
 					setAreaText(left_part + middle_part + right_part); 
 
 					try {
-						//TODO prendere la chiave pubblica per criptare dal controller
-						byte[] encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, selected_text, "giovannino");
-						String enc= new String(encripted);
+						String enc= "";
+						if(control.isReceiverSingleUser()){
+							user_receiver= control.getUserForEncryptOrDecrypt();
+							PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(CryptoUtility.fromBase64(user_receiver.getPublicKey())));
+							byte[] encripted= CryptoUtility.asymm_encrypt(ASYMMCRYPTO_ALGO.RSA, selected_text.getBytes(), publicKey);
+							enc= new String(encripted);
+						}
+						else{
+							level_receiver= control.getKeyLevelForEncryptDecrypt();
+							String tmp_level_key= level_receiver.substring(level_receiver.lastIndexOf("] "));
+							System.out.println("tmp_level_key = " + tmp_level_key);
+							byte[] encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, selected_text, tmp_level_key);
+							enc= new String(encripted);
+						}
 						System.out.println("lunghezza criptata = " + enc.length());
 						System.out.println("Selezione criptata: " + enc);
 
@@ -377,10 +443,7 @@ public class WriteLayout implements GeneralLayout{
 						qr.writeQRCode(enc, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
 						//configurePath();
 
-						//String qrcode_file= getOutput_folder()+"/"+getNameFile()+".jpg";
-						//TODO prendere il percorso per salvare dalle preferenze dell'utente
-						//String qrcode_file= "/home/pasquale/ProgettoSicurezza/qrcode_0.jpg";
-						String qrcode_file= control.getUser_manager().getActualUser().getDir_out() + "qrcode_0.jpg";
+						String qrcode_file= control.getUser_manager().getActualUser().getDir_out() + "/"+"qrcode_0.jpg";
 						int i=1;
 						while(checkExists(qrcode_file)){
 							qrcode_file= qrcode_file.substring(0, qrcode_file.lastIndexOf("_")+1);
@@ -428,67 +491,67 @@ public class WriteLayout implements GeneralLayout{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			//JFileChooser file_chooser= new JFileChooser(getOutput_folder());
-			//file_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			//int choose= file_chooser.showDialog(null, "SELEZIONA");
-			//String path="";
-			//if(choose == JFileChooser.APPROVE_OPTION){
-			if(true){
-				String name_file= JOptionPane.showInputDialog(getPane(), "inserisci il nome del file\nsenza estensione", "");
-				//setOutput_folder(file_chooser.getSelectedFile().getAbsolutePath() +  "/");
-				//path= getOutput_folder() + name_file +  ".pdf";
-				//File f= new File(path);
-				//f.mkdir();
-				String sign_path= getOutput_folder() + "sign.jpg";
-				//System.out.println("Il percorso scelto è: " + path);
-				try {
-					String pat_pdf= getOutput_folder() + name_file + ".pdf";
-					PDFUtil.create(pat_pdf);
-					if(PDFUtil.open()){
-						
-						String title= field_title.getText();
-						String author= field_author.getText();
-						String text= area.getText();
-						//hash del testo criptato
-						String signature= CryptoUtility.hash(HASH_ALGO.SHA1, text);
-						//firma dell'hash
-						byte[] enc= CryptoUtility.encrypt(CRYPTO_ALGO.AES, signature, control.getUser_manager().getActualUser().getPrivateKey());
-						QRCode qr= new QRCode();
-						qr.writeQRCode(new String(enc), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
-						qr.saveQRCodeToFile(sign_path);
-						
-						String[] info= {field_info.getText(), "", "", field_receiver.getText()};
-						String[] qrcodes= {"", "", "", "", "", "", "", "", "", ""};
-						for(int i=0; i<10; i++){
-							String tmp_path= qrcodes_path.get(i);
-							if(tmp_path != null)
-								qrcodes[i]= tmp_path;
-							else
-								qrcodes[i]= "";
-						}
 
-						PDFUtil.createDocument(title, author, text, sign_path, info, qrcodes);
-						PDFUtil.close();
+			String name_file= JOptionPane.showInputDialog(getPane(), "inserisci il nome del file\nsenza estensione", "");
+			String sign_path= getOutput_folder() + "sign.jpg";
+			String infQrCodePath= getOutput_folder() + "infoQrCode.jpg";
+			//System.out.println("Il percorso scelto è: " + path);
+			try {
+				String pat_pdf= getOutput_folder() + name_file + ".pdf";
+				PDFUtil.create(pat_pdf);
+				if(PDFUtil.open()){
+
+					String title= field_title.getText();
+					String author= field_author.getText();
+					String receiver= field_receiver.getText();
+					String text= area.getText();
+
+					//hash del testo criptato
+					String signature= CryptoUtility.hash(HASH_ALGO.SHA1, text);
+					//firma dell'hash
+					byte[] enc= CryptoUtility.encrypt(CRYPTO_ALGO.AES, signature, user_sender.getPrivateKey());
+					QRCode qr= new QRCode();
+					qr.writeQRCode(new String(enc), QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
+					qr.saveQRCodeToFile(sign_path);
+
+					//info per la decodifica in chiaro
+					QRCode qrInfo= new QRCode();
+					qrInfo.writeQRCode(author + "\n" + receiver, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
+					qrInfo.saveQRCodeToFile(infQrCodePath);
+
+
+					String[] info= {receiver, field_info.getText()};
+					String[] qrcodes= {"", "", "", "", "", "", "", "", "", ""};
+					for(int i=0; i<10; i++){
+						String tmp_path= qrcodes_path.get(i);
+						if(tmp_path != null)
+							qrcodes[i]= tmp_path;
+						else
+							qrcodes[i]= "";
 					}
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (DocumentException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
+
+					PDFUtil.createDocument(title, author, text, sign_path, infQrCodePath, info, qrcodes);
+					PDFUtil.close();
+					System.out.println("PDF salvato in " + pat_pdf);
 				}
-				finally{
-					File tmp_sign= new File(sign_path);
-					tmp_sign.delete();
-					for(String s : qrcodes_path){
-						File tmp_file= new File(s);
-						tmp_file.delete();
-					}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (DocumentException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			finally{
+				File tmp_sign= new File(sign_path);
+				tmp_sign.delete();
+				File tmp_infoQrCode= new File(infQrCodePath);
+				tmp_infoQrCode.delete();
+				for(String s : qrcodes_path){
+					File tmp_file= new File(s);
+					tmp_file.delete();
 				}
 			}
-			else if(false){
-				System.out.println("annullato");
-			}
+			setReceiverSetted(false);
 		}
 	}
 	
