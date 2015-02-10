@@ -20,7 +20,7 @@ public class RequestGetPublicKey extends Request {
 		if(user==null)
 			return new ResultInvalid("404 - PK not found for " + this.user);
 		
-		System.out.println(user.toString());
+		//System.out.println(user.toString());
 		return new ResultGetPublicKey(user.getPublicKey());
 	}
 

@@ -62,12 +62,12 @@ public abstract class SecRequestFactory {
 			CertData data = new CertData(cert);
 			
 			//solo test
-			System.out.println(data.getIssuerDN() + " " + data.getSubjectDN() + " " + data.getSignatureAlgo());
+			//System.out.println(data.getIssuerDN() + " " + data.getSubjectDN() + " " + data.getSignatureAlgo());
 
 			UserDAO udao = new UserDaoImpl();
 			trustedUser = udao.findUserByUsername(data.getSubjectParameter(TYPE.Name)+ "_" + data.getSubjectParameter(TYPE.UID));
 			
-			System.out.println(data.getSubjectParameter(TYPE.Name)+ "_" + data.getSubjectParameter(TYPE.UID));
+			System.out.println(data.getSubjectParameter(TYPE.Name)+ "_" + data.getSubjectParameter(TYPE.UID) + " was connected");
 		} catch(Exception e) {
 			e.printStackTrace();
 			return null;

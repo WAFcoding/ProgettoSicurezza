@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -59,7 +58,7 @@ public abstract class ServerController {
 
 		// recupero keystore
 		//KeyStore ks = KeyStore.getInstance("JKS");
-		//ks.load(new FileInputStream(ServerMasterData.keyStorePath),ServerMasterData.passphrase);
+		ServerMasterData.ks.load(new FileInputStream(ServerMasterData.keyStorePath),ServerMasterData.passphrase);
 
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(ServerMasterData.ks, ServerMasterData.passphrase);

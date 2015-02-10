@@ -22,6 +22,9 @@ public class SecServerController extends ServerController {
 	
 	public static final int SERVER_PORT = 8888;
 	
+	private SSLServerSocketFactory ssf = null;
+	private SSLServerSocket s = null;
+	
 	/**
 	 * Costruttore principale del controllore.
 	 * @param password	La password del keystore.
@@ -35,13 +38,25 @@ public class SecServerController extends ServerController {
 	 * @throws KeyManagementException
 	 */
 	public SecServerController() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException, UnrecoverableKeyException, KeyManagementException {
+		startOrRestartServer();
+	}
+	
+	public void startOrRestartServer() throws IOException, UnrecoverableKeyException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
+		if(s!=null)
+			s.close();
+		ssf = super.init();
 		
-		//creo socket per server
-		SSLServerSocketFactory ssf = super.init();
-		
-		SSLServerSocket s = (SSLServerSocket) ssf.createServerSocket(SERVER_PORT);		
+		this.s = (SSLServerSocket) ssf.createServerSocket(SERVER_PORT);		
 		s.setNeedClientAuth(true);
 
+		if(_mainServerThread==null) {
+			_mainServerThread = new SecServerThread(s);
+			return;
+		}
+		
+		stopServer();
 		_mainServerThread = new SecServerThread(s);
+		startServer();
+		
 	}
 }

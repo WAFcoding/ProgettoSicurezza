@@ -1,5 +1,6 @@
 package servermain;
 import java.io.IOException;
+import java.net.SocketException;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
@@ -24,7 +25,7 @@ public abstract class ServerThread extends Thread implements Runnable {
 		if(s==null)
 			throw new NullPointerException("Invalid SSL Server Socket");
 		this.socket = s;
-		printServerSocketInfo(this.socket);
+		//printServerSocketInfo(this.socket);
 	}
 
 	/**
@@ -35,11 +36,15 @@ public abstract class ServerThread extends Thread implements Runnable {
 		WorkerThread work = null;
 		while(true) {
 			try {
+				System.out.println("Listening:"+socket.getLocalPort());
 				SSLSocket sock = (SSLSocket)socket.accept();
+				//System.out.println("Accepted");
 				work = initWorker(sock);
 				work.setDaemon(true);
 				work.setName("Worker-"+System.currentTimeMillis());
 				work.start();
+			} catch (SocketException se) {
+				return;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

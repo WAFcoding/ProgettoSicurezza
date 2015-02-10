@@ -82,7 +82,9 @@ public class ServerMain {
 		ServerMasterData.ks.load(new FileInputStream(ServerMasterData.keyStorePath), ServerMasterData.passphrase);
 		
 		try {
-			new SecServerController().startServer();
+			ServerMasterData.srvController = new SecServerController();
+			ServerMasterData.srvController.startServer();
+			
 			new AuthServerController().startServer();
 		} catch (UnrecoverableKeyException | KeyManagementException
 				| KeyStoreException | NoSuchAlgorithmException
