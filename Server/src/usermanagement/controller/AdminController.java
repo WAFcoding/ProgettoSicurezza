@@ -1,10 +1,9 @@
 package usermanagement.controller;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyStore;
+import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -12,6 +11,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
@@ -77,7 +77,6 @@ public class AdminController {
 			//aggiunta al keystore del server
 			KeyTool.addCertificate(ServerMasterData.ks, certUser, user.getUID());
 			KeyTool.storeKeystore(ServerMasterData.ks, ServerMasterData.keyStorePath , ServerMasterData.passphrase);
-			ServerMasterData.ks.load(new FileInputStream(ServerMasterData.keyStorePath), ServerMasterData.passphrase);
 			
 			//aggiornamento DB
 			UserCertificateDAO bdao = new UserCertificateDaoImpl();
@@ -93,8 +92,13 @@ public class AdminController {
 			udao.saveUser(u);
 			user.setTrustLevel(trustLevel);
 			
+			ServerMasterData.srvController.startOrRestartServer();
+			
+			
 		} catch (KeyStoreException | NoSuchAlgorithmException
 				| CertificateException | IOException | UnrecoverableEntryException | InvalidKeyException | SecurityException | SignatureException | NoSuchProviderException | OperatorCreationException | InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
 			e.printStackTrace();
 		}		
 	}
@@ -126,10 +130,11 @@ public class AdminController {
 			if(ServerMasterData.ks!=null && ServerMasterData.ks.containsAlias(user.getUID())) {
 				KeyTool.removeEntry(ServerMasterData.ks, user.getUID());
 				KeyTool.storeKeystore(ServerMasterData.ks, ServerMasterData.keyStorePath, ServerMasterData.passphrase);
-				ServerMasterData.ks.load(new FileInputStream(ServerMasterData.keyStorePath), ServerMasterData.passphrase);
+				
+				ServerMasterData.srvController.startOrRestartServer();
 			}
 		} catch (KeyStoreException | NoSuchAlgorithmException
-				| CertificateException | IOException e) {
+				| CertificateException | IOException | UnrecoverableKeyException | KeyManagementException e) {
 			e.printStackTrace();
 		}
 		

@@ -97,7 +97,7 @@ public class TestConnection {
 	
 	public static void testUsage() throws Exception{
 		
-		try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, "simone_1", password, password)) {
+		try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, "claudio_1", password, password)) {
 			String key = cli.getLevelKey(2);
 			String pkey = cli.getUserPublicKey("iole_1");
 			List<User> users = cli.getAllUsers();

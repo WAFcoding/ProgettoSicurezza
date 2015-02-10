@@ -1,0 +1,92 @@
+\documentclass[12pt, a4paper, openany, oneside, titlepage]{book}	%opzione "twoside" anziché "oneside" per la stampa fronte-retro, "openrigth" anziché "openany" per far apparire i capitoli sempre a destra
+
+\usepackage[italian]{babel}
+\usepackage{fontenc}
+\usepackage[tc]{titlepic}									%gestisce l'immagine nel frontespizio
+%\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{indentfirst}									%indenta le prime righe
+%\usepackage{emptypage}								%elimina la numerazione delle pagine bianche
+\usepackage{fancyhdr}									%gestisce note a margine, note a piè di pagina, e intestazioni
+\usepackage[pagebackref]{hyperref}						%gestisce i collegamenti ipertestuali
+\usepackage[scaled=0.95]{helvet}\selectfont					%utilizza il font selezionato per tutto il documento
+\usepackage{graphicx}									%include le figure
+\usepackage{float}										%package per il posizionamento delle figure
+\usepackage{amsmath}									%include l'ambiente matematico
+\usepackage{enumitem}									%include l'ambiente per le enumerazioni
+\usepackage{varwidth}									%permette di centrare le enumerazioni
+\usepackage[nottoc]{tocbibind}							%gestisce il sommario
+\usepackage{enumitem}									%permette di riprendere il conto di una enumerazione dove era stato interrotto
+%\usepackage{clrscode3e}									%permette di scrivere pseudocodice (il file relativo si trova nella stessa cartella di questo sorgente Latex)
+\usepackage{subfigure}									%permette di inserire sottofigure
+\usepackage{amsfonts}									%gestisce il font matematico
+\usepackage{amssymb}									%gestisce i simboli matematici
+%\usepackage{epigraph}									%per la scrittura delle epigrafi a inizio capitolo
+%\usepackage{midpage}									%per scrivere al centro della pagina
+%\usepackage{extsizes}									%per utilizzare il tipo 'extbook'
+\usepackage{listings}									%per inserire codice sorgente nel documento
+\usepackage{color}										%per la gestione dei colori
+\usepackage{pifont}									%introduce alcuni simboli
+\usepackage{moresize}									%introduce nuove dimensioni per il testo
+\usepackage{pdfpages}
+\usepackage{rotating}
+
+\pagestyle{fancy}
+%\fancyhf{\small\thepage}
+\fancyhead[RO, LE]{}										%solo i titotli dei capitoli in alto
+%\fancyhead[RO, LE]{\small\thepage}
+%\fancyhead[RE]{\small\nouppercase{\leftmark}}
+%\fancyhead[RO,LE]{\small\thepage}
+
+\def \openquote{``}										%alias per aprire le virgolette
+\def \closequote{''}										%alias per chiudere le virgolette
+
+\def \abs#1{\lvert #1 \rvert}								%alias per il simbolo di valore assoluto
+\def \quote#1{\openquote #1\closequote}						%alias per il testo "virgolettato"
+
+\newcommand{\accg}{\`}									%per i caratteri con accento grave
+\newcommand{\acca}{\'}									%per i caratteri con accento acuto
+
+\begin{document}
+	\begin{titlepage}
+		
+		\title{Progetto di \vspace{2mm} \\ Sicurezza Informatica e Internet \\ \vspace{2 mm} {\large \bf{Progetto A2 - Encrypted 2D Barcodes}}}
+		\author{Giovanni Rossi - \url{gio.rossi.1991@gmail.com}\\Pasquale Verlotta - \url{pasquale.verlotta@gmail.com} }
+		\date{}%\today}
+		\titlepic{\includegraphics[width=5cm]{Immagini/logo_tor_vergata}}
+
+	\end{titlepage}
+
+	\maketitle
+
+	\frontmatter
+
+	\small
+
+	\pagenumbering{Roman}
+
+	\phantomsection
+
+	\addcontentsline{toc}{chapter}{Indice}
+	%\addcontentsline{toc}{chapter}{\listfigurename}
+
+	\tableofcontents 
+	\label{Indice}
+	
+	\listoffigures
+	%\label{Elenco delle figure}
+
+	%\listoftables
+
+	\normalsize
+
+	\mainmatter
+
+	\include{Capitolo_1}
+	\include{Capitolo_2}
+	\include{Capitolo_3}
+	\include{Capitolo_4}
+
+	%\appendix
+
+\end{document}

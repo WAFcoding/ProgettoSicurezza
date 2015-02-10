@@ -46,7 +46,7 @@ public abstract class WorkerThread extends Thread implements Runnable{
 		if(sock==null)
 			throw new NullPointerException("Socket Passed is NULL");
 		try {
-			printSocketInfo(sock);
+			//printSocketInfo(sock);
 			this.sock = sock;
 			this.w = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
 			this.r = new BufferedReader(new InputStreamReader(sock.getInputStream()));

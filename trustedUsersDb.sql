@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.2.7
+-- version 4.0.4.1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 07, 2015 alle 15:16
--- Versione del server: 5.5.41-0ubuntu0.14.04.1
--- PHP Version: 5.5.9-1ubuntu4.5
+-- Generation Time: Feb 10, 2015 at 01:05 PM
+-- Server version: 5.5.41-0ubuntu0.12.04.1
+-- PHP Version: 5.3.10-1ubuntu3.15
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -19,77 +19,72 @@ SET time_zone = "+00:00";
 --
 -- Database: `trustedUsersDb`
 --
+CREATE DATABASE IF NOT EXISTS `trustedUsersDb` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin;
+USE `trustedUsersDb`;
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `registered_request`
+-- Table structure for table `registered_request`
 --
 
 CREATE TABLE IF NOT EXISTS `registered_request` (
-`id` int(11) NOT NULL,
-  `name` varchar(30) COLLATE utf8_bin NOT NULL,
-  `surname` varchar(30) COLLATE utf8_bin NOT NULL,
-  `country` varchar(30) COLLATE utf8_bin NOT NULL,
-  `countryCode` varchar(2) COLLATE utf8_bin NOT NULL,
-  `city` varchar(30) COLLATE utf8_bin NOT NULL,
-  `organization` varchar(30) COLLATE utf8_bin NOT NULL,
-  `secidentifier` varchar(60) COLLATE utf8_bin NOT NULL,
-  `status` int(11) NOT NULL DEFAULT '0',
-  `publicKey` varchar(255) COLLATE utf8_bin DEFAULT NULL
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Contiene tutte le richieste di registrazione pendenti' AUTO_INCREMENT=2 ;
+  `id` int(11) NOT NULL,
+  `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `surname` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `country` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `countryCode` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `city` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `organization` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `secidentifier` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `publicKey` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
--- Dump dei dati per la tabella `registered_request`
+-- Dumping data for table `registered_request`
 --
 
 INSERT INTO `registered_request` (`id`, `name`, `surname`, `country`, `countryCode`, `city`, `organization`, `secidentifier`, `status`, `publicKey`) VALUES
-(1, 'Giorgio', 'Bianchi', 'Italy', 'IT', 'Rome', 'blablabla', '301BEC10E916FC9AC23F6D6FB6291953917C8314', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCo/6F8Qtjcb3r+mI2/D2omHgxiHkVIzFhZdp3KNznIpd7ZLRuDO6Lehyjuu7SFdWEpDomDxJrPP5dvbILKPTZ8YAXDC2EHNAaJKRyLgI8Z2yXOxv91uw7dhXPRVT19DMFFjbmJNK0uJz2uTFWkBbxpLEyM36UPcz3q+xkF4a6tVwIDAQAB');
+(1, 'Giovanni', 'Rossi', 'Italy', 'IT', 'Rome', 'VeRo', '13FA1D5A54889403117A4FA5386BA9CED3E9D2CC', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCBTpVtwegEG7uMnj+v89AHv33cURSmAmttq3Nol66aKnWz6TfHo0DR7GF56v59yRrwQyTtEInvFEqG9pK2rm0b/y4mimVXnPxyKE3tPP7wUtgU5bOVImW+miI8PTUiIsB2AmMlK2KNv6urLotmo3VnokjBOwVKYnMYkX56L54SRwIDAQAB'),
+(2, 'Pasquale', 'Verlotta', 'Italy', 'IT', 'Rome', 'VeRo', '710E9D27159AEC9D2D41F5F51946B579BFD5301A', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZTh7WdLz/AgVb+5K9mxORGxN/vrHiLwSJG19aUbVEc0+jt6Hi5Xpk0bpXVFeUonUoyAn+V/iY83sH0uiuCYaJ9JBZw13RD66NIizc0tII85LhIuJC84GFFd0lkPHicAwqh6nP2rQv7o8kD8FkPQVGYW5f0ueaCbLzQ5U06ncb6wIDAQAB'),
+(3, 'Giulio', 'Montenero', 'Italy', 'IT', 'Rome', 'VeRo', '16F4DF5A89B49C8BFDF6A3EE51F6597BB013777D', 2, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDOds5OCQsUpcH1dmjH8YotlWt/uEfvfjM4cCcFJfkOy7RIfxIS/J/mFzZGu9Kykbbw+Hwr7f7YHiTuuQVRBb0AmuW0cRQJfb1ELO8rSD+eAVI/6qMg5dskKuo07CYWLmEfbv1doGwM8iF6zLAvLh9jWEcj6KtsmyxlnlY79242RQIDAQAB'),
+(4, 'Giulio', 'Montenero', 'Italy', 'IT', 'Rome', 'VeRo', '0863DA710DD3566362564E079FD0CD25ED82727F', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCYvbCHbXCj7S4Ol/M8LeFZBx5FcHSaI+cekcaHd4afNsgGjThe0LVXD4Lqfo/dxJnP1bxNdbmmEBcntkvtfIhHPoiN3OFC7FUfnQNFWA0Zue3bNxfYgidtNS6+K0XQaWb7r09X+XC7INSZezN3J8P8zJkKi01OW5jcLSOfUXrAtQIDAQAB'),
+(5, 'Mattia', 'Mancini', 'Italy', 'IT', 'Rome', 'ManciniCorporation', '72DAB3AE2FFE00FE6A5288E91BE479DC9F5D46DB', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3GdG9GyzQRdEg0BDFJpH99AKRL30iGueBz/Xgt54KGTOxsqyqU12CKzKyVZdb4h6UfqkiwgLFAiwilaAuO3GAWcCSMECFMkuJrMy9sLcFd0LQZysBdtkXKhd9aZ62gX9U7sgrwjVHjkKyv1mQ2I/eCCN5/dWpFFjHun738UwukwIDAQAB'),
+(6, 'Simone', 'Martucci', 'Italy', 'IT', 'Rome', 'ManciniCorporations', '66276F78F99205C736426F50FFC1C6B2F0869393', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCl0NpUG6Z0gugAnBm5jLMPGjypSZ3JEtWERo5WUhJ+sefVBrqKBTs7rxqJ+ZHOMoINGr4ZgIJ3TCXTPe64C80ZYjn1NXKcrnNB76CG387Aik+JJJJ1vooVcVdQhD6+QifF6UahKRpdBxfngkjwEIpkCVAWOOKtO3/+OKZwTwVGTwIDAQAB'),
+(7, 'Gabriele', 'Santi', 'Italy', 'IT', 'Rome', 'SantiCorporation', 'DC6F2CBAA6135F4F64A3A70746F2954CB925B138', 2, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCaTm6s3guXp8SqoUcuOfLIj1+PbigSDGzqXaxEOCHJayFTWaq4qj7Ny4VIYcF1ipmuF00dI6DkxeqHsCrTqMTQ8nw0UDF1gYUn9sJhoYxEABiy+1J4hSg9I/28P9ySBEOAmyBQoJj/3viAMZhMhvLhaBiD61R9ty5nbSXmUeZj0wIDAQAB'),
+(8, 'Gabriele', 'Santi', 'Italy', 'IT', 'Rome', 'SantiCorporation', 'B1C032901FE1B93A687F5EEDDEA71AECD4DF2FCC', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZhoQ7jDLa+lHFjowE0gqWRriB0rq1wm2Oql+pBA+a7YW+EuUALubW5gCPNCpVsVhKyaWiRLA75W1x2fAOYd7g8IehEvp9uaTQMsGsU2KyC/wmwjTa8V1QdzjLLX6xbs1UL8utIrx3nZRLZVQCwXefvnRowEgiRAYmeNY2sprVUwIDAQAB'),
+(9, 'Claudio', 'Pupparo', 'Italy', 'IT', 'Rome', 'VeRo', 'F6F70B3B3CE4933FD3B24C1FE5CC6596A211317B', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbTEJmk1A39iwPORH6dahQT1GgDWpqzobrF77AAvkcPE+Vp1bdwvmtVCtLi6ap5xndquvUhFCu6k0AhKYNj6gcMxwKEnk0SOVNykjFjc8hyXq1sQQV8LbUh/YxUnlUzRO7py2ApVnrXcWg/q5go63u1Mh5Zo9eAVQmy+3sobxgtwIDAQAB'),
+(10, 'Alessio', 'Opimo', 'Italy', 'IT', 'Rome', 'Opimooo', '569276D817FBFBA55C03502D29A95D06798AAC02', 1, 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCcfv9lZ8fjPVVy1DCI7UDh+v4o8qyofWS0klueqbHY87RoYS4VhX2FYVUzEVvMm6hbNC5KnBF/1qGJLxtMMgNUbPMCI189gIrruJtiRyML9TyPlH2ZoalWjH87cquAToFzs+CMoZtGARdx/zbgdyAJBwEwx/pkOJ3s1IfV8Y6SoQIDAQAB');
 
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `user`
+-- Table structure for table `user`
 --
 
 CREATE TABLE IF NOT EXISTS `user` (
-  `username` varchar(30) COLLATE utf8_bin NOT NULL,
-  `pkey` varchar(300) COLLATE utf8_bin NOT NULL,
-  `trustLevel` int(10) NOT NULL
+  `username` varchar(255) COLLATE utf8_bin NOT NULL,
+  `pkey` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `trustLevel` int(11) DEFAULT NULL,
+  PRIMARY KEY (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
--- Dump dei dati per la tabella `user`
+-- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`username`, `pkey`, `trustLevel`) VALUES
-('Giorgio_1', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCo/6F8Qtjcb3r+mI2/D2omHgxiHkVIzFhZdp3KNznIpd7ZLRuDO6Lehyjuu7SFdWEpDomDxJrPP5dvbILKPTZ8YAXDC2EHNAaJKRyLgI8Z2yXOxv91uw7dhXPRVT19DMFFjbmJNK0uJz2uTFWkBbxpLEyM36UPcz3q+xkF4a6tVwIDAQAB', 4);
+('Alessio_10', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCcfv9lZ8fjPVVy1DCI7UDh+v4o8qyofWS0klueqbHY87RoYS4VhX2FYVUzEVvMm6hbNC5KnBF/1qGJLxtMMgNUbPMCI189gIrruJtiRyML9TyPlH2ZoalWjH87cquAToFzs+CMoZtGARdx/zbgdyAJBwEwx/pkOJ3s1IfV8Y6SoQIDAQAB', 5),
+('Claudio_9', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCbTEJmk1A39iwPORH6dahQT1GgDWpqzobrF77AAvkcPE+Vp1bdwvmtVCtLi6ap5xndquvUhFCu6k0AhKYNj6gcMxwKEnk0SOVNykjFjc8hyXq1sQQV8LbUh/YxUnlUzRO7py2ApVnrXcWg/q5go63u1Mh5Zo9eAVQmy+3sobxgtwIDAQAB', 6),
+('Gabriele_8', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZhoQ7jDLa+lHFjowE0gqWRriB0rq1wm2Oql+pBA+a7YW+EuUALubW5gCPNCpVsVhKyaWiRLA75W1x2fAOYd7g8IehEvp9uaTQMsGsU2KyC/wmwjTa8V1QdzjLLX6xbs1UL8utIrx3nZRLZVQCwXefvnRowEgiRAYmeNY2sprVUwIDAQAB', 3),
+('Giovanni_1', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCBTpVtwegEG7uMnj+v89AHv33cURSmAmttq3Nol66aKnWz6TfHo0DR7GF56v59yRrwQyTtEInvFEqG9pK2rm0b/y4mimVXnPxyKE3tPP7wUtgU5bOVImW+miI8PTUiIsB2AmMlK2KNv6urLotmo3VnokjBOwVKYnMYkX56L54SRwIDAQAB', 4),
+('Giulio_4', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCYvbCHbXCj7S4Ol/M8LeFZBx5FcHSaI+cekcaHd4afNsgGjThe0LVXD4Lqfo/dxJnP1bxNdbmmEBcntkvtfIhHPoiN3OFC7FUfnQNFWA0Zue3bNxfYgidtNS6+K0XQaWb7r09X+XC7INSZezN3J8P8zJkKi01OW5jcLSOfUXrAtQIDAQAB', 2),
+('Mattia_5', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3GdG9GyzQRdEg0BDFJpH99AKRL30iGueBz/Xgt54KGTOxsqyqU12CKzKyVZdb4h6UfqkiwgLFAiwilaAuO3GAWcCSMECFMkuJrMy9sLcFd0LQZysBdtkXKhd9aZ62gX9U7sgrwjVHjkKyv1mQ2I/eCCN5/dWpFFjHun738UwukwIDAQAB', 2),
+('Pasquale_2', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZTh7WdLz/AgVb+5K9mxORGxN/vrHiLwSJG19aUbVEc0+jt6Hi5Xpk0bpXVFeUonUoyAn+V/iY83sH0uiuCYaJ9JBZw13RD66NIizc0tII85LhIuJC84GFFd0lkPHicAwqh6nP2rQv7o8kD8FkPQVGYW5f0ueaCbLzQ5U06ncb6wIDAQAB', 5),
+('Simone_6', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCl0NpUG6Z0gugAnBm5jLMPGjypSZ3JEtWERo5WUhJ+sefVBrqKBTs7rxqJ+ZHOMoINGr4ZgIJ3TCXTPe64C80ZYjn1NXKcrnNB76CG387Aik+JJJJ1vooVcVdQhD6+QifF6UahKRpdBxfngkjwEIpkCVAWOOKtO3/+OKZwTwVGTwIDAQAB', 7);
 
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `registered_request`
---
-ALTER TABLE `registered_request`
- ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `user`
---
-ALTER TABLE `user`
- ADD PRIMARY KEY (`username`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `registered_request`
---
-ALTER TABLE `registered_request`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
