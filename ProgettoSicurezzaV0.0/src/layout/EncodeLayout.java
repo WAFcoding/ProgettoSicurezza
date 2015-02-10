@@ -35,7 +35,6 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
     private ArrayList<String> list_item;
     private String list_selected;
     private int pos_list_selected;
-    private boolean img_selected, file_selected;
     
     public EncodeLayout(LayoutControl control, Container pane, ArrayList<String> items){
     	setPane(pane);
@@ -49,9 +48,6 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         list.addListSelectionListener(this);
         list.setSelectedIndex(-1);
-        
-        setImg_selected(false);
-        setFile_selected(true);
     }
     
     @Override
@@ -191,20 +187,6 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 	public void setPos_list_selected(int pos_list_selected) {
 		this.pos_list_selected = pos_list_selected;
 	}
-	public boolean isImg_selected() {
-		return img_selected;
-	}
-
-	public void setImg_selected(boolean img_selected) {
-		this.img_selected = img_selected;
-	}
-	public boolean isFile_selected() {
-		return file_selected;
-	}
-
-	public void setFile_selected(boolean file_selected) {
-		this.file_selected = file_selected;
-	}
 	//l'azione da compiere alla pressione encode
 	private class EncodeAction implements ActionListener{
 
@@ -215,19 +197,6 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 
 				control.setWriteLayoutCurrentFile(getList_selected());
 				control.setLayout("WRITE");
-				//control.draw(getList_selected(), "ENCODE");
-				/*MagickImage img= MagickUtility.getImage(getList_selected());
-				MagickImage cropped = MagickUtility.cropImage(img, 10, 50, 400, 200);
-				MagickImage covered = MagickUtility.coverWithImage(img, cropped, 400, 400);
-				MagickUtility.saveImage(covered, OUTPUT_FOLDER + "covered.jpg");
-				MagickUtility.saveImage(cropped, OUTPUT_FOLDER + "cropped.jpg");
-				
-				MagickImage rect = MagickUtility.createRectangleImage(new Color(255, 0, 0), 100, 100);
-				MagickImage rectText = MagickUtility.createRectangleImageWithText(new Color(255,0,0), "BELLA X TE!!", new Color(255,255,255), 12.0, 45, 45, 400, 400);
-				MagickImage covered2 = MagickUtility.coverWithImage(img, rect, 30, 30);
-				MagickImage covered3 = MagickUtility.coverWithImage(covered2, rectText, 60, 60);
-				MagickUtility.saveImage(covered2, OUTPUT_FOLDER + "covered2.jpg");
-				MagickUtility.saveImage(covered3, OUTPUT_FOLDER + "covered3.jpg");*/
 			}
 			else{
 				JOptionPane.showMessageDialog(getPane(), "devi selezionare un file");
@@ -239,17 +208,18 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser file_chooser= new JFileChooser();
+			JFileChooser file_chooser= new JFileChooser(control.getUser_manager().getActualUser().getDir_in());
 			int choose= file_chooser.showDialog(null, "apri");
 			
 			if(choose == JFileChooser.APPROVE_OPTION){
 				File file= file_chooser.getSelectedFile();
 				
-				if(isFile_selected())
+				if(control.isText(file)){
 					control.addEncodeChoice(file.getAbsolutePath());
-				else if(isImg_selected())
-					control.addDecodeChoice(file.getAbsolutePath());
-				//updateList();
+				}
+				else{
+					JOptionPane.showMessageDialog(getPane(), "deve essere un file txt");
+				}
 			}
 		}
 	}
@@ -259,6 +229,7 @@ public class EncodeLayout implements GeneralLayout, ListSelectionListener{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			control.removeItem(getPos_list_selected());
+			updateList();
 			System.out.println("rimosso elemento in posizione " + getPos_list_selected());
 		}
 	}

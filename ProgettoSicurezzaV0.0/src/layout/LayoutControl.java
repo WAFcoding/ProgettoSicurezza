@@ -43,15 +43,16 @@ public class LayoutControl {
 	private SettingsLayout s_layout;
 	private PrimaryLayout p_layout;
 	private EncodeLayout e_layout;
+	private DecodeLayout d_layout;
 	private WriteLayout w_layout;
 	private HomeLayout h_layout;
 	private RegistrationLayout r_layout;
 	private ErrorLayout err_layout;
 	private ReceiverSettingsLayout rec_layout;
-	private ArrayList<String> choosed_images;
+	private ArrayList<String> choosed_file_decode;
 	private SettingsControl set_ctrl;
 
-	private ArrayList<String> choosed_files;
+	private ArrayList<String> choosed_files_encode;
 	private String[] image_types= {"gif", "jpg", "png", "bmp", "pdf"};
 	private String[] text_types= {"txt"};
 	private String w_layout_currentFilePath;
@@ -59,13 +60,13 @@ public class LayoutControl {
 	private UserManager user_manager;
 	
 	private enum LAYOUT{
-		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER
+		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER, DECODE
 	}
 	
 	public LayoutControl(){
 		
-		choosed_images= new ArrayList<String>();
-		choosed_files= new ArrayList<String>();
+		choosed_file_decode= new ArrayList<String>();
+		choosed_files_encode= new ArrayList<String>();
 		mainFrame= new JFrame("Progetto SII");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(WIDTH, HEIGHT);
@@ -123,6 +124,10 @@ public class LayoutControl {
 			ReceiverLayout();
 			mainFrame.setSize(500, 500);
 		}
+		else if(layout == 8){
+			DecodeLayout();
+			mainFrame.setSize(500, 500);
+		}
 		
 		//mainFrame.pack();
 		mainFrame.repaint();
@@ -149,6 +154,8 @@ public class LayoutControl {
 				return 6;
 			case RECEIVER:
 				return 7;
+			case DECODE:
+				return 8;
 		}
 		
 		return -1;
@@ -181,12 +188,20 @@ public class LayoutControl {
 	
 	public void EncodeLayout(){
 		if(e_layout == null){
-			e_layout= new EncodeLayout(this, mainFrame.getContentPane(), this.choosed_files);
+			e_layout= new EncodeLayout(this, mainFrame.getContentPane(), this.choosed_files_encode);
 			e_layout.addComponentsToPane();
 		}
 		else{
 			e_layout.addComponentsToPane();
 		}
+	}
+	
+	public void DecodeLayout(){
+		if(d_layout == null){
+			d_layout= new DecodeLayout(this, mainFrame.getContentPane(), this.choosed_file_decode);
+		}
+		
+		d_layout.addComponentsToPane();
 	}
 
 	public void SettingsLayout(){
@@ -235,27 +250,27 @@ public class LayoutControl {
 	 * @return the choosed_files
 	 */
 	public ArrayList<String> getChoosed_files() {
-		return choosed_files;
+		return choosed_files_encode;
 	}
 
 	/**
 	 * @param choosed_files the choosed_files to set
 	 */
 	public void setChoosed_files(ArrayList<String> choosed_files) {
-		this.choosed_files = choosed_files;
+		this.choosed_files_encode = choosed_files;
 	}
 	/**
 	 * @return the choosed_images
 	 */
 	public ArrayList<String> getChoosed_images() {
-		return choosed_images;
+		return choosed_file_decode;
 	}
 
 	/**
 	 * @param choosed_images the choosed_images to set
 	 */
 	public void setChoosed_images(ArrayList<String> choosed_images) {
-		this.choosed_images = choosed_images;
+		this.choosed_file_decode = choosed_images;
 	}
 	//============================================================================
 	/**
@@ -272,20 +287,20 @@ public class LayoutControl {
 	}
 	
 	public void addDecodeChoice(String path){
-		if(!this.choosed_images.contains(path) && isToDecode(path)){
-			this.choosed_images.add(path);
+		if(!this.choosed_file_decode.contains(path) && isToDecode(path)){
+			this.choosed_file_decode.add(path);
 		}
 		else{
 			System.out.println("immagine gia presente e/o non supportata");
 		}
 		
-		if(e_layout != null)
-			e_layout.updateList();
+		if(d_layout != null)
+			d_layout.updateList();
 	}
 	
 	public void addEncodeChoice(String path){
-		if(!this.choosed_files.contains(path) && isText(path)){
-			this.choosed_files.add(path);
+		if(!this.choosed_files_encode.contains(path) && isText(path)){
+			this.choosed_files_encode.add(path);
 		}
 		else{
 			System.out.println("file gia presente e/o non supportato");
@@ -296,7 +311,7 @@ public class LayoutControl {
 	}
 	
 	public void removeItem(int pos){
-		this.choosed_images.remove(pos);
+		this.choosed_file_decode.remove(pos);
 		
 		if(e_layout != null)
 			e_layout.updateList();

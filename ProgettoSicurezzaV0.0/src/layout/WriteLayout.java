@@ -81,7 +81,6 @@ public class WriteLayout implements GeneralLayout{
 			while(tmp != null){
 				text= text + tmp;
 				tmp= buff.readLine();
-				//System.out.println(text);
 			}
 			setAreaText(text);
 			buff.close();

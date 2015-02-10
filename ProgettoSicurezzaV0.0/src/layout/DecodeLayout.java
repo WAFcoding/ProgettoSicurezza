@@ -12,12 +12,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -37,7 +40,6 @@ public class DecodeLayout implements GeneralLayout, ListSelectionListener{
     private String list_selected;
     private int pos_list_selected;
     private JButton btn_image, btn_file;
-    private boolean img_selected, file_selected;
 
 	public DecodeLayout(LayoutControl control, Container pane, ArrayList<String> items){
     	setPane(pane);
@@ -60,8 +62,7 @@ public class DecodeLayout implements GeneralLayout, ListSelectionListener{
         scroll_pane= new JScrollPane(list);
         scroll_pane.setPreferredSize(new Dimension(300, 300));
         
-        
-       // updateList();
+        updateList();
         
         //inserimento pulsanti
         pane.removeAll();
@@ -75,35 +76,26 @@ public class DecodeLayout implements GeneralLayout, ListSelectionListener{
 		c.fill = GridBagConstraints.NONE;
 		c.insets= new Insets(10, 10, 10, 10);
 		
-		//0.0 - IMMAGINI
-		c.gridx=posx;c.gridy=posy;
-		btn_image= new JButton("IMMAGINI");
-		btn_image.setForeground(Color.white);
-		btn_image.setBackground(Color.black);
-		//btn_image.addActionListener(new ImageAction());
-		pane.add(btn_image, c);
-		//1.0 - FILE
-		posx++;
 		//0.1 -SCROLL PANE
-		posx=0;posy++;
+		posx=0;posy=0;
 		c.gridx=posx;c.gridy=posy;c.gridheight=6;c.gridwidth=2;c.weighty= 1;c.weightx=1;
 		c.fill = GridBagConstraints.BOTH;
 		//c.ipadx=scroll_pane.getSize().width;c.ipady= scroll_pane.getSize().height;
 		pane.add(scroll_pane, c);
-		//2.1 - ENCODE
+		//2.1 - DECODE
 		posx=2;
-		button = new JButton("ENCODE");
+		button = new JButton("DECODE");
 		c.gridx = posx;c.gridy= posy;c.gridheight=1;c.gridwidth=1;c.ipadx=0;c.ipady= 0;
 		c.fill= GridBagConstraints.HORIZONTAL;c.weighty= 0;c.weightx=0;
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
-		//button.addActionListener(new EncodeAction());
+		button.addActionListener(new DecodeAction());
 		pane.add(button, c);
 		//2.2 - AGGIUNGI
 		posy++;
 		button = new JButton("AGGIUNGI");
 		c.gridx = posx;c.gridy=posy;c.gridheight=1;c.ipadx=0;
-		//button.addActionListener(new AddAction());
+		button.addActionListener(new AddAction());
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
@@ -111,7 +103,7 @@ public class DecodeLayout implements GeneralLayout, ListSelectionListener{
 		posy++;
 		button= new JButton("ELIMINA");
 		c.gridx = posx;c.gridy = posy;c.gridheight=1;c.ipadx=0;
-		//button.addActionListener(new RemoveAction());
+		button.addActionListener(new RemoveAction());
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
 		pane.add(button, c);
@@ -271,39 +263,66 @@ public class DecodeLayout implements GeneralLayout, ListSelectionListener{
 	public void setBtn_file(JButton btn_file) {
 		this.btn_file = btn_file;
 	}
-
 	/**
-	 * @return the img_selected
+	 * aggiorna la lista di file visualizzata nel layout encode
 	 */
-	public boolean isImg_selected() {
-		return img_selected;
-	}
-
-	/**
-	 * @param img_selected the img_selected to set
-	 */
-	public void setImg_selected(boolean img_selected) {
-		this.img_selected = img_selected;
-	}
-
-	/**
-	 * @return the file_selected
-	 */
-	public boolean isFile_selected() {
-		return file_selected;
-	}
-
-	/**
-	 * @param file_selected the file_selected to set
-	 */
-	public void setFile_selected(boolean file_selected) {
-		this.file_selected = file_selected;
+	public void updateList(){
+        
+        list_model.clear();
+        for(String s : list_item){
+        	list_model.addElement(s);
+        }
 	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		// TODO Auto-generated method stub
 		
+	}	
+	
+	private class DecodeAction implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+	
+			if(getList_selected() != null){
+
+				
+			}
+			else{
+				JOptionPane.showMessageDialog(getPane(), "devi selezionare un file");
+			}
+		}
+	}
+	//l'azione da compiere alla pressione di aggiungi
+	private class AddAction implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser file_chooser= new JFileChooser(control.getUser_manager().getActualUser().getDir_in());
+			int choose= file_chooser.showDialog(null, "apri");
+			
+			if(choose == JFileChooser.APPROVE_OPTION){
+				File file= file_chooser.getSelectedFile();
+				
+				if(control.isToDecode(file)){
+					control.addDecodeChoice(file.getAbsolutePath());
+				}
+				else{
+					JOptionPane.showMessageDialog(getPane(), "Deve essere un file PDF o un'immagine");
+				}
+			}
+		}
+	}
+	//l'azione da compiere alla pressione di elimina
+	private class RemoveAction implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			control.removeItem(getPos_list_selected());
+			updateList();
+			System.out.println("rimosso elemento in posizione " + getPos_list_selected());
+		}
 	}
 
 }
