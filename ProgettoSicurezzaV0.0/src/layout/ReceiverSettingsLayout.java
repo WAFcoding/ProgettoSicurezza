@@ -88,6 +88,8 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
 			}
 			else{
 				Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
+				//TODO ordinare le chiavi della mappa
+				control.setKeyLevelMap(levelKey);
 				list_items.clear();
 				all_level_key.clear();
 				Iterator it = levelKey.entrySet().iterator();
@@ -150,7 +152,7 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
 				if(isSingleUser())
 					control.setUserForEncryptOrDecrypt(all_user.get(pos_list_selected));
 				else
-					control.setKeyLevelForEncryptDecrypt(list_items.get(pos_list_selected));
+					control.setKeyLevelForEncryptDecrypt(pos_list_selected+1);
 				control.setLayout("WRITE");
 			}
 		});		

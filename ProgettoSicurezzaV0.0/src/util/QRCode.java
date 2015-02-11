@@ -206,8 +206,7 @@ public class QRCode {
 	 * 
 	 * @throws Exception
 	 */
-	public static BufferedImage magickImageToBufferedImage(
-			MagickImage magickImage) throws Exception {
+	public static BufferedImage magickImageToBufferedImage(MagickImage magickImage) throws Exception {
 		Dimension dim = magickImage.getDimension();
 		int size = dim.width * dim.height;
 		byte[] pixels = new byte[size * 3];
@@ -277,6 +276,27 @@ public class QRCode {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static String getTextFromQrCode(String path){
+		String toReturn= "";
+		try {
+			QRCode qrcode= readQRCodeFromFile(path);
+			toReturn= qrcode.readQRCode().getText();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+		} catch (FormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ChecksumException e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
+		
 	}
 	
 	

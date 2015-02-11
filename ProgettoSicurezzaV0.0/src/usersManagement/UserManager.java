@@ -78,11 +78,7 @@ public class UserManager {
 		String surname= arg[1];
 		String password= arg[2];
 		String code= arg[3];
-		for(String t : arg){
 
-			System.out.print(t + " ");
-		}
-		System.out.println("");
 		if(checkForLogin(arg)){
 			
 			String dbPath= "";
@@ -134,7 +130,7 @@ public class UserManager {
 						System.out.println("check user code " + u.getCode() + " equal insert code " + hash_code );
 						if(u.getCode().equals(hash_code)){
 							//controllo password
-							System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
+							//System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
 							if(u.getPassword().equals(hash_password)){
 								System.out.println(name + " " + surname + " is logging in.");
 								control.setActualSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def(), url);
@@ -202,7 +198,6 @@ public class UserManager {
 			e1.printStackTrace();
 		}
 		
-		//TODO UserManager: cambiare il nome del DB?
 		if(!HibernateUtil.isCreated()){
 			HibernateUtil.setDbPath(dir_def);
 			HibernateUtil.createSession();
@@ -236,6 +231,8 @@ public class UserManager {
 			user.setPassword(hash_password);
 			int trustLevel= -1;
 			user.setTrustLevel(trustLevel);
+			String server_uid= "-1";
+			user.setServer_uid(server_uid);
 
 			try(RegistrationClient reg = ConnectionFactory.getRegistrationServerConnection(url, keystore_pwd)) {
 				secid = reg.submitRegistration(user);
@@ -470,6 +467,40 @@ public class UserManager {
 			
 			//control.getUser_manager().printActualUser();
 			actualUser.setTrustLevel(trustLevel);
+			
+			session.update(actualUser);
+			
+			tx.commit();
+			
+		}catch (Exception e) {
+			if(tx != null) tx.rollback();
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+			HibernateUtil.shutdown();
+			HibernateUtil.encryptDb(actualUser.getPassword());
+		}
+		
+	}
+	
+	public void updateActualUserServerUid(String server_uid){
+		
+		User actualUser= control.getUser_manager().getActualUser();
+		
+		if(!HibernateUtil.isCreated()){
+			HibernateUtil.setDbPath(control.getActualDbPath());
+			HibernateUtil.decryptDb(actualUser.getPassword());
+			HibernateUtil.createSession();
+		}
+		
+		Session session= HibernateUtil.getSessionFactory().openSession();
+		Transaction tx= null;
+		try{
+			tx= session.beginTransaction();
+			
+			//control.getUser_manager().printActualUser();
+			actualUser.setServer_uid(server_uid);
 			
 			session.update(actualUser);
 			

@@ -9,11 +9,13 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.swing.JFrame;
 
 import usersManagement.User;
 import usersManagement.UserManager;
+import util.CertData;
 import util.CryptoUtility;
 import util.KeyTool;
 import connection.ClientConfig;
@@ -45,22 +47,25 @@ public class LayoutControl {
 	private RegistrationLayout r_layout;
 	private ErrorLayout err_layout;
 	private ReceiverSettingsLayout rec_layout;
+	private ReadLayout read_layout;
 	private ArrayList<String> choosed_file_decode;
 	private SettingsControl set_ctrl;
 
 	private ArrayList<String> choosed_files_encode;
-	private String[] image_types= {"gif", "jpg", "png", "bmp", "pdf"};
+	private String[] image_types= {"gif", "jpg", "png", "bmp", "jpeg", "pdf"};
 	private String[] text_types= {"txt"};
 	private String w_layout_currentFilePath;
 	private boolean receiverSingleUser= true;
+	private String read_layout_current_file;
 	
 	private UserManager user_manager;
 	
 	private User userForEncryptOrDecrypt;
-	private String KeyLevelForEncryptDecrypt;
+	private int KeyLevelForEncryptDecryptPos;
+	private Map<Integer, String> keyLevelMap;
 	
 	private enum LAYOUT{
-		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER, DECODE
+		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER, DECODE, READ
 	}
 	
 	public LayoutControl(){
@@ -128,6 +133,10 @@ public class LayoutControl {
 			DecodeLayout();
 			mainFrame.setSize(500, 500);
 		}
+		else if(layout == 9){
+			ReadLayout();
+			mainFrame.setSize(800, 600);
+		}
 		
 		//mainFrame.pack();
 		mainFrame.repaint();
@@ -156,6 +165,8 @@ public class LayoutControl {
 				return 7;
 			case DECODE:
 				return 8;
+			case READ:
+				return 9;
 		}
 		
 		return -1;
@@ -241,6 +252,13 @@ public class LayoutControl {
 		}
 		rec_layout.setSingleUser(receiverSingleUser);
 		rec_layout.addComponentsToPane();
+	}
+	
+	public void ReadLayout(){
+		if(read_layout == null){
+			read_layout= new ReadLayout(this, mainFrame.getContentPane());
+		}
+		read_layout.addComponentsToPane();
 	}
 	
 	public void setReceiverSingleUSer(boolean b){
@@ -402,7 +420,7 @@ public class LayoutControl {
 		if(isToDecode(f)){
 			addDecodeChoice(path);
 			drawDecode(path, backTo);
-			//setLayout("DECODE");
+			setLayout("DECODE");
 		}
 		else if(isText(f)){
 			addEncodeChoice(path);
@@ -504,6 +522,10 @@ public class LayoutControl {
 			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
 			X509Certificate cert = (X509Certificate)certFactory.generateCertificate(new ByteArrayInputStream(bean.getCertificateData()));
 
+			CertData certData= new CertData(cert);
+			String uid= certData.getIssuerParameter(CertData.TYPE.UID);
+			getUser_manager().updateActualUserServerUid(uid);
+			
 			KeyStore ks = KeyTool.loadKeystore(ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
 			KeyTool.addNewPrivateKey(ks, privateKey, cert, username, keystore_pwd.toCharArray());
 
@@ -543,15 +565,15 @@ public class LayoutControl {
 	/**
 	 * @return the keyLevelForEncryptDecrypt
 	 */
-	public String getKeyLevelForEncryptDecrypt() {
-		return KeyLevelForEncryptDecrypt;
+	public int getLevelForEncryptDecrypt() {
+		return KeyLevelForEncryptDecryptPos;
 	}
 
 	/**
 	 * @param keyLevelForEncryptDecrypt the keyLevelForEncryptDecrypt to set
 	 */
-	public void setKeyLevelForEncryptDecrypt(String keyLevelForEncryptDecrypt) {
-		KeyLevelForEncryptDecrypt = keyLevelForEncryptDecrypt;
+	public void setKeyLevelForEncryptDecrypt(int keyLevelForEncryptDecrypt) {
+		KeyLevelForEncryptDecryptPos = keyLevelForEncryptDecrypt;
 	}
 
 	/**
@@ -567,4 +589,45 @@ public class LayoutControl {
 	public void setReceiverSingleUser(boolean receiverSingleUser) {
 		this.receiverSingleUser = receiverSingleUser;
 	}
+
+	/**
+	 * @return the keyLevelMap
+	 */
+	public Map<Integer, String> getKeyLevelMap() {
+		return keyLevelMap;
+	}
+
+	/**
+	 * @param keyLevelMap the keyLevelMap to set
+	 */
+	public void setKeyLevelMap(Map<Integer, String> keyLevelMap) {
+		this.keyLevelMap = keyLevelMap;
+	}
+	
+	public String getKeyByLevel(int level){
+		String toReturn="";
+		
+		toReturn= keyLevelMap.get(Integer.valueOf(level));
+		
+		if(toReturn != null)
+			return toReturn;
+		
+		return "";
+	}
+
+	/**
+	 * @return the read_layout_current_file
+	 */
+	public String getRead_layout_current_file() {
+		return read_layout_current_file;
+	}
+
+	/**
+	 * @param read_layout_current_file the read_layout_current_file to set
+	 */
+	public void setRead_layout_current_file(String read_layout_current_file) {
+		this.read_layout_current_file = read_layout_current_file;
+	}
+	
+	
 }

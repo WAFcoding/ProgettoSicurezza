@@ -33,6 +33,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 import usersManagement.User;
 import util.CryptoUtility;
@@ -63,7 +66,7 @@ public class WriteLayout implements GeneralLayout{
 	private boolean receiverSetted;
 	private User user_sender;
 	private User user_receiver;
-	private String level_receiver;
+	private int level_receiver;
 	private ArrayList<String> qrcodes_path;
 	private int current_qrcode= 0;
 
@@ -126,11 +129,12 @@ public class WriteLayout implements GeneralLayout{
 		//0.0 - title
 		field_title= new JTextField("Title");
 		field_title.addFocusListener(new FocusOnClick(field_title, "Title"));
+		field_title.setDocument(new JTextFieldLimit(18));
 		c.gridx= posx;c.gridy= posy;c.gridheight= 1;c.gridwidth= 3;c.weightx= 1;c.weighty=0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		pane.add(field_title, c);
 		//0.1 - author
-		tmp_user= control.getUser_manager().getActualUser().getName() + " " + control.getUser_manager().getActualUser().getSurname() + " [ " + control.getUser_manager().getActualUser().getTrustLevel() + " ]";
+		tmp_user= control.getUser_manager().getActualUser().getName() + " " + control.getUser_manager().getActualUser().getSurname() ;
 		posy++;
 		field_author= new JTextField(tmp_user);
 		field_author.addFocusListener(new FocusOnClick(field_author, "Author"));
@@ -142,12 +146,12 @@ public class WriteLayout implements GeneralLayout{
 		String tmp_receiver= "";
 		if(control.isReceiverSingleUser()){
 			if(user_receiver == null) tmp_receiver= "Receiver";
-			else tmp_receiver= user_receiver.getName() + " " + user_receiver.getSurname() + " [ " + user_receiver.getTrustLevel() + " ]";
+			else tmp_receiver= user_receiver.getName() + " " + user_receiver.getSurname();
 		}
 		else{
-			level_receiver= control.getKeyLevelForEncryptDecrypt();
-			System.out.println("level= " + level_receiver);
-			tmp_receiver= "Level " + level_receiver.substring(0, level_receiver.lastIndexOf("] ")+1);
+			level_receiver= control.getLevelForEncryptDecrypt();
+			//System.out.println("level= " + level_receiver);
+			tmp_receiver= "Level " + level_receiver;
 		}
 		field_receiver= new JTextField(tmp_receiver);
 		field_receiver.addFocusListener(new FocusOnClick(field_receiver, tmp_receiver));
@@ -182,7 +186,7 @@ public class WriteLayout implements GeneralLayout{
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				control.setLayout("PRIMARY");
+				control.setLayout("ENCODE");
 			}
 		});
 		pane.add(button, c);
@@ -430,10 +434,14 @@ public class WriteLayout implements GeneralLayout{
 							enc= new String(encripted);
 						}
 						else{
-							level_receiver= control.getKeyLevelForEncryptDecrypt();
-							String tmp_level_key= level_receiver.substring(level_receiver.lastIndexOf("] "));
-							System.out.println("tmp_level_key = " + tmp_level_key);
-							byte[] encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, selected_text, tmp_level_key);
+							level_receiver= control.getLevelForEncryptDecrypt();
+							String tmp_level_key="";
+							byte[] encripted= selected_text.getBytes();
+							for(int i=1; i<= level_receiver;i++){
+								tmp_level_key= control.getKeyByLevel(level_receiver);
+								System.out.println("tmp_level_key = " + tmp_level_key);
+								encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, encripted, tmp_level_key);
+							}
 							enc= new String(encripted);
 						}
 						System.out.println("lunghezza criptata = " + enc.length());
@@ -503,6 +511,7 @@ public class WriteLayout implements GeneralLayout{
 
 					String title= field_title.getText();
 					String author= field_author.getText();
+					String author_name= author.substring(0, author.indexOf(" "));
 					String receiver= field_receiver.getText();
 					String text= area.getText();
 
@@ -515,10 +524,13 @@ public class WriteLayout implements GeneralLayout{
 					qr.saveQRCodeToFile(sign_path);
 
 					//info per la decodifica in chiaro
+					String infoQrCode= "Title: " + title + "\n" +
+										"Sender: " + author + "\n" +
+										"Sender uid: " + author_name.toLowerCase() + "_" +user_sender.getServer_uid() +"\n"+
+										"Receiver: " + receiver;
 					QRCode qrInfo= new QRCode();
-					qrInfo.writeQRCode(author + "\n" + receiver, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
+					qrInfo.writeQRCode(infoQrCode, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);
 					qrInfo.saveQRCodeToFile(infQrCodePath);
-
 
 					String[] info= {receiver, field_info.getText()};
 					String[] qrcodes= {"", "", "", "", "", "", "", "", "", ""};
@@ -530,7 +542,7 @@ public class WriteLayout implements GeneralLayout{
 							qrcodes[i]= "";
 					}
 
-					PDFUtil.createDocument(title, author, text, sign_path, infQrCodePath, info, qrcodes);
+					PDFUtil.createDocument(title, author, text, infQrCodePath, info, qrcodes);
 					PDFUtil.close();
 					System.out.println("PDF salvato in " + pat_pdf);
 				}
@@ -577,6 +589,24 @@ public class WriteLayout implements GeneralLayout{
 				field.setText(text);
 		}
 		
+	}
+	
+	private class JTextFieldLimit extends PlainDocument {
+		private static final long serialVersionUID = 4592979636590560189L;
+		private int limit;
+		JTextFieldLimit(int limit) {
+			super();
+			this.limit = limit;
+		}
+
+		public void insertString(int offset, String str, AttributeSet attr) throws BadLocationException {
+			if (str == null)
+				return;
+
+			if ((getLength() + str.length()) <= limit) {
+				super.insertString(offset, str.toUpperCase(), attr);
+			}
+		}
 	}
 		
 }

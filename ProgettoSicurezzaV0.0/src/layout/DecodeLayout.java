@@ -273,12 +273,28 @@ public class DecodeLayout implements GeneralLayout, ListSelectionListener{
         	list_model.addElement(s);
         }
 	}
-
+	//l'azione eseguita alla selezione di un file nella lista
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}	
+		if(!e.getValueIsAdjusting()){
+			if(list.getSelectedValuesList().size() > 1){
+				System.out.println("selezione multipla ");
+				for(String s : list.getSelectedValuesList()){
+
+					System.out.println(s);
+				}
+			}
+			else{
+				String selected= list.getSelectedValue();
+				int pos_selected= list.getSelectedIndex();
+				if(selected != null && pos_selected != -1){
+					setList_selected(selected);
+					setPos_list_selected(pos_selected);
+					System.out.println("selezionato " + selected + ", posizione " + pos_selected);
+				}
+			}
+		}
+	}
 	
 	private class DecodeAction implements ActionListener{
 
@@ -286,8 +302,8 @@ public class DecodeLayout implements GeneralLayout, ListSelectionListener{
 		public void actionPerformed(ActionEvent e) {
 	
 			if(getList_selected() != null){
-
-				
+				control.setRead_layout_current_file(getList_selected());
+				control.setLayout("READ");
 			}
 			else{
 				JOptionPane.showMessageDialog(getPane(), "devi selezionare un file");

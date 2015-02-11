@@ -15,7 +15,7 @@ import util.MagickUtility;
 public class TestCropImage {
 	
 	public static void main(String[] args) throws MagickException, MagickImageNullException {
-		String path= "/home/pasquale/ProgettoSicurezza/crop/prova1.jpg";
+		String path= "/home/pasquale/ProgettoSicurezza/crop3/test_pdf.png";
 		MagickUtility.getDataToDecrypt(path);
 	}
 }

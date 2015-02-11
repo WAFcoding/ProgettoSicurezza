@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import com.itextpdf.text.Anchor;
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -87,7 +88,7 @@ public class PDFUtil {
 		pdfwr= PdfWriter.getInstance(doc, new FileOutputStream(file_path));
 		if(open()){
 			pdfcb= pdfwr.getDirectContent();
-			font= new Font(FontFamily.HELVETICA, 12);
+			font= new Font(FontFamily.TIMES_ROMAN);
 			bf_helv = font.getCalculatedBaseFont(false);
 			return true;
 		}
@@ -154,12 +155,27 @@ public class PDFUtil {
 		/*pdfcb.beginText();
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, text, x, PAGESIZE.getHeight() - y, 0);
 		pdfcb.endText();*/
-		if(textSize == 0) textSize= DEFSIZETEXT;
+		if(textSize == 0) textSize= 40;//textSize= DEFSIZETEXT;
 		ColumnText ct= new ColumnText(pdfcb);
-		Phrase p= new Phrase(text);
-		p.setFont(new Font(bf_helv, textSize));
-		ct.setSimpleColumn(p, x, PAGESIZE.getHeight() - y, PAGESIZE.getWidth() - 20, PAGESIZE.getHeight() - y - 450, 20, Element.ALIGN_LEFT);
-		ct.go();
+		Paragraph paragraph = new Paragraph();
+		Chunk chunk= new Chunk(text);
+		chunk.setFont(new Font(bf_helv, 15));
+        paragraph.add(chunk);
+
+        // Set paragraph's left side indent
+        paragraph.setIndentationLeft(5);
+
+        // Set paragraph's right side indent
+        paragraph.setIndentationRight(5);
+        addEmptyLine(8);
+        doc.add(paragraph);
+		/*Phrase p= new Phrase(text);
+		p.setFont(new Font(bf_helv, 50));
+		p.setLeading(60);
+		ct.setText(p);
+		ct.setSimpleColumn(x, PAGESIZE.getHeight() - y, PAGESIZE.getWidth() - 20, PAGESIZE.getHeight() - y - 450);
+		//ct.setSimpleColumn(p, x, PAGESIZE.getHeight() - y, PAGESIZE.getWidth() - 20, PAGESIZE.getHeight() - y - 450, 25, Element.ALIGN_LEFT);
+		ct.go();*/
 		//pdfcb.saveState();
 	}
 	/**
@@ -193,7 +209,11 @@ public class PDFUtil {
 			par.add(" ");
 		}
 		if(doc.isOpen()){
-			doc.add(par);
+			//doc.add(par);
+			for(int i=0;i<nline;i++){
+				par.add(" ");
+				doc.add(par);
+			}
 		}
 		else
 			System.out.println("Aprire prima il file");
@@ -258,7 +278,6 @@ public class PDFUtil {
 
 		pdfcb.beginText();
 		pdfcb.setFontAndSize(bf_helv, 30);
-		//TODO PDFUtil: cambiare i valori della posizione del titolo
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, title, TITLEX, TITLEY, 0);
 		pdfcb.endText();
 	}
@@ -267,7 +286,6 @@ public class PDFUtil {
 
 		pdfcb.beginText();
 		pdfcb.setFontAndSize(bf_helv, 20);
-		//TODO PDFUtil: cambiare i valori della posizione del titolo
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, author, AUTHORX, AUTHORY, 0);
 		pdfcb.endText();
 	}
@@ -322,16 +340,14 @@ public class PDFUtil {
         reader.close();
 	}
 	
-	public static void createDocument(String title, String author, String text, String signaturePath, String infoQrCodePath, String[] subtitleInfo, String[] qrCodes){
+	public static void createDocument(String title, String author, String text, String infoQrCodePath, String[] subtitleInfo, String[] qrCodes){
 		try {
 			addLogo(LOGO_PATH);
 			addTitle(title);
 			addAuthor(author);
 			addSubtitleInfo(subtitleInfo[0], subtitleInfo[1]);
 			addRectangle(SIGNATUREX, SIGNATUREY, RECTWIDTH, RECTHEIGHT);
-			if(signaturePath != null && !signaturePath.equals("")){
-				addQRCodeImage(signaturePath, SIGNATUREX + 1, SIGNATUREY + 1 - RECTHEIGHT);
-			}
+			
 			addRectangle(INFOQRCODEX, INFOQRCODEY, RECTWIDTH, RECTHEIGHT);
 			addQRCodeImage(infoQrCodePath, INFOQRCODEX + 1, INFOQRCODEY + 1 - RECTHEIGHT); 
 			addLineHorizontal(10, 150, 0);

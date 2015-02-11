@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import net.sourceforge.tess4j.TessAPI;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.vietocr.ImageHelper;
 import magick.CompositeOperator;
 import magick.DrawInfo;
 import magick.ImageInfo;
@@ -17,6 +20,7 @@ import magick.MagickImage;
 import magick.PixelPacket;
 
 import com.itextpdf.text.PageSize;
+import com.recognition.software.jdeskew.ImageDeskew;
 
 import exceptions.MagickImageNullException;
 
@@ -232,6 +236,45 @@ public class MagickUtility {
 		return img.imageToBlob(info);
 	}
 	
+	public static String getTextFromMagickImage(MagickImage magickimage){
+		String toReturn= "";
+		
+		try {
+			BufferedImage img= QRCode.magickImageToBufferedImage(magickimage);
+
+			img= ImageHelper.convertImageToBinary(img);
+			
+			Tesseract ts = Tesseract.getInstance();
+			
+			ts.setPageSegMode(TessAPI.TessPageSegMode.PSM_SINGLE_BLOCK);
+			
+			//serve a vedere quanto è ruotato il testo: troppo angolato non lo legge.
+			ImageDeskew deskew = new ImageDeskew(img);
+			double angle = deskew.getSkewAngle();
+			
+			/*Valore soglia: da vedere l'angolazione max tollerabile per non ruotare ogni volta l'immagine*/
+			if(Math.abs(angle)>5) {
+				img = ImageHelper.rotateImage(img, -angle);
+			
+				deskew = new ImageDeskew(img);
+				angle = deskew.getSkewAngle();
+			}
+			
+			toReturn = ts.doOCR(img);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
+	}
+	/**
+	 * 0-text
+	 * 1-cod info
+	 * 2-signature
+	 * 3..12-qrcodes
+	 * @param path
+	 * @return
+	 */
 	public static ArrayList<MagickImage> getDataToDecrypt(String path){
 		
 		ArrayList<MagickImage> toReturn= new ArrayList<MagickImage>();
@@ -250,27 +293,27 @@ public class MagickUtility {
 			int title_x= resizeX(129, width, pagesizex);
 			int title_y= resizeY(10, height, pagesizey);
 			int title_width= resizeX(200, width, pagesizex);
-			MagickImage img_title= cropImage(img, title_x, title_y, resizeY(40, height, pagesizey), title_width);
+			//MagickImage img_title= cropImage(img, title_x, title_y, resizeY(40, height, pagesizey), title_width);
 			//saveImage(img_title, "/home/pasquale/ProgettoSicurezza/crop/img_title.jpg");
-			toReturn.add(img_title);
+			//toReturn.add(img_title);
 			//author
 			int author_x= resizeX(129, width, pagesizex);
 			int author_y= resizeY(50, height, pagesizey);
 			int author_width= resizeX(230, width, pagesizex);
-			MagickImage img_author= cropImage(img, author_x, author_y, resizeY(30, height, pagesizey), author_width);
+			//MagickImage img_author= cropImage(img, author_x, author_y, resizeY(30, height, pagesizey), author_width);
 			//saveImage(img_author, "/home/pasquale/ProgettoSicurezza/crop/img_author.jpg");
-			toReturn.add(img_author);
+			//toReturn.add(img_author);
 			//info
 			int info_x= resizeX(129, width, pagesizex);
 			int info_y= resizeY(80, height, pagesizey);
-			MagickImage img_info= cropImage(img, info_x, info_y, resizeY(20, height, pagesizey), title_width);
+			//MagickImage img_info= cropImage(img, info_x, info_y, resizeY(20, height, pagesizey), title_width);
 			//saveImage(img_info, "/home/pasquale/ProgettoSicurezza/crop/img_info.jpg");
-			toReturn.add(img_info);
+			//toReturn.add(img_info);
 			//text
 			int text_x= resizeX(1, width, pagesizex);
 			int text_y= resizeY(160, height, pagesizey);
 			MagickImage img_text= cropImage(img, text_x, text_y, resizeY(400, height, pagesizey), resizedPagesizex);
-			//saveImage(img_text, "/home/pasquale/ProgettoSicurezza/crop/img_text.jpg");
+			saveImage(img_text, "/home/pasquale/ProgettoSicurezza/crop3/img_text.png");
 			toReturn.add(img_text);
 			//codification info
 			int codInfo_x= resizeX(pagesizex - 222, width, pagesizex);
@@ -312,11 +355,11 @@ public class MagickUtility {
 		return toReturn;
 	}
 	
-	private static int resizeX(int xToResize, int resX, int pageSizeX){
+	public static int resizeX(int xToResize, int resX, int pageSizeX){
 		return (xToResize * resX)/ pageSizeX;
 	}
 	
-	private static int resizeY(int yToResize, int resY, int pageSizeY){
+	public static int resizeY(int yToResize, int resY, int pageSizeY){
 		return (yToResize * resY)/pageSizeY;
 	}
 
