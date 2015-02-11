@@ -2,15 +2,23 @@ package util;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
-import exceptions.MagickImageNullException;
+import javax.imageio.ImageIO;
+
 import magick.CompositeOperator;
 import magick.DrawInfo;
 import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
 import magick.PixelPacket;
+
+import com.itextpdf.text.PageSize;
+
+import exceptions.MagickImageNullException;
 
 /**
  * Questa classe facilita ulteriormente l'utilizzo delle funzioni della libreria ImageMagick.
@@ -223,4 +231,93 @@ public class MagickUtility {
 		info.setMagick(img.getMagick());
 		return img.imageToBlob(info);
 	}
+	
+	public static ArrayList<MagickImage> getDataToDecrypt(String path){
+		
+		ArrayList<MagickImage> toReturn= new ArrayList<MagickImage>();
+		try {
+			BufferedImage bimg = ImageIO.read(new File(path));
+			int width          = bimg.getWidth();
+			int height         = bimg.getHeight();
+			
+			MagickImage img= getImage(path);
+
+			int pagesizex= new Double(PageSize.A4.getWidth()).intValue();
+			int pagesizey= new Double(PageSize.A4.getHeight()).intValue();
+			int resizedPagesizex= resizeX(pagesizex, width, pagesizex);
+			
+			//title
+			int title_x= resizeX(129, width, pagesizex);
+			int title_y= resizeY(10, height, pagesizey);
+			int title_width= resizeX(200, width, pagesizex);
+			MagickImage img_title= cropImage(img, title_x, title_y, resizeY(40, height, pagesizey), title_width);
+			//saveImage(img_title, "/home/pasquale/ProgettoSicurezza/crop/img_title.jpg");
+			toReturn.add(img_title);
+			//author
+			int author_x= resizeX(129, width, pagesizex);
+			int author_y= resizeY(50, height, pagesizey);
+			int author_width= resizeX(230, width, pagesizex);
+			MagickImage img_author= cropImage(img, author_x, author_y, resizeY(30, height, pagesizey), author_width);
+			//saveImage(img_author, "/home/pasquale/ProgettoSicurezza/crop/img_author.jpg");
+			toReturn.add(img_author);
+			//info
+			int info_x= resizeX(129, width, pagesizex);
+			int info_y= resizeY(80, height, pagesizey);
+			MagickImage img_info= cropImage(img, info_x, info_y, resizeY(20, height, pagesizey), title_width);
+			//saveImage(img_info, "/home/pasquale/ProgettoSicurezza/crop/img_info.jpg");
+			toReturn.add(img_info);
+			//text
+			int text_x= resizeX(1, width, pagesizex);
+			int text_y= resizeY(160, height, pagesizey);
+			MagickImage img_text= cropImage(img, text_x, text_y, resizeY(400, height, pagesizey), resizedPagesizex);
+			//saveImage(img_text, "/home/pasquale/ProgettoSicurezza/crop/img_text.jpg");
+			toReturn.add(img_text);
+			//codification info
+			int codInfo_x= resizeX(pagesizex - 222, width, pagesizex);
+			int codInfo_y= resizeY(10, height, pagesizey);
+			int codeInfo_width= resizeX(101, width, pagesizex);
+			MagickImage img_codInfo= cropImage(img, codInfo_x, codInfo_y, resizeY(101, height, pagesizey), codeInfo_width);
+			//saveImage(img_codInfo, "/home/pasquale/ProgettoSicurezza/crop/img_codeInfo.jpg");
+			toReturn.add(img_codInfo);
+			//signature
+			int signature_x= resizeX(pagesizex - 111, width, pagesizex);
+			int signature_y= resizeY(10, height, pagesizey);
+			int signature_width= resizeX(101, width, pagesizex);
+			MagickImage img_signature= cropImage(img, signature_x, signature_y, resizeY(101, height, pagesizey), signature_width);
+			//saveImage(img_signature, "/home/pasquale/ProgettoSicurezza/crop/img_signature.jpg");
+			toReturn.add(img_signature);
+			//qrcodes encripted
+			int qrcode_y= resizeY(609, height, pagesizey);
+			int qrcode_width= resizeX(101, width, pagesizex);
+			int qrcode_x= resizeX(20, width, pagesizex);
+			int j=0;
+			for(int i= qrcode_x; i< resizeX(466, width, pagesizex);i= i + resizeX(110, width, pagesizex)){
+				MagickImage img_qrcode= cropImage(img, i, qrcode_y, resizeY(101, height, pagesizey), qrcode_width);
+				//saveImage(img_qrcode, "/home/pasquale/ProgettoSicurezza/crop/img_qrcode_"+j+".jpg");
+				toReturn.add(img_qrcode);
+				j++;
+			}
+			qrcode_y= resizeY(719, height, pagesizey);
+			for(int i= qrcode_x; i< resizeX(466, width, pagesizex);i= i + resizeX(110, width, pagesizex)){
+				MagickImage img_qrcode= cropImage(img, i, qrcode_y, resizeY(101, height, pagesizey), qrcode_width);
+				//saveImage(img_qrcode, "/home/pasquale/ProgettoSicurezza/crop/img_qrcode_"+j+".jpg");
+				toReturn.add(img_qrcode);
+				j++;
+			}
+			
+		} catch (MagickException | MagickImageNullException | IOException e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
+	}
+	
+	private static int resizeX(int xToResize, int resX, int pageSizeX){
+		return (xToResize * resX)/ pageSizeX;
+	}
+	
+	private static int resizeY(int yToResize, int resY, int pageSizeY){
+		return (yToResize * resY)/pageSizeY;
+	}
+
 }

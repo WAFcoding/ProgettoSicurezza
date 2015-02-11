@@ -60,7 +60,7 @@ public class PDFUtil {
 	private static final float RECTHEIGHT= 101;
 	private static final float SIGNATUREX= PAGESIZE.getWidth() - 10 - RECTWIDTH;
 	private static final float SIGNATUREY= 10 + RECTWIDTH;
-	private static final float INFOQRCODEX= SIGNATUREX - 10 - RECTHEIGHT;
+	private static final float INFOQRCODEX= SIGNATUREX - 10 - RECTWIDTH;
 	private static final float INFOQRCODEY= 10 + RECTHEIGHT;
 	
 
@@ -432,6 +432,8 @@ public class PDFUtil {
 		
 		//doc.add(table);
 	}
+	
+	//TODO funzione per leggere il testo
 	
 	private static class ImageRenderListener implements RenderListener{
 		
