@@ -53,7 +53,8 @@ public class ReadLayout implements GeneralLayout {
 	private int current_qrcode = 0;
 	private ArrayList<MagickImage> filePart;
 	
-	private String title, author, info;
+	private String title, author, info, receiver;
+	private boolean isSingleUser;
 
 	public ReadLayout(LayoutControl control, Container pane) {
 		this.control = control;
@@ -64,8 +65,9 @@ public class ReadLayout implements GeneralLayout {
 		author= "";
 		info= "";
 		text= "";
+		receiver= "";
 		sender_uid= "";
-		
+		isSingleUser= true;
 
 	}
 
@@ -126,7 +128,7 @@ public class ReadLayout implements GeneralLayout {
 		pane.add(field_author, c);
 		// 0.2 - receiver
 		posy++;
-		field_receiver= new JTextField("");
+		field_receiver= new JTextField(receiver);
 		field_receiver.setEditable(false);
 		c.gridx = posx;
 		c.gridy = posy;
@@ -136,11 +138,8 @@ public class ReadLayout implements GeneralLayout {
 		c.weighty = 0;
 		pane.add(field_receiver, c);
 		// 0.3 - info
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date date = new Date();
-		tmp_user = dateFormat.format(date);
 		posy++;
-		field_info = new JTextField(tmp_user);
+		field_info = new JTextField(info);
 		field_info.setEditable(false);
 		c.gridx = posx;
 		c.gridy = posy;
@@ -438,6 +437,20 @@ public class ReadLayout implements GeneralLayout {
 		area.setText(text);
 	}
 
+	/**
+	 * @return the isSingleUser
+	 */
+	public boolean isSingleUser() {
+		return isSingleUser;
+	}
+
+	/**
+	 * @param isSingleUser the isSingleUser to set
+	 */
+	public void setSingleUser(boolean isSingleUser) {
+		this.isSingleUser = isSingleUser;
+	}
+
 	public void decrypt(){
 		
 		filePart.clear();
@@ -451,16 +464,12 @@ public class ReadLayout implements GeneralLayout {
 			QRCode cod_info= QRCode.getQRCodeFromMagick(tmp_img);
 			String tmp= cod_info.readQRCode().getText();
 			String[] info_split= tmp.split("\n");
-			title= info_split[0];
+			title= info_split[0].substring(info_split[0].indexOf("Title: "));
 			author= info_split[1];
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date date = new Date();
 			info= dateFormat.format(date);
-			info = info + info_split[3];
-			
-			field_title.setText(title);
-			field_author.setText(author);
-			field_info.setText(info);
+			receiver= info_split[3];
 			
 			sender_uid= info_split[2];
 
@@ -478,6 +487,8 @@ public class ReadLayout implements GeneralLayout {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		//confront signature
+		tmp_img = filePart.get(2);
 		//qrcodes
 		
 	}

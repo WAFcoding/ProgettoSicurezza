@@ -271,7 +271,8 @@ public class MagickUtility {
 	 * 0-text
 	 * 1-cod info
 	 * 2-signature
-	 * 3..12-qrcodes
+	 * 3-signature to confront
+	 * 4..13-qrcodes
 	 * @param path
 	 * @return
 	 */
@@ -329,6 +330,13 @@ public class MagickUtility {
 			MagickImage img_signature= cropImage(img, signature_x, signature_y, resizeY(101, height, pagesizey), signature_width);
 			//saveImage(img_signature, "/home/pasquale/ProgettoSicurezza/crop/img_signature.jpg");
 			toReturn.add(img_signature);
+			int x = MagickUtility.resizeX(1, width, pagesizex);
+			int y= MagickUtility.resizeY(160, height, pagesizey);
+			int crop_width= MagickUtility.resizeX(pagesizex, width, pagesizex);
+			int crop_height= MagickUtility.resizeY(pagesizey - 160, height, pagesizey);
+			MagickImage img_crop= MagickUtility.cropImage(img, x, y, crop_height, crop_width);
+			//MagickUtility.saveImage(img_crop, "/home/pasquale/ProgettoSicurezza/tmp_crop_mattata.png");
+			toReturn.add(img_crop);
 			//qrcodes encripted
 			int qrcode_y= resizeY(609, height, pagesizey);
 			int qrcode_width= resizeX(101, width, pagesizex);
