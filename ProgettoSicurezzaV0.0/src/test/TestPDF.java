@@ -5,6 +5,7 @@ package test;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import javax.imageio.ImageIO;
@@ -14,8 +15,10 @@ import magick.MagickImage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 
+import util.ImagePHash;
 import util.MagickUtility;
 import util.PDFUtil;
+import util.QRCode;
 
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.PageSize;
@@ -68,15 +71,19 @@ public class TestPDF {
 				//					  "test8", "test9", "test10", "test11", "test12", "test13", "test14");
 			PDFUtil.close();
 			
+			//prendo il documento
 			PDDocument document= PDDocument.load(path_test);
 			PDPage page= (PDPage) document.getDocumentCatalog().getAllPages().get(0);
+			//converto in immagine
 			BufferedImage img = page.convertToImage(BufferedImage.TYPE_BYTE_BINARY, 400);
 			int resx= img.getWidth();
 			int resy= img.getHeight();
+			//salvo l'immagine
+			//TODO eliminare l'immagine
 			File outputfile = new File("/home/pasquale/ProgettoSicurezza/tmp_mattata.png");
 			ImageIO.write(img, "jpg", outputfile);
-			
-
+			//croppo l'immagine
+			//TODO eliminare immagini croppate
 			int pagesizex= new Double(PageSize.A4.getWidth()).intValue();
 			int pagesizey= new Double(PageSize.A4.getHeight()).intValue();
 			MagickImage magick= MagickUtility.getImage("/home/pasquale/ProgettoSicurezza/tmp_mattata.png");
@@ -86,6 +93,26 @@ public class TestPDF {
 			int height= MagickUtility.resizeY(pagesizey - 160, resy, pagesizey);
 			MagickImage crop= MagickUtility.cropImage(magick, x, y, height, width);
 			MagickUtility.saveImage(crop, "/home/pasquale/ProgettoSicurezza/tmp_crop_mattata.png");
+			//faccio hash
+			ImagePHash hash = new ImagePHash(42, 5);
+			String originale = hash.getHash(new FileInputStream("/home/pasquale/ProgettoSicurezza/tmp_crop_mattata.png"));
+			//TODO firma con chiave privata
+			//creo il qrcode
+			//TODO eliminare qrcode
+			QRCode qr= new QRCode();
+			int qr_width= MagickUtility.resizeX(QRCode.DEFAULT_WIDTH, resx, pagesizex);
+			int qr_height= MagickUtility.resizeY(QRCode.DEFAULT_HEIGHT, resy, pagesizey);
+			qr.writeQRCode(originale, qr_width , qr_height);
+			qr.saveQRCodeToFile("/home/pasquale/ProgettoSicurezza/tmp_qrcode_crop_hash.png");
+			//copro l'immagine
+			//TODO non cancellare l'immagine coperta
+			MagickImage qrimg= MagickUtility.getImage("/home/pasquale/ProgettoSicurezza/tmp_qrcode_crop_hash.png");
+			int coverx= MagickUtility.resizeX(pagesizex - 111, resx, pagesizex);
+			int covery= MagickUtility.resizeY(11, resy, pagesizey);
+			MagickImage buffImg= MagickUtility.getImage("/home/pasquale/ProgettoSicurezza/tmp_mattata.png");
+			MagickImage coveredimg= MagickUtility.coverWithImage(buffImg, qrimg, coverx, covery);
+			MagickUtility.saveImage(coveredimg, "/home/pasquale/ProgettoSicurezza/tmp_mattata.png");
+			
 		}
 		//PDFUtil.extractImages(path_test, "/home/pasquale/ProgettoSicurezza/img/Img%s.%s");
 		
