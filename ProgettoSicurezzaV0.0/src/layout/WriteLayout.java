@@ -21,7 +21,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.KeyFactory;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -551,7 +553,6 @@ public class WriteLayout implements GeneralLayout{
 					PDFUtil.createDocument(title, author, text, infQrCodePath, info, qrcodes);
 					PDFUtil.close();
 
-
 					//prendo il documento
 					PDDocument document= PDDocument.load(pat_pdf);
 					PDPage page= (PDPage) document.getDocumentCatalog().getAllPages().get(0);
@@ -576,13 +577,16 @@ public class WriteLayout implements GeneralLayout{
 					ImagePHash hash = new ImagePHash(42, 5);
 					String signature = hash.getHash(new FileInputStream(img_cropped));
 					//firma dell'hash
-					byte[] enc= CryptoUtility.encrypt(CRYPTO_ALGO.AES, signature, user_sender.getPrivateKey());
+					//byte[] enc= CryptoUtility.encrypt(CRYPTO_ALGO.AES, signature, user_sender.getPrivateKey());
+					PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(user_sender.getPrivateKey())));
+					byte[] enc= CryptoUtility.signRSA(privateKey, signature);
+					//String encripted= CryptoUtility.toBase64(enc);
 					String encripted= new String(enc);
 					//creo il qrcode
 					QRCode qr= new QRCode();
 					int qr_width= MagickUtility.resizeX(QRCode.DEFAULT_WIDTH, resx, pagesizex);
 					int qr_height= MagickUtility.resizeY(QRCode.DEFAULT_HEIGHT, resy, pagesizey);
-					qr.writeQRCode(encripted, qr_width , qr_height);
+					qr.writeQRCode(signature, qr_width , qr_height);
 					qr.saveQRCodeToFile(qrcode_tosave);
 					//copro l'immagine
 					MagickImage qrimg= MagickUtility.getImage(qrcode_tosave);
@@ -608,8 +612,8 @@ public class WriteLayout implements GeneralLayout{
 					tmp= new File(s);
 					tmp.delete();
 				}
-				tmp= new File(pat_pdf);
-				tmp.delete();
+				//tmp= new File(pat_pdf);
+				//tmp.delete();
 				tmp= new File(img_cropped);
 				tmp.delete();
 				tmp= new File(qrcode_tosave);

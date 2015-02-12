@@ -176,13 +176,12 @@ public class LayoutControl {
 
 		if(err_layout == null){
 			err_layout= new ErrorLayout(this, mainFrame.getContentPane(), error_message, backTo);
-			err_layout.addComponentsToPane();
 		}
 		else{
 			err_layout.setError_message(error_message);
 			err_layout.setBackTo(backTo);
-			err_layout.addComponentsToPane();
 		}
+		err_layout.addComponentsToPane();
 		
 		setLayout("ERROR");
 	}
@@ -256,6 +255,7 @@ public class LayoutControl {
 	
 	public void ReadLayout(){
 		if(read_layout == null){
+			System.out.println("new read layout");
 			read_layout= new ReadLayout(this, mainFrame.getContentPane());
 		}
 		read_layout.addComponentsToPane();

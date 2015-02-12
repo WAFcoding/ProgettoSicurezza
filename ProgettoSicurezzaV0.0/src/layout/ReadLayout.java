@@ -13,11 +13,16 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
@@ -27,14 +32,22 @@ import javax.swing.ScrollPaneConstants;
 
 import magick.MagickImage;
 import usersManagement.User;
+import util.CryptoUtility;
+import util.CryptoUtility.ASYMMCRYPTO_ALGO;
+import util.ImagePHash;
 import util.MagickUtility;
 import util.QRCode;
+import connection.ConnectionFactory;
+import connection.KeyDistributionClient;
 
 /**
  * @author pasquale
  *
  */
 public class ReadLayout implements GeneralLayout {
+	
+	public final static String keystore_pwd= "progettoSII";
+	public final static String url= "localhost";//TODO UserManager: inserire il url nei settings
 
 	private LayoutControl control;
 	private Container pane;
@@ -47,14 +60,17 @@ public class ReadLayout implements GeneralLayout {
 	private File currentFile;
 	private boolean isAlreadyConfigured;
 	private boolean receiverSetted;
-	private User user;
+	private User actualUser;
 	private String sender_uid;
 	private ArrayList<String> qrcodes_path;
 	private int current_qrcode = 0;
 	private ArrayList<MagickImage> filePart;
 	
 	private String title, author, info, receiver;
-	private boolean isSingleUser;
+	private boolean isSingleUser, error;
+
+	private String decode_key;
+	private ArrayList<String> level_key;
 
 	public ReadLayout(LayoutControl control, Container pane) {
 		this.control = control;
@@ -68,6 +84,12 @@ public class ReadLayout implements GeneralLayout {
 		receiver= "";
 		sender_uid= "";
 		isSingleUser= true;
+		
+		actualUser= control.getUser_manager().getActualUser();
+		error= false;
+		
+		decode_key= "";
+		level_key= new ArrayList<String>();
 
 	}
 
@@ -77,119 +99,119 @@ public class ReadLayout implements GeneralLayout {
 		setCurrentFile(new File(control.getRead_layout_current_file()));
 
 		decrypt();
+		
+		if(!isError()){
+			String tmp_user = "";
+			area= new JTextArea(text);
+			area.setMargin(new Insets(5, 5, 5, 5));
+			area.setWrapStyleWord(true);
+			area.setLineWrap(true);
+			JScrollPane scroll_pane = new JScrollPane(area);
+			scroll_pane.setPreferredSize(new Dimension(600, 400));
+			scroll_pane.setMaximumSize(new Dimension(600, 400));
+			scroll_pane
+					.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-		String tmp_user = "";
-		area= new JTextArea(text);
-		area.setMargin(new Insets(5, 5, 5, 5));
-		area.setWrapStyleWord(true);
-		area.setLineWrap(true);
-		JScrollPane scroll_pane = new JScrollPane(area);
-		scroll_pane.setPreferredSize(new Dimension(600, 400));
-		scroll_pane.setMaximumSize(new Dimension(600, 400));
-		scroll_pane
-				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			// inserimento pulsanti
+			pane.removeAll();
+			pane.setLayout(new GridBagLayout());
+			pane.setSize(800, 600);
 
-		// inserimento pulsanti
-		pane.removeAll();
-		pane.setLayout(new GridBagLayout());
-		pane.setSize(800, 600);
+			int posx = 0, posy = 0;
+			GridBagConstraints c = new GridBagConstraints();
+			c.anchor = GridBagConstraints.WEST;
+			c.insets = new Insets(10, 10, 10, 10);
+			// 0.0 - title
+			field_title = new JTextField("Title");
+			field_title.setEditable(false);
+			field_title.setText(title);
+			c.gridx = posx;
+			c.gridy = posy;
+			c.gridheight = 1;
+			c.gridwidth = 3;
+			c.weightx = 1;
+			c.weighty = 0;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			pane.add(field_title, c);
+			// 0.1 - author
+			posy++;
+			field_author = new JTextField(author);
+			field_author.setEditable(false);
+			c.gridx = posx;
+			c.gridy = posy;
+			c.gridheight = 1;
+			c.gridwidth = 6;
+			c.weightx = 1;
+			c.weighty = 0;
+			pane.add(field_author, c);
+			// 0.2 - receiver
+			posy++;
+			field_receiver= new JTextField(receiver);
+			field_receiver.setEditable(false);
+			c.gridx = posx;
+			c.gridy = posy;
+			c.gridheight = 1;
+			c.gridwidth = 6;
+			c.weightx = 1;
+			c.weighty = 0;
+			pane.add(field_receiver, c);
+			// 0.3 - info
+			posy++;
+			field_info = new JTextField(info);
+			field_info.setEditable(false);
+			c.gridx = posx;
+			c.gridy = posy;
+			c.gridheight = 1;
+			c.gridwidth = 6;
+			c.weightx = 1;
+			c.weighty = 0;
+			pane.add(field_info, c);
+			// 0.2 - text area
+			posy++;
+			c.gridx = posx;
+			c.gridy = posy;
+			c.gridheight = 8;
+			c.gridwidth = 6;
+			c.weightx = 1;
+			c.weighty = 1;
+			c.fill = GridBagConstraints.BOTH;
+			pane.add(scroll_pane, c);
+			// 7.0 - BACK
+			JButton button = new JButton("BACK");
+			posx = 7;
+			posy = 0;
+			c.gridheight = 1;
+			c.gridwidth = 1;
+			c.weightx = 0;
+			c.weighty = 0;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.gridx = posx;
+			c.gridy = posy;
+			c.ipadx = 0;
+			c.ipady = 0;
+			button.setBackground(Color.BLUE);
+			button.setForeground(Color.WHITE);
+			button.addActionListener(new ActionListener() {
 
-		int posx = 0, posy = 0;
-		GridBagConstraints c = new GridBagConstraints();
-		c.anchor = GridBagConstraints.WEST;
-		c.insets = new Insets(10, 10, 10, 10);
-		// 0.0 - title
-		field_title = new JTextField("Title");
-		field_title.setEditable(false);
-		field_title.setText(title);
-		c.gridx = posx;
-		c.gridy = posy;
-		c.gridheight = 1;
-		c.gridwidth = 3;
-		c.weightx = 1;
-		c.weighty = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		pane.add(field_title, c);
-		// 0.1 - author
-		tmp_user = control.getUser_manager().getActualUser().getName() + " "
-				+ control.getUser_manager().getActualUser().getSurname()
-				+ " [ "
-				+ control.getUser_manager().getActualUser().getTrustLevel()
-				+ " ]";
-		posy++;
-		field_author = new JTextField(tmp_user);
-		field_author.setEditable(false);
-		c.gridx = posx;
-		c.gridy = posy;
-		c.gridheight = 1;
-		c.gridwidth = 6;
-		c.weightx = 1;
-		c.weighty = 0;
-		pane.add(field_author, c);
-		// 0.2 - receiver
-		posy++;
-		field_receiver= new JTextField(receiver);
-		field_receiver.setEditable(false);
-		c.gridx = posx;
-		c.gridy = posy;
-		c.gridheight = 1;
-		c.gridwidth = 6;
-		c.weightx = 1;
-		c.weighty = 0;
-		pane.add(field_receiver, c);
-		// 0.3 - info
-		posy++;
-		field_info = new JTextField(info);
-		field_info.setEditable(false);
-		c.gridx = posx;
-		c.gridy = posy;
-		c.gridheight = 1;
-		c.gridwidth = 6;
-		c.weightx = 1;
-		c.weighty = 0;
-		pane.add(field_info, c);
-		// 0.2 - text area
-		posy++;
-		c.gridx = posx;
-		c.gridy = posy;
-		c.gridheight = 8;
-		c.gridwidth = 6;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
-		pane.add(scroll_pane, c);
-		// 7.0 - BACK
-		JButton button = new JButton("BACK");
-		posx = 7;
-		posy = 0;
-		c.gridheight = 1;
-		c.gridwidth = 1;
-		c.weightx = 0;
-		c.weighty = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.gridx = posx;
-		c.gridy = posy;
-		c.ipadx = 0;
-		c.ipady = 0;
-		button.setBackground(Color.BLUE);
-		button.setForeground(Color.WHITE);
-		button.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				control.setLayout("DECODE");
-			}
-		});
-		pane.add(button, c);
-		// 7.3 - SALVA
-		button = new JButton("SALVA");
-		posy++;
-		c.gridx = posx;
-		c.gridy = posy;
-		button.setBackground(Color.BLUE);
-		button.setForeground(Color.WHITE);
-		// button.addActionListener(new SaveAction());
-		pane.add(button, c);
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					control.setLayout("DECODE");
+				}
+			});
+			pane.add(button, c);
+			// 7.3 - SALVA
+			button = new JButton("SALVA");
+			posy++;
+			c.gridx = posx;
+			c.gridy = posy;
+			button.setBackground(Color.BLUE);
+			button.setForeground(Color.WHITE);
+			// button.addActionListener(new SaveAction());
+			pane.add(button, c);
+		}
+		else{
+			control.setErrorLayout("Le firme combaciano meno del 90%\npossibili manomissioni.", "READ");
+		}
 	}
 
 	/**
@@ -391,7 +413,7 @@ public class ReadLayout implements GeneralLayout {
 	 * @return the user
 	 */
 	public User getUser() {
-		return user;
+		return actualUser;
 	}
 
 	/**
@@ -399,7 +421,7 @@ public class ReadLayout implements GeneralLayout {
 	 *            the user to set
 	 */
 	public void setUser(User user) {
-		this.user = user;
+		this.actualUser = user;
 	}
 
 	/**
@@ -451,27 +473,47 @@ public class ReadLayout implements GeneralLayout {
 		this.isSingleUser = isSingleUser;
 	}
 
+	/**
+	 * @return the error
+	 */
+	public boolean isError() {
+		return error;
+	}
+
+	/**
+	 * @param error the error to set
+	 */
+	public void setError(boolean error) {
+		this.error = error;
+	}
+
 	public void decrypt(){
 		
 		filePart.clear();
 		filePart= MagickUtility.getDataToDecrypt(currentFile.getAbsolutePath());
 		MagickImage tmp_img = filePart.get(0);
 		text= MagickUtility.getTextFromMagickImage(tmp_img);
-		//TODO decodificare il testo
+		
 		//codification info
 		tmp_img = filePart.get(1);
 		try {
 			QRCode cod_info= QRCode.getQRCodeFromMagick(tmp_img);
 			String tmp= cod_info.readQRCode().getText();
 			String[] info_split= tmp.split("\n");
-			title= info_split[0].substring(info_split[0].indexOf("Title: "));
-			author= info_split[1];
+			title= info_split[0].substring(7);
+			author= info_split[1].substring(8);
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date date = new Date();
 			info= dateFormat.format(date);
-			receiver= info_split[3];
+			receiver= info_split[3].substring(10);
+			if(receiver.startsWith("Level ")){
+				setSingleUser(false);
+			}
+			else{
+				setSingleUser(true);
+			}
 			
-			sender_uid= info_split[2];
+			sender_uid= info_split[2].substring(12);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -480,15 +522,76 @@ public class ReadLayout implements GeneralLayout {
 		tmp_img = filePart.get(2);
 		try{
 			QRCode cod_signature= QRCode.getQRCodeFromMagick(tmp_img);
-			String tmp= cod_signature.readQRCode().getText();
-			//TODO decriptare con chiave pubblica mittente
-			//fare hash del testo criptato
-			//confrontare hash
+			String signature= cod_signature.readQRCode().getText();
+			//signature = CryptoUtility.fromBase64(signature).toString();
+			String username= actualUser.getName() + "_" + actualUser.getID();
+			String pwd= actualUser.getPassword();
+			try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, username, keystore_pwd, pwd)) {
+				String public_key= cli.getUserPublicKey(sender_uid);
+				PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(CryptoUtility.fromBase64(public_key)));
+				
+				//byte[] dec= CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, signature.getBytes(), publicKey);
+				
+				//String signature_decrypted= new String(dec);
+				
+				tmp_img= filePart.get(3);
+				String tmp_path= getOutput_folder()+"tmp_img.png";
+				MagickUtility.saveImage(tmp_img, tmp_path);
+				ImagePHash hash = new ImagePHash(42, 5);
+				
+				String signature_calculated= hash.getHash(new FileInputStream(tmp_path));
+
+				boolean correct= CryptoUtility.verifyRSA(publicKey, CryptoUtility.fromBase64(signature_calculated), signature);
+				
+				File tmp_f= new File(tmp_path);
+				tmp_f.delete();
+				
+				//double match= hash.matchPercentage(signature_decrypted, signature_calculated);
+				//System.out.println("signature= " + signature + "\ncalculated= " + signature_calculated);
+				//if(match < 90.0){
+				if(!correct){
+					//System.out.println("match < 90");
+					System.out.println("signature not match");
+					if(!isError())
+						setError(true);
+					else
+						setError(false);
+				}
+				else{
+					System.out.println("signature match");
+				/*	
+					//decodifica del testo
+					if(isSingleUser()){
+						decode_key= actualUser.getPrivateKey();
+					}
+					else{
+						Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
+						//TODO ordinare le chiavi della mappa
+						control.setKeyLevelMap(levelKey);
+					}
+					ArrayList<MagickImage> qrcodes= new ArrayList<MagickImage>();
+					for(int i=4; i<14; i++){
+						qrcodes.add(filePart.get(i));
+					}
+					//prenderli al contrario
+					int size= qrcodes.size();
+					for(int i= size-1; i>=0; i--){
+						QRCode qrcode= QRCode.getQRCodeFromMagick(qrcodes.get(i));
+						if(isSingleUser()){
+							
+						}
+						else{
+							//get dal control della chiave, se null errore
+						}
+					}*/
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		//confront signature
-		tmp_img = filePart.get(2);
+		//tmp_img = filePart.get(2);
 		//qrcodes
 		
 	}

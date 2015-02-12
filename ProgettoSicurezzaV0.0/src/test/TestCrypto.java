@@ -15,7 +15,7 @@ public class TestCrypto {
 		String testData = "tanto era tanto antico";
 		String key = "pasqualino";//lol
 		
-		System.out.println("===TEST Crypto-Utility===\nDati:" + testData + "\nChiave:" + key);
+		System.out.println("===TEST Crypto- Utility===\nDati:" + testData + "\nChiave:" + key);
 		
 		System.out.println("\nAES-TEST");
 		byte[] enc = CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, testData, key);
