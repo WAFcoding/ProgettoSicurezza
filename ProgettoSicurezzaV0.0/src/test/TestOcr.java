@@ -61,7 +61,7 @@ public class TestOcr {
 		 * FIXME
 		 * Il percorso del file immagine va cambiato (mando anche queste immagini per email)
 		 */
-		File f = new File("/home/pasquale/ProgettoSicurezza/crop3/img_text.png");
+		File f = new File("/home/pasquale/ProgettoSicurezza/pasquale/output/img_text.png");
 		BufferedImage img = ImageIO.read(f);
 		
 		img= ImageHelper.convertImageToBinary(img);

@@ -30,6 +30,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
+import magick.MagickException;
 import magick.MagickImage;
 import usersManagement.User;
 import util.CryptoUtility;
@@ -39,6 +40,7 @@ import util.MagickUtility;
 import util.QRCode;
 import connection.ConnectionFactory;
 import connection.KeyDistributionClient;
+import exceptions.MagickImageNullException;
 
 /**
  * @author pasquale
@@ -493,6 +495,11 @@ public class ReadLayout implements GeneralLayout {
 		filePart= MagickUtility.getDataToDecrypt(currentFile.getAbsolutePath());
 		MagickImage tmp_img = filePart.get(0);
 		text= MagickUtility.getTextFromMagickImage(tmp_img);
+		try {
+			MagickUtility.saveImage(tmp_img, "/home/pasquale/ProgettoSicurezza/pasquale/output/img_text.png");
+		} catch (MagickImageNullException | MagickException e1) {
+			e1.printStackTrace();
+		}
 		
 		//codification info
 		tmp_img = filePart.get(1);
@@ -523,16 +530,18 @@ public class ReadLayout implements GeneralLayout {
 		try{
 			QRCode cod_signature= QRCode.getQRCodeFromMagick(tmp_img);
 			String signature= cod_signature.readQRCode().getText();
-			//signature = CryptoUtility.fromBase64(signature).toString();
+			System.out.println("signature " + signature);
+			byte[] b_signature= CryptoUtility.fromBase64(signature);
+			System.out.println("signature2 " + signature);
 			String username= actualUser.getName() + "_" + actualUser.getID();
 			String pwd= actualUser.getPassword();
 			try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, username, keystore_pwd, pwd)) {
-				String public_key= cli.getUserPublicKey(sender_uid);
+				String public_key= cli.getUserPublicKey(sender_uid).replace("\n", "");
 				PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(CryptoUtility.fromBase64(public_key)));
 				
-				//byte[] dec= CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, signature.getBytes(), publicKey);
+				byte[] dec= CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, b_signature, publicKey);
 				
-				//String signature_decrypted= new String(dec);
+				String signature_decrypted= new String(dec);
 				
 				tmp_img= filePart.get(3);
 				String tmp_path= getOutput_folder()+"tmp_img.png";
@@ -540,16 +549,13 @@ public class ReadLayout implements GeneralLayout {
 				ImagePHash hash = new ImagePHash(42, 5);
 				
 				String signature_calculated= hash.getHash(new FileInputStream(tmp_path));
-
-				boolean correct= CryptoUtility.verifyRSA(publicKey, CryptoUtility.fromBase64(signature_calculated), signature);
 				
 				File tmp_f= new File(tmp_path);
 				tmp_f.delete();
 				
-				//double match= hash.matchPercentage(signature_decrypted, signature_calculated);
-				//System.out.println("signature= " + signature + "\ncalculated= " + signature_calculated);
-				//if(match < 90.0){
-				if(!correct){
+				double match= hash.matchPercentage(signature_decrypted, signature_calculated);
+				System.out.println("signature= "+signature+"\nsignature_decrypted= " + signature_decrypted + "\ncalculated= " + signature_calculated);
+				if(match < 90.0){
 					//System.out.println("match < 90");
 					System.out.println("signature not match");
 					if(!isError())
@@ -559,7 +565,7 @@ public class ReadLayout implements GeneralLayout {
 				}
 				else{
 					System.out.println("signature match");
-				/*	
+				
 					//decodifica del testo
 					if(isSingleUser()){
 						decode_key= actualUser.getPrivateKey();
@@ -583,7 +589,7 @@ public class ReadLayout implements GeneralLayout {
 						else{
 							//get dal control della chiave, se null errore
 						}
-					}*/
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

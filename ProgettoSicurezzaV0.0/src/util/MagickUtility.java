@@ -314,7 +314,7 @@ public class MagickUtility {
 			int text_x= resizeX(1, width, pagesizex);
 			int text_y= resizeY(160, height, pagesizey);
 			MagickImage img_text= cropImage(img, text_x, text_y, resizeY(400, height, pagesizey), resizedPagesizex);
-			saveImage(img_text, "/home/pasquale/ProgettoSicurezza/crop3/img_text.png");
+			//saveImage(img_text, "/home/pasquale/ProgettoSicurezza/pasquale/output/img_text.png");
 			toReturn.add(img_text);
 			//codification info
 			int codInfo_x= resizeX(pagesizex - 222, width, pagesizex);

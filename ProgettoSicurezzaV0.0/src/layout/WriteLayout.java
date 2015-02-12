@@ -577,16 +577,15 @@ public class WriteLayout implements GeneralLayout{
 					ImagePHash hash = new ImagePHash(42, 5);
 					String signature = hash.getHash(new FileInputStream(img_cropped));
 					//firma dell'hash
-					//byte[] enc= CryptoUtility.encrypt(CRYPTO_ALGO.AES, signature, user_sender.getPrivateKey());
 					PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(user_sender.getPrivateKey())));
-					byte[] enc= CryptoUtility.signRSA(privateKey, signature);
-					//String encripted= CryptoUtility.toBase64(enc);
-					String encripted= new String(enc);
+					byte[] enc= CryptoUtility.asymm_encrypt(ASYMMCRYPTO_ALGO.RSA, signature.getBytes(), privateKey);
+					String encripted= new String(CryptoUtility.toBase64(enc));
+					encripted= encripted.replace("\n", "");
 					//creo il qrcode
 					QRCode qr= new QRCode();
 					int qr_width= MagickUtility.resizeX(QRCode.DEFAULT_WIDTH, resx, pagesizex);
 					int qr_height= MagickUtility.resizeY(QRCode.DEFAULT_HEIGHT, resy, pagesizey);
-					qr.writeQRCode(signature, qr_width , qr_height);
+					qr.writeQRCode(encripted, qr_width , qr_height);
 					qr.saveQRCodeToFile(qrcode_tosave);
 					//copro l'immagine
 					MagickImage qrimg= MagickUtility.getImage(qrcode_tosave);
@@ -612,8 +611,8 @@ public class WriteLayout implements GeneralLayout{
 					tmp= new File(s);
 					tmp.delete();
 				}
-				//tmp= new File(pat_pdf);
-				//tmp.delete();
+				tmp= new File(pat_pdf);
+				tmp.delete();
 				tmp= new File(img_cropped);
 				tmp.delete();
 				tmp= new File(qrcode_tosave);
