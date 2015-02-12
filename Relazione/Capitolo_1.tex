@@ -15,7 +15,7 @@ In particolare questo significa che chi utilizza tale sistema deve essere in gra
 	\item decifrare il contenuto di un documento ricevuto da un'altra persona.
 \end{itemize}
 Lo scopo ultimo è dunque quello di abilitare l'utilizzatore ad inviare ad un gruppo di persone il documento che ha appena creato. Tuttavia durante il trasferimento (funzione che non compete a questa applicazione) può succedere che il documento possa venire alterato in alcune sue parti se non si utilizzano canali sicuri; moltissime truffe avvenute in passato si sono basate su questa vulnerabilità. Dunque uno degli scopi è quello di garantire con opportune tecniche basate su crittografia asimmetrica che il documento cartaceo resti robusto ed inattaccabile qualunque sia il canale di comunicazione che l'utente finale sceglie per l'invio.
-Nel caso di questo progetto, l'elaborazione riguarda documenti cartacei, quindi non è possibile archiviare le informazioni sensibili in una qualche struttura dati. Dunque la sfida più importante è quella di trasportare insieme al documento stampato le informazioni segrete.
+Nel caso di questo progetto, l'elaborazione riguarda documenti cartacei, quindi non è possibile archiviare le informazioni sensibili in una qualche struttura dati. La sfida più importante è quella di trasportare insieme al documento stampato le informazioni segrete.
 Questo apre una serie di problematiche legate alla gestione delle informazioni che sono in formato digitale nella fase di composizione e diventano analogiche nella fase di acquisizione di un documento spedito (che può essere stampato e acquisito più volte durante il percorso - per esempio via fax).
 La tecnologia migliore per il trasporto dei dati su immagini è rappresentata dal \emph{QR-Code}, un particolare tipo di codice a barre 2D che può contenere al suo interno una discreta quantità di informazioni.
 I dati possono essere riletti utilizzando algoritmi di riconoscimento robusti che hanno raggiunto nel tempo un elevata maturità.
@@ -24,7 +24,7 @@ Nell'ambito di questo progetto i QR-Code sono stati utilizzati sia per memorizza
 Un'altra funzionalità importante che rientra negli scopi di questa applicazione, è quella di creare una gerarchia tra gli utenti che accedono al servizio. 
 Può capitare, infatti, di voler pubblicare un certo documento e di voler permettere solo a pochi eletti di accedere alle informazioni cifrate. Questo implica che nel sistema si avranno utenti con livelli di privilegio diversi dove ognuno di questi può decifrare e leggere solo le informazioni adeguate al suo livello.
 In questo caso la soluzione più ovvia potrebbe essere quella di pubblicare versioni diverse dello stesso documento oscurando opportunamente sulle diverse copie le informazioni che si vogliono tenere segrete a ciascun gruppo. Questo processo può risultare lungo, macchinoso e poco sicuro: è possibile, infatti, che qualche copia possa finire al destinatario sbagliato se non si prendono opportune precauzioni.
-Ci si è quindi occupato di realizzare un sistema dove la cifratura viene effettuata con chiavi speciali (che da ora in poi chiameremo \textbf{chiavi di livello}), le quali vengono distribuite solo agli utenti che hanno un \textbf{livello di fiducia} (o \textbf{Trust~Level}) adeguato. In questo caso un Trust~Level basso corrisponde ad un basso livello di privilegio, mentre un Trust~Level alto garantisce l'accesso a tutte le informazioni cifrate con le chiavi di livello più basso.
+Ci si è quindi occupato di realizzare un sistema dove la cifratura viene effettuata con chiavi speciali (che da ora in poi verranno chiamate \textbf{chiavi di livello}), le quali vengono distribuite solo agli utenti che hanno un \textbf{livello di fiducia} (o \textbf{Trust~Level}) adeguato. In questo caso un Trust~Level basso corrisponde ad un basso livello di privilegio, mentre un Trust~Level alto garantisce l'accesso a tutte le informazioni cifrate con le chiavi di livello più basso.
 
 Riassumendo quindi, per quanto riguarda le funzionalità principali, il sistema dovrebbe permettere di:
 \begin{itemize}
@@ -37,7 +37,7 @@ Riassumendo quindi, per quanto riguarda le funzionalità principali, il sistema 
 
 \section{Tecnologie Utilizzate}
 	\label{sec:tecnologie}
-Gli obiettivi appena illustrati, danno un'idea delle tante problematiche che l'applicazione deve affrontare. Per questo sono molte le tecnologie che sono state messe in gioco. Di seguito si riportano quelle utilizzate maggiormente.
+Gli obiettivi appena illustrati, danno un'idea delle tante problematiche che l'applicazione deve affrontare. Per questo sono molte le tecnologie che sono state messe in gioco. Nel seguito di questo paragrafo verranno spiegate quelle utilizzate maggiormente.
 
 \subsection{Strumenti di sviluppo}
 Per quanto riguarda gli strumenti, si è fatto uso di
@@ -88,10 +88,19 @@ Il QR-Code fu sviluppato nel $1994$ dalla compagnia giapponese \emph{Denso~Wave}
 Tuttavia essendo un codice che deve essere riportato su un documento cartaceo, può subire dei danni che possono provocare degli errori nella seguente lettura.
 Per questo viene utilizzato il codice Reed-Solomon per la rilevazione e correzione d'errore che permette di ricostruire i dati persi, ripristinando, durante la decodifica, fino al $30\%$ delle informazioni codificate.
 
+	\begin{center}	
+		\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.9]{Immagini/qrcode}
+		\caption[Esempio di QR-Code]{Un esempio di QR-Code.}
+		\label{fig:usecase}
+		\end{figure}
+	\end{center}
+
 \subsection{OCR}
 	\label{subsec:ocr}
 La parola \emph{OCR} (Optical~Character~Recognition) descrive una classe di sistemi di riconoscimento ottico dei caratteri.
-Gli OCR sono programmi dedicati alla conversione di un'immagine contenente testo, solitamente acquisite tramite scanner (come nel caso di questo progetto), in testo digitale modificabile con un normale editor. Il testo può essere convertito in formato ASCII semplice, Unicode o, nel caso dei sistemi più avanzati, in un formato contenente anche l'impaginazione del documento.
+Gli OCR sono programmi dedicati alla conversione di un'immagine contenente testo, solitamente acquisite tramite scanner (come nel caso di questo progetto), in testo digitale modificabile con un normale editor. Il testo può essere convertito in formato \texttt{ASCII} semplice, \texttt{Unicode} o, nel caso dei sistemi più avanzati, in un formato contenente anche l'impaginazione del documento.
 L'OCR è un importante campo di ricerca dell'intelligenza artificiale, della visione artificiale e del pattern recognition, legati al riconoscimento delle immagini.
 I sistemi OCR per funzionare correttamente richiedono una fase di ``addestramento''. Durante questa fase al sistema vengono forniti degli esempi di immagini col corrispondente testo in formato ASCII o simile in modo che gli algoritmi si possano calibrare sul testo che usualmente andranno ad analizzare. Gli ultimi software di OCR utilizzano algoritmi in grado di riconoscere i contorni e in grado di ricostruire oltre al testo anche la formattazione della pagina.
 Gli OCR possono essere usati per riconoscere:
@@ -100,3 +109,12 @@ Gli OCR possono essere usati per riconoscere:
 	\item scrittura a mano libera, problema tutt'altro che risolto, per la quale gli algoritmi hanno tassi di accuratezza dell'$80\%$ - $90\%$;
 	\item caratteri in corsivo, che è un campo in fase di studio, per il quale si hanno tutt'oggi risultati poco soddisfacenti a livello di accuratezza. 
 \end{itemize}
+
+	\begin{center}	
+		\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.9]{Immagini/ocr}
+		\caption[OCR]{Processo da seguire per utilizzare un sistema OCR.}
+		\label{fig:usecase}
+		\end{figure}
+	\end{center}

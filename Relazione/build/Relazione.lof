@@ -1,8 +1,11 @@
 \select@language {italian}
 \select@language {italian}
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Esempio di QR-Code}}{5}{figure.1.1}
+\contentsline {figure}{\numberline {1.2}{\ignorespaces OCR}}{6}{figure.1.2}
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Use Case Diagram}}{8}{figure.2.1}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Architettura del sistema}}{10}{figure.2.2}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
