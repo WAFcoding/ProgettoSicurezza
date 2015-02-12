@@ -311,13 +311,13 @@ public class WriteLayout implements GeneralLayout{
 		this.currentFile = currentFile;
 		String path= this.currentFile.getAbsolutePath();
 		String name= path.substring(path.lastIndexOf("/")+1, path.lastIndexOf("."))+"_0";
-		path= path.substring(0, path.lastIndexOf("/"));
+		/*path= path.substring(0, path.lastIndexOf("/"));
 		path= path.substring(0, path.lastIndexOf("/"));
 		path+= "/ProgettoSicurezza/";
 		File f= new File(path);
 		if(!f.exists()){
 			f.mkdir();
-		}
+		}*/
 		setNameFile(name);
 	}
 	

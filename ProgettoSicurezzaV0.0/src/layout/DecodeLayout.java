@@ -315,7 +315,7 @@ public class DecodeLayout implements GeneralLayout, ListSelectionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			JFileChooser file_chooser= new JFileChooser(control.getUser_manager().getActualUser().getDir_in());
+			JFileChooser file_chooser= new JFileChooser(control.getUser_manager().getActualUser().getDir_out());
 			int choose= file_chooser.showDialog(null, "apri");
 			
 			if(choose == JFileChooser.APPROVE_OPTION){
