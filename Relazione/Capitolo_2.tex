@@ -94,7 +94,7 @@ Quello appena descritto è ciò che avviene dal punto di vista del server. Per q
 Si tratterà adesso l'aspetto principale di questo progetto: l'elaborazione dei documenti. Si descriveranno in modo dettagliato le procedure che sono state implementate per costruire, cifrare e decifrare i contenuti.
 
 \subsubsection{Costruzione del documento}
-In questo paragrafo verrà analizzata l'impaginazione del documento cartaceo.
+In questo paragrafo verrà analizzata l'impaginazione del documento cartaceo che ha il formato di un foglio A4 molto comodo per il processo di stampa di scansione con periferiche esterne.
 	\begin{center}	
 		\begin{figure}[H]
 		\centering
@@ -114,7 +114,7 @@ Nella parte centrale c'è il corpo del documento dove l'utente può inserire il 
 Nella parte in basso vengono posizionati, infine, i QR-Code contenenti il testo cifrato e le informazioni per il posizionamento nel testo che sono anch'esse cifrate.
 
 \subsubsection{Cifratura del Documento}
-
+Quello mostrato nella figura~\ref{fig:cifratura} è un diagramma di flusso che ha lo scopo di illustrare la procedura che viene eseguita da quando si compone il documento a quando si produce l'immagine in output (delle proporzioni di un foglio A4 ma a $400$ \texttt{DPI}) pronta per essere stampata (la qualità media di stampa di una stampante commerciale è intorno ai $300$ \texttt{DPI}).
 	\begin{center}	
 		\begin{figure}[H]
 		\centering
@@ -123,6 +123,13 @@ Nella parte in basso vengono posizionati, infine, i QR-Code contenenti il testo 
 		\label{fig:cifratura}
 		\end{figure}
 	\end{center}
+Da quello che si può vedere in figura~\ref{fig:cifratura} il primo passo è rappresentato dalla scelta del destinatario. Dopodiché l'utente compone il documento e può iniziare da subito a cifrare le porzioni di testo che vuole mantenere segrete.
+A questo punto la procedura può seguire due strade a seconda del tipo di destinatario: se è uno solo, il testo viene cifrato usando la chiave pubblica dell'utente. In questo modo ci si accerta che solo il possessore della chiave privata possa decifrare. Se invece il messaggio è destinato ad un gruppo di utenti si sceglie preventivamente il livello di fiducia (che individua univocamente il gruppo di utenti). In tal caso si chiederanno al server le chiavi fino al livello scelto (purché si disponga dell'autorizzazione necessaria), e poi si cifrerà il testo selezionato con l'algoritmo AES partendo dalla chiave di livello più basso fino a quella di livello più alto per aumentare il livello di sicurezza proporzionalmente al livello di fiducia richiesto (si ricorda che la quantità di informazioni cui si ha accesso è direttamente proporzionale al Trust~Level). Passo finale è la generazione del QR-Code ed il posizionamento di quest'ultimo in fondo al documento.
+Quando l'utente ha terminato di oscurare le parti sensibili, si passa alla firma del documento.
+Quello che viene firmato è l'hash dell'immagine comprensiva del corpo del documento e dei QR-Code sottostanti relativi al testo cifrato.
+L'hash viene calcolato utilizzando una funzione di \textbf{perceptual hashing}. Il perceptual hash, è un particolare tipo di hash che presenta uno scarsissimo \textbf{avalanche effect}. Questo significa che a scarse variazioni dell'immagine corrispondono scarse variazioni dell'hash. Questa tecnica è particolarmente utile in questo caso; utilizzare funzioni di hash crittografico come ad esempio la \texttt{SHA1} non è, infatti, opportuno perché presentando un forte \textbf{avalanche effect} basterebbe che un solo byte dell'immagine cambiasse per produrre un hash quasi totalmente diverso. Dopo un processo di Print \& Scan è normale che l'immagine originale subisca delle alterazioni per quanto riguarda risoluzione, colore o contrasto e addirittura disturbi, per esempio una banale piegatura del foglio. Il perceptual hashing aiuta quindi a non preoccuparsi di tutte le possibili variazioni che possono avvenire nei vari processi.
+Tuttavia dal punto di vista della sicurezza questo non è il massimo a cui si può ambire. Purtroppo è possibile che alcune particolari manipolazioni dell'immagine non vengano rilevate, problema che tutt'ora rimane aperto.  %secondo te va bene così?
+
 \subsubsection{Decifrazione del Documento}
 	\begin{center}	
 		\begin{figure}[H]
@@ -132,3 +139,14 @@ Nella parte in basso vengono posizionati, infine, i QR-Code contenenti il testo 
 		\label{fig:decifrazione}
 		\end{figure}
 	\end{center}
+Come si può immaginare il processo di decifrazione è esattamente l'inverso del processo di cifratura.
+Il primo passo è, infatti, l'acquisizione del documento, e poi successivamente la verifica della firma.
+La verifica avviene nel seguente modo:
+\begin{enumerate}
+	\item si legge il QR-Code relativo alla firma;
+	\item si decodifica la firma con la chiave pubblica del mittente;
+	\item si esegue il \textbf{perceptual hashing} del documento (corpo più QR-Code in basso);
+	\item si confronta l'hash ottenuto con quello derivato dalla decodifica della firma. Il confronto consiste nel calcolare la distanza di Hamming tra le due stringhe e nello stabilire quanti sono i caratteri diversi. Tale confronto può essere effettuato agevolmente perché l'output della funzione di perceptual hashing è una stringa composta di \texttt{0} e \texttt{1}. Si è deciso di stabilire in maniera empirica un compromesso sulla percentuale di match al $90$\%.
+\end{enumerate}
+Dopo la verifica della firma, la procedura di decifrazione è esattamente l'inverso di quella di cifratura tenendo conto anche della distinzione dei casi in cui il destinatario sia singolo o un gruppo di utenti.
+L'output finale non è altro che il documento ricomposto utilizzando il sistema OCR per recuperare il testo in chiaro e i QR-Code decodificati e decriptati per la parte cifrata. Il testo così ottenuti è di nuovo modificabile e riutilizzabile per una successiva spedizione.

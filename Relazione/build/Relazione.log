@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.8.10)  12 FEB 2015 18:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.8.10)  12 FEB 2015 19:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -966,11 +966,11 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
                                                   \fi \fi 
 l.116 \subsubsection
                     {Cifratura del Documento} <./Immagini/template.png>]
-<Immagini/cifratura_vert.png, id=251, 339.669pt x 792.3201pt>
+<Immagini/cifratura_vert.png, id=252, 339.669pt x 792.3201pt>
 File: Immagini/cifratura_vert.png Graphic file (type png)
 
 <use Immagini/cifratura_vert.png>
-Package pdftex.def Info: Immagini/cifratura_vert.png used on input line 120.
+Package pdftex.def Info: Immagini/cifratura_vert.png used on input line 121.
 (pdftex.def)             Requested size: 203.80296pt x 475.39572pt.
 
 
@@ -979,40 +979,61 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[16pdfTeX warning (ext4): destination with the same identifier (name{figure.2.5
-}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.124 	\end{center}
-                    <./Immagini/cifratura_vert.png>]
-<Immagini/decifrazione_vert.png, id=259, 293.6571pt x 552.8655pt>
-File: Immagini/decifrazione_vert.png Graphic file (type png)
-
-<use Immagini/decifrazione_vert.png>
-Package pdftex.def Info: Immagini/decifrazione_vert.png used on input line 129.
-
-(pdftex.def)             Requested size: 176.19562pt x 331.72185pt.
-)
+[16]
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 14.49998pt.
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[17pdfTeX warning (ext4): destination with the same identifier (name{figure.2.6
+[17pdfTeX warning (ext4): destination with the same identifier (name{figure.2.5
 }) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.86 	\include{Capitolo_2}
-                           <./Immagini/decifrazione_vert.png>]
+l.132 
+       <./Immagini/cifratura_vert.png>]
+<Immagini/decifrazione_vert.png, id=265, 323.5287pt x 622.0038pt>
+File: Immagini/decifrazione_vert.png Graphic file (type png)
+
+<use Immagini/decifrazione_vert.png>
+Package pdftex.def Info: Immagini/decifrazione_vert.png used on input line 137.
+
+(pdftex.def)             Requested size: 194.11871pt x 373.20517pt.
+
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 14.49998pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[18]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 14.49998pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[19pdfTeX warning (ext4): destination with the same identifier (name{figure.2.6
+}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.149 	\item s
+              i confronta l'hash ottenuto con quello derivato dalla decodifi...
+ <./Immagini/decifrazione_vert.png>])
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 14.49998pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[20]
 \openout2 = `Capitolo_3.aux'.
 
-
-(./Capitolo_3.tex
+ (./Capitolo_3.tex
 Capitolo 3.
-) [18
+) [21
 
 
 
@@ -1021,7 +1042,7 @@ Capitolo 3.
 
  (./Capitolo_4.tex
 Capitolo 4.
-) [19
+) [22
 
 
 
@@ -1030,7 +1051,7 @@ Capitolo 4.
 
  (./Appendice_A.tex
 Appendice A.
-) [20
+) [23
 
 
 
@@ -1050,13 +1071,13 @@ LaTeX Font Warning: Size substitutions with differences
 
  ) 
 Here is how much of TeX's memory you used:
- 10506 strings out of 493108
- 149309 string characters out of 6134853
- 252620 words of memory out of 5000000
- 13669 multiletter control sequences out of 15000+600000
+ 10517 strings out of 493108
+ 149421 string characters out of 6134853
+ 254620 words of memory out of 5000000
+ 13673 multiletter control sequences out of 15000+600000
  17751 words of font info for 68 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 32i,12n,43p,985b,451s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 32i,12n,43p,1031b,479s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
@@ -1070,10 +1091,10 @@ xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/tex
 live/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texl
 ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texli
 ve/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on build/Relazione.pdf (23 pages, 990628 bytes).
+Output written on build/Relazione.pdf (26 pages, 1004754 bytes).
 PDF statistics:
- 337 PDF objects out of 1000 (max. 8388607)
- 279 compressed objects within 3 object streams
- 61 named destinations out of 1000 (max. 500000)
+ 357 PDF objects out of 1000 (max. 8388607)
+ 296 compressed objects within 3 object streams
+ 68 named destinations out of 1000 (max. 500000)
  214 words of extra memory for PDF output out of 10000 (max. 10000000)
 
