@@ -454,8 +454,11 @@ public class WriteLayout implements GeneralLayout{
 								tmp_level_key= control.getKeyByLevel(i);
 								System.out.println("tmp_level_key = " + tmp_level_key);
 								encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, encripted, tmp_level_key);
+								String tmp_s_qrcode_info= CryptoUtility.decrypt(CryptoUtility.CRYPTO_ALGO.AES, encripted, tmp_level_key);
+								System.out.println(tmp_s_qrcode_info);
 							}
-							enc= new String(encripted);
+							enc= new String(CryptoUtility.toBase64(encripted));
+							
 						}
 						//enc.replace("\n", "");
 						//System.out.println("lunghezza criptata = " + enc.length());

@@ -595,9 +595,9 @@ public class ReadLayout implements GeneralLayout {
 							QRCode qrcode = QRCode.getQRCodeFromMagick(qrcodes.get(i));
 							String qrcode_info = qrcode.readQRCode().getText();
 							System.out.println("qrcode_info= " + qrcode_info);
+							byte[] b_qrcode_info = CryptoUtility.fromBase64(qrcode_info);
 							if (isSingleUser()) {
 								//decripto con rsa
-								byte[] b_qrcode_info = CryptoUtility.fromBase64(qrcode_info);
 								PrivateKey privateKey = KeyFactory.getInstance("RSA").
 										generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(decode_key)));
 								byte[] qrcode_dec = CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, b_qrcode_info, privateKey);
@@ -613,21 +613,24 @@ public class ReadLayout implements GeneralLayout {
 								text= first_part + plain_text + second_part;
 							} else {
 								// get dal control della chiave, se null errore
-								String s_qrcode_info = qrcode_info;
+								String s_qrcode_info = "";
 								int level_key= control.getLevelForEncryptDecrypt();
-								System.out.println("level_key= " + level_key);
+								//System.out.println("level_key= " + level_key);
 								boolean cont= true;
-								for(int k=level_key; k >0; k--){
-									System.out.println("actual key= " + k);
+								for(int k=level_key; k>0; k--){
+									//System.out.println("actual key_level= " + k);
 									String key= control.getKeyByLevel(k);
+									//System.out.println("actual key= " + key);
 									if(key.equals("")){
 										//errore non si ha il livello per decriptare
 										System.out.println("Errore, livello non sufficiente");
 										cont= false;
 										break;
 									}
-									s_qrcode_info= CryptoUtility.decrypt(CryptoUtility.CRYPTO_ALGO.AES, s_qrcode_info.getBytes(), key);
+									b_qrcode_info= CryptoUtility.decryptToByte(CryptoUtility.CRYPTO_ALGO.AES, b_qrcode_info, key);
+									//s_qrcode_info= tmp_s_qrcode_info;
 								}
+								s_qrcode_info= new String(b_qrcode_info);
 								if(cont){
 									System.out.println("s_qrcode_info= " + s_qrcode_info);
 									String[] dec_split= s_qrcode_info.split("_");
