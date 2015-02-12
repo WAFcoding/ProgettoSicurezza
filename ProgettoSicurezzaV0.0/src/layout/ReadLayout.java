@@ -12,8 +12,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -23,9 +26,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -39,7 +42,12 @@ import util.CryptoUtility;
 import util.CryptoUtility.ASYMMCRYPTO_ALGO;
 import util.ImagePHash;
 import util.MagickUtility;
+import util.PDFUtil;
 import util.QRCode;
+
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
+
 import connection.ConnectionFactory;
 import connection.KeyDistributionClient;
 import exceptions.MagickImageNullException;
@@ -76,6 +84,10 @@ public class ReadLayout implements GeneralLayout {
 
 	private String decode_key;
 	private ArrayList<String> level_key;
+	
+	private ArrayList<MagickImage> qrcodes;
+	private MagickImage tmp_img_info;
+	private int resx, resy;
 
 	public ReadLayout(LayoutControl control, Container pane) {
 		this.control = control;
@@ -96,7 +108,7 @@ public class ReadLayout implements GeneralLayout {
 		decode_key = "";
 		level_key = new ArrayList<String>();
 
-
+		qrcodes = new ArrayList<MagickImage>();
 	}
 
 	@Override
@@ -212,7 +224,7 @@ public class ReadLayout implements GeneralLayout {
 			c.gridy = posy;
 			button.setBackground(Color.BLUE);
 			button.setForeground(Color.WHITE);
-			// button.addActionListener(new SaveAction());
+			button.addActionListener(new SaveAction());
 			pane.add(button, c);
 		} else {
 			control.setErrorLayout(
@@ -497,6 +509,14 @@ public class ReadLayout implements GeneralLayout {
 	}
 
 	public void decrypt() {
+		
+		try {
+			BufferedImage buff= ImageIO.read(new File(currentFile.getAbsolutePath()));
+			resx= buff.getWidth();
+			resy= buff.getHeight();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
 		filePart.clear();
 		filePart = MagickUtility.getDataToDecrypt(currentFile.getAbsolutePath());
@@ -511,6 +531,7 @@ public class ReadLayout implements GeneralLayout {
 
 		// codification info
 		tmp_img = filePart.get(1);
+		tmp_img_info= tmp_img;
 		try {
 			QRCode cod_info = QRCode.getQRCodeFromMagick(tmp_img);
 			String tmp = cod_info.readQRCode().getText();
@@ -583,7 +604,7 @@ public class ReadLayout implements GeneralLayout {
 						Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
 						control.setKeyLevelMap(levelKey);
 					}
-					ArrayList<MagickImage> qrcodes = new ArrayList<MagickImage>();
+					qrcodes.clear();
 					for (int i = 4; i < 14; i++) {
 						qrcodes.add(filePart.get(i));
 					}
@@ -654,8 +675,60 @@ public class ReadLayout implements GeneralLayout {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// tmp_img = filePart.get(2);
-		// qrcodes
+	}
+	
+	private class SaveAction implements ActionListener{
 
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			String path= actualUser.getDir_out() +"/"+ title+ "decripted.pdf";
+			try {
+				if(PDFUtil.create(path)){
+					/*//System.out.println("resx= " + resx + " resy= " + resy);
+					String[] paths= new String[10];
+					int j=0;
+					int pagesizex= new Float(PageSize.A4.getWidth()).intValue();
+					int pagesizey= new Float(PageSize.A4.getHeight()).intValue();
+					for(MagickImage m : qrcodes){
+						int mx= new Double(m.getXResolution()).intValue();
+						int my= new Double(m.getYResolution()).intValue();
+//						int x= MagickUtility.resizeX(mx, resx, pagesizex);
+//						int y= MagickUtility.resizeY(my, resy, pagesizey);
+						int x= 100;
+						int y= 100;
+						m= m.scaleImage(x, y);
+						MagickUtility.saveImage(m, actualUser.getDir_out() +"/"+ "tmp_qrcode" + j + ".png");
+						paths[j]= actualUser.getDir_out()+"/"+ "tmp_qrcode" + j + ".png";
+						//System.out.println(paths[j]);
+						j++;
+					}
+					String img_info_path= actualUser.getDir_out()+"/"+ "info_path.png";
+					int tmp_img_infox= new Double(tmp_img_info.getXResolution()).intValue();
+					int tmp_img_infoy= new Double(tmp_img_info.getYResolution()).intValue();
+//					int x= MagickUtility.resizeX(tmp_img_infox, resx, pagesizex);
+//					int y= MagickUtility.resizeY(tmp_img_infoy, resy, pagesizey);
+					int x= 100;
+					int y= 100;
+					tmp_img_info= tmp_img_info.scaleImage(x, y);
+					MagickUtility.saveImage(tmp_img_info, img_info_path);
+					*/
+					String[] arr= {receiver, info};
+					PDFUtil.createDocument(title, author, text, null, arr ,null );
+					PDFUtil.close();
+					/*File f= new File(img_info_path);
+					f.delete();
+					for(String s : paths){
+						f= new File(s);
+						f.delete();
+					}*/
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (DocumentException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 }

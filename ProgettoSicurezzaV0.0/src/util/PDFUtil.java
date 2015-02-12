@@ -349,7 +349,8 @@ public class PDFUtil {
 			addRectangle(SIGNATUREX, SIGNATUREY, RECTWIDTH, RECTHEIGHT);
 			
 			addRectangle(INFOQRCODEX, INFOQRCODEY, RECTWIDTH, RECTHEIGHT);
-			addQRCodeImage(infoQrCodePath, INFOQRCODEX + 1, INFOQRCODEY + 1 - RECTHEIGHT); 
+			if(infoQrCodePath != null)
+				addQRCodeImage(infoQrCodePath, INFOQRCODEX + 1, INFOQRCODEY + 1 - RECTHEIGHT); 
 			addLineHorizontal(10, 150, 0);
 			addText(text, 10, 170, 0);
 			addLineHorizontal(10, 600, 0);
@@ -360,18 +361,20 @@ public class PDFUtil {
 				addRectangle(i, 820, RECTWIDTH, RECTHEIGHT);
 			}
 			int j=0;
-			for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
-				String tmp_qrcodePath= qrCodes[j];
-				if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
-					addQRCodeImage(tmp_qrcodePath, i, 611);
-					j++;
+			if(qrCodes != null){
+				for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
+					String tmp_qrcodePath= qrCodes[j];
+					if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
+						addQRCodeImage(tmp_qrcodePath, i, 611);
+						j++;
+					}
 				}
-			}
-			for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
-				String tmp_qrcodePath= qrCodes[j];
-				if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
-					addQRCodeImage(tmp_qrcodePath, i, 721);
-					j++;
+				for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
+					String tmp_qrcodePath= qrCodes[j];
+					if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
+						addQRCodeImage(tmp_qrcodePath, i, 721);
+						j++;
+					}
 				}
 			}
 			
