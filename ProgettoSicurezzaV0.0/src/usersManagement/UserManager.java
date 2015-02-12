@@ -259,7 +259,6 @@ public class UserManager {
 			KeyTool.storeKeystore(ks, ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), password);
 			*/
 			
-			//TODO UserManager: encode del file serializzato
 			
 			createPdfResume(name, surname, password, code, mail, city, country, country_code, organization, 
 							dir_def, dir_out, dir_in, public_key, private_key, secid, String.valueOf(trustLevel));
@@ -269,17 +268,6 @@ public class UserManager {
 			//stampa del contenuto del PDF a schermo
 			control.setErrorLayout("Registration summary:\n" + registration_summary, "HOME");
 
-			System.out.println("Stai registrando l'utente: " + registration_summary);
-			
-			//TODO UserMAnager: questo si fa quando si prelevano le informazioni di un utente per
-			//criptare un documento
-			/*UserPublicKeyKnown user_pbck= new UserPublicKeyKnown();
-			user_pbck.setID_user("3");
-			user_pbck.setPbc_key("yuuuuuuuuuuuuuuu");
-			user_pbck.setUser(user);
-			user.getPublicKeyKnown().add(user_pbck);
-			session.save(user_pbck);
-			*/
 		}
 		catch(Exception e){
 			if(tx != null) tx.rollback();
