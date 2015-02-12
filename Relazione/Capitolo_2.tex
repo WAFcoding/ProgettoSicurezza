@@ -4,13 +4,13 @@
 \chapter{Progettazione}
 	\label{cap:progettazione}
 	
-    In questo capitolo verranno analizzate in dettaglio le scelte progettuali che hanno permesso la realizzazione del sistema software, considerando le limitazioni riscontrate nell'architettura del sistema stesso. Dopodiché si analizzerà, attraverso la rappresentazione dei diagrammi \textbf{UML}, la definizione delle fasi di sviluppo, ossia la progettazione delle funzionalità correnti dell'applicazione.
+    In questo capitolo verranno analizzate in dettaglio le scelte progettuali che hanno permesso la realizzazione del sistema software. Dopodiché si analizzerà, attraverso la rappresentazione dei diagrammi \textbf{UML}, la definizione delle fasi di sviluppo, ossia la progettazione delle funzionalità correnti dell'applicazione.
 
 \section{Requisiti}
 	\label{sec:requisiti}
 	Come primo aspetto della progettazione si analizzeranno adesso i requisiti del sistema. Innanzitutto si deve specificare che l'intero sistema è pensato per essere utilizzato in un ambito amministrativo dove gli utenti possono essere per esempio i dipendenti di un'azienda. Questo vuol dire che ci si trova in un sistema chiuso in cui le persone che usano il sistema sono note. Tuttavia è possibile che nel tempo i dipendenti si licenzino oppure che ne sopraggiungano di nuovi, quindi deve essere presente una procedura che consenta di inserire nuovi utenti ed eventualmente di rimuovere quelli esistenti. In questo sistema dove gli utenti sono noti, immaginiamo la presenza di un utente \textbf{amministratore} che agisce come supervisore ed è l'unico ad avere la facoltà di abilitare gli utenti all'utilizzo del servizio nonché di assegnare il \emph{Trust~Level}.
 
-Di seguito viene mostrato il diagramma dei casi d'uso che rappresenta una vista generale delle funzionalità del sistema.
+Di seguito viene mostrato il diagramma dei casi d'uso che rappresenta una vista generale delle funzionalità che il sistema deve avere.
 	\begin{center}	
 		\begin{figure}[H]
 		\centering
@@ -29,7 +29,7 @@ Altro compito fondamentale è quello dell'assegnazione del Trust~Level che viene
 L'utente registrato (o come riportato in figura~\ref{fig:usecase} ``autenticato'') rappresenta una qualsiasi persona che è stata abilitata dall'amministratore ad usare l'applicazione in tutte le sue funzionalità attuali. Un utente di questo tipo dispone di una coppia di chiavi asimmetriche RSA a $1024$ \texttt{bit} e di un certificato \texttt{X.509} che viene utilizzato per le connessioni al server che richiedono mutua autenticazione. L'utente autenticato ha la possibilità di comporre un documento, oscurarlo in alcune sue parti utilizzando le chiavi di livello a cui può accedere, e firmarlo con la propria chiave privata RSA. 
 Naturalmente oltre alla composizione del documento, l'utente registrato ha anche la facoltà di leggere quello che è stato inviato a lui o agli utenti con il suo stesso Trust~Level\footnote{Si rimanda al paragrafo~\ref{sec:sicurezza} per una trattazione più approfondita di questo aspetto.}.
 
-Per quanto riguarda l'utente semplice, si è sicuramente notato che questo ha l'unica facoltà di registrarsi al sistema. Questo perché non dispone ancora di un certificato da usare per l'autenticazione e quindi non ha alcuna possibilità di leggere le informazioni se non provando a fare un attacco sulla sicurezza del sistema o del documento cartaceo.
+Per quanto riguarda l'utente semplice, si è sicuramente notato che questo ha l'unica facoltà di registrarsi al sistema. Questo perché non dispone ancora di un certificato da usare per l'autenticazione e quindi non ha alcuna possibilità di leggere le informazioni se non provando ad eseguire un attacco sulla sicurezza del sistema o del documento cartaceo.
 
 \section{Architettura}
 	\label{sec:architettura}
@@ -38,15 +38,34 @@ Data una panoramica dei requisiti e delle funzionalità principali del sistema, 
 		\begin{figure}[H]
 		\centering
 		\includegraphics[scale=0.9]{Immagini/architettura}
-		\caption[Architettura del sistema]{Questa figura rappresenta l'architettura del sistema software realizzato}
-		\label{fig:usecase}
+		\caption[Architettura del sistema]{In questa figura sono rappresentate le componenti del sistema software realizzato.}
+		\label{fig:architettura}
 		\end{figure}
 	\end{center}
+Quella mostrata in figura~\ref{fig:architettura} è l'architettura del sistema che è stato realizzato per questo progetto.
+Come si può vedere (anche da quanto già accennato nei paragrafi precedenti) il sistema si compone di due applicazione separate: un server e un client.
+Entrambe queste applicazioni comunicano con il protocollo TCP/IP con l'aggiunta del layer di sicurezza realizzato da SSL.
 
+Per quanto riguarda il server esso offre $2$ servizi differenti. Il primo (sulla porta $8888$) che richiede che gli utenti in connessione confermino la loro identità inviando il loro certificato così come previsto dallo standard SSL quando il server richiede, come requisito nella fase di handshake, il certificato del client al fine di verificare la mutua autenticazione.
+Le funzionalità offerte da questo primo servizio sono:
+\begin{itemize}
+	\item fornire le chiavi~di~livello agli utenti autenticati che le richiedono (purché ne abbiano diritto in base al loro livello~di~fiducia);
+	\item fornire le chiavi pubbliche degli utenti registrati al sistema, così che gli utenti possano verificare le firme digitali apposte sui documenti cartacei.
+\end{itemize}
+Il secondo servizio (sulla porta $8889$) non richiede invece autenticazione mutua, in quanto è quello che permette agli utenti nuovi di comunicare i loro dati al server al fine di richiedere un'abilitazione all'utilizzo del sistema.
 
+Da come si può vedere in figura~\ref{fig:architettura} il server dispone di una connessione a due database MySQL separati e ad un \emph{Java~KeyStore}\footnote{Un Java~KeyStore (JKS) è un repository di certificati pubblici e chiavi utilizzato per la cifratura dei pacchetti su connessioni SSL.}. 
+Il KeyStore serve a memorizzare i certificati degli utenti, in modo che possano essere identificati univocamente nella fase di handshake della connessione.
+Il primo dei due database si occupa di gestire le chiavi di livello necessarie per la cifratura del documento. Le chiavi sono memorizzate cifrate con \textbf{AES} tramite una chiave robusta e ad ognuna di queste è associato il livello di fiducia relativo. L'altro database si occupa di mantenere le informazioni degli utenti registrati, comprese le loro rispettive chiavi pubbliche. Si è deciso di separare i due database in quanto essi devono soddisfare requisiti di sicurezza differenti in quanto dalla segretezza delle chiavi di livello (che dovrebbero essere cambiate periodicamente) dipende la robustezza dell'intero sistema di cifratura dei documenti. La separazione permetterebbe allora di ospitare su server differenti i due database, che sarebbero quindi protetti con password robuste e differenti e con l'aggiunta di altri sistemi di sicurezza, quali \emph{VPN} e \emph{Firewall}, per la protezione da attacchi esterni.
+
+All'applicazione stand-alone lato client compete invece tutta la gestione dei documenti, ossia la cifratura, la firma e la decifrazione delle immagini. Dal diagramma dell'architettura si vede come anche questo componente presenti una connessione ad un KeyStore e a diversi database di tipo SQLite. Per quanto riguarda il KeyStore, questo assolve alla stessa funzione di quello del server, ossia mantiene il certificato pubblico del server e la chiave privata di ciascun utente insieme al suo rispettivo certificato. Ogni entry del KeyStore (che nella pratica non è altro che una mappa indicizzata per una stringa chiamata \emph{alias}) è cifrata con la password personale di ciascun utente. In più anche il file del KeyStore stesso è cifrato con una master key.
+I database SQLite, invece, servono a memorizzare i dati locali di ciascun utente compresa anche la coppia di chiavi asimmetriche RSA. Ogni utente ha il proprio database personale cifrato con la sua password.
+Il motivo di questa scelta riguarda soprattutto il fatto che i database SQLite non sono altro che file binari che sono gestiti da un software molto leggero (dimensioni nell'ordine delle centinaia di KByte). Quindi possono essere manipolati molto meglio rispetto per esempio ad un file di configurazione personalizzato per cui si sarebbe dovuta implementare una logica di gestione.
+Quindi la facilità di gestione e la leggerezza sono stati i principali responsabili di questa scelta.
 
 \section{Gestione della sicurezza}
 	\label{sec:sicurezza}
+Dopo aver trattato in dettaglio dell'architettura del sistema, si può passare a descrivere tutte le procedure che sono state implementate per gestire la sicurezza del sistema e dei documenti cartacei.
 	%login - autenticazione forte
 	%come si cripta: singolo/molti utenti
 	%come si descripta

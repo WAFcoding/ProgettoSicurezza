@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.8.10)  12 FEB 2015 11:26
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.8.10)  12 FEB 2015 13:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -642,18 +642,8 @@ Package: rotating 2009/03/28 v2.16a rotated objects in LaTeX
 Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
 less on input line 36.
 
-(build/Relazione.aux (build/Capitolo_1.aux
-
-LaTeX Warning: Label `fig:usecase' multiply defined.
-
-) (build/Capitolo_2.aux
-
-LaTeX Warning: Label `fig:usecase' multiply defined.
-
-
-LaTeX Warning: Label `fig:usecase' multiply defined.
-
-) (build/Capitolo_3.aux) (build/Capitolo_4.aux) (build/Appendice_A.aux))
+(build/Relazione.aux (build/Capitolo_1.aux) (build/Capitolo_2.aux)
+(build/Capitolo_3.aux) (build/Capitolo_4.aux) (build/Appendice_A.aux))
 \openout1 = `Relazione.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 50.
@@ -813,12 +803,11 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[4] <Immagini/qrcode.png, id=159, 220.825pt x 220.825pt>
+[4] <Immagini/qrcode.png, id=159, 401.5pt x 401.5pt>
 File: Immagini/qrcode.png Graphic file (type png)
-
-<use Immagini/qrcode.png>
+ <use Immagini/qrcode.png>
 Package pdftex.def Info: Immagini/qrcode.png used on input line 94.
-(pdftex.def)             Requested size: 198.74065pt x 198.74065pt.
+(pdftex.def)             Requested size: 120.45091pt x 120.45091pt.
 
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -834,7 +823,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 l.108 	\item
              caratteri stampati, per i quali gli algoritmi noti hanno un tas...
  <./Immagini/qrcode.png>]
-<Immagini/ocr.png, id=167, 330.48468pt x 214.55156pt>
+<Immagini/ocr.png, id=166, 330.48468pt x 214.55156pt>
 File: Immagini/ocr.png Graphic file (type png)
  <use Immagini/ocr.png>
 Package pdftex.def Info: Immagini/ocr.png used on input line 116.
@@ -857,7 +846,7 @@ l.85 	\include{Capitolo_1}
 
  (./Capitolo_2.tex
 Capitolo 2.
-<Immagini/usecase.png, id=172, 469.755pt x 400.6167pt>
+<Immagini/usecase.png, id=171, 469.755pt x 400.6167pt>
 File: Immagini/usecase.png Graphic file (type png)
 
 <use Immagini/usecase.png>
@@ -890,10 +879,10 @@ l.28
 File: Immagini/architettura.png Graphic file (type png)
 
 <use Immagini/architettura.png>
-Package pdftex.def Info: Immagini/architettura.png used on input line 41.
+Package pdftex.def Info: Immagini/architettura.png used on input line 40.
 (pdftex.def)             Requested size: 475.67676pt x 216.37437pt.
 
-Overfull \hbox (85.67676pt too wide) in paragraph at lines 41--42
+Overfull \hbox (85.67676pt too wide) in paragraph at lines 40--41
  [][] 
  []
 
@@ -903,7 +892,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[9])
+[9]
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 14.49998pt.
@@ -915,13 +904,27 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.86 	\include{Capitolo_2}
-                           <./Immagini/architettura.png>]
+l.60 
+      <./Immagini/architettura.png>])
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 14.49998pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[11]
+
+Package Fancyhdr Warning: \headheight is too small (12.0pt): 
+ Make it at least 14.49998pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[12]
 \openout2 = `Capitolo_3.aux'.
 
  (./Capitolo_3.tex
 Capitolo 3.
-) [11
+) [13
 
 
 
@@ -930,7 +933,7 @@ Capitolo 3.
 
  (./Capitolo_4.tex
 Capitolo 4.
-) [12
+) [14
 
 
 
@@ -939,7 +942,7 @@ Capitolo 4.
 
  (./Appendice_A.tex
 Appendice A.
-) [13
+) [15
 
 
 
@@ -957,18 +960,15 @@ Package rerunfilecheck Info: File `Relazione.out' has not changed.
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 4.98pt have occurred.
 
-
-LaTeX Warning: There were multiply-defined labels.
-
  ) 
 Here is how much of TeX's memory you used:
- 10457 strings out of 493108
- 148432 string characters out of 6134853
- 252201 words of memory out of 5000000
- 13641 multiletter control sequences out of 15000+600000
+ 10463 strings out of 493108
+ 148496 string characters out of 6134853
+ 252277 words of memory out of 5000000
+ 13644 multiletter control sequences out of 15000+600000
  17751 words of font info for 68 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 32i,12n,43p,925b,451s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 32i,12n,43p,985b,451s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
@@ -982,10 +982,10 @@ xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/tex
 live/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texl
 ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texli
 ve/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on build/Relazione.pdf (16 pages, 611840 bytes).
+Output written on build/Relazione.pdf (18 pages, 616567 bytes).
 PDF statistics:
- 269 PDF objects out of 1000 (max. 8388607)
- 226 compressed objects within 3 object streams
- 44 named destinations out of 1000 (max. 500000)
+ 281 PDF objects out of 1000 (max. 8388607)
+ 236 compressed objects within 3 object streams
+ 47 named destinations out of 1000 (max. 500000)
  178 words of extra memory for PDF output out of 10000 (max. 10000000)
 
