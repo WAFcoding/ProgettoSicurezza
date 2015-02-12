@@ -9,6 +9,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -83,6 +84,8 @@ public class LayoutControl {
 		
 		set_ctrl= new SettingsControl(this);
 		set_ctrl.readSettings();
+		
+		keyLevelMap= new HashMap<Integer, String>();
 	}
 	
 	public void createLayout(){
@@ -601,7 +604,9 @@ public class LayoutControl {
 	 * @param keyLevelMap the keyLevelMap to set
 	 */
 	public void setKeyLevelMap(Map<Integer, String> keyLevelMap) {
-		this.keyLevelMap = keyLevelMap;
+		this.keyLevelMap.clear();
+		this.keyLevelMap.putAll(keyLevelMap);
+		System.out.println("map= " + this.keyLevelMap.toString());
 	}
 	
 	public String getKeyByLevel(int level){

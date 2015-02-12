@@ -52,7 +52,7 @@ public class ReadLayout implements GeneralLayout {
 
 	public final static String keystore_pwd = "progettoSII";
 	public final static String url = "localhost";// TODO UserManager: inserire
-													// il url nei settings
+	// il url nei settings
 
 	private LayoutControl control;
 	private Container pane;
@@ -96,6 +96,7 @@ public class ReadLayout implements GeneralLayout {
 		decode_key = "";
 		level_key = new ArrayList<String>();
 
+
 	}
 
 	@Override
@@ -115,7 +116,7 @@ public class ReadLayout implements GeneralLayout {
 			scroll_pane.setPreferredSize(new Dimension(600, 400));
 			scroll_pane.setMaximumSize(new Dimension(600, 400));
 			scroll_pane
-					.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 			// inserimento pulsanti
 			pane.removeAll();
@@ -498,8 +499,7 @@ public class ReadLayout implements GeneralLayout {
 	public void decrypt() {
 
 		filePart.clear();
-		filePart = MagickUtility
-				.getDataToDecrypt(currentFile.getAbsolutePath());
+		filePart = MagickUtility.getDataToDecrypt(currentFile.getAbsolutePath());
 		MagickImage tmp_img = filePart.get(0);
 		text = MagickUtility.getTextFromMagickImage(tmp_img);
 		/*
@@ -521,20 +521,23 @@ public class ReadLayout implements GeneralLayout {
 			Date date = new Date();
 			info = dateFormat.format(date);
 			receiver = info_split[3].substring(10);
+			//			System.out.println("receiver= " + receiver);
 			if (receiver.startsWith("Level ")) {
 				setSingleUser(false);
-			} else {
+				int level_needed= Integer.valueOf(receiver.substring(6));
+				System.out.println("level_needed= " + level_needed);
+				control.setKeyLevelForEncryptDecrypt(level_needed);
+			} 
+			else {
 				setSingleUser(true);
 			}
 
 			sender_uid = info_split[2].substring(12);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// signature
-		tmp_img = filePart.get(2);
-		try {
+
+			// signature
+			tmp_img = filePart.get(2);
+
 			QRCode cod_signature = QRCode.getQRCodeFromMagick(tmp_img);
 			String signature = cod_signature.readQRCode().getText();
 			byte[] b_signature = CryptoUtility.fromBase64(signature);
@@ -577,8 +580,7 @@ public class ReadLayout implements GeneralLayout {
 					if (isSingleUser()) {
 						decode_key = actualUser.getPrivateKey();
 					} else {
-						Map<Integer, String> levelKey = cli
-								.getAllAuthorizedLevelKey();
+						Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
 						control.setKeyLevelMap(levelKey);
 					}
 					ArrayList<MagickImage> qrcodes = new ArrayList<MagickImage>();
@@ -589,26 +591,57 @@ public class ReadLayout implements GeneralLayout {
 					int size = qrcodes.size();
 					for (int i = size - 1; i >= 0; i--) {
 						try {
+							System.out.println("prima di prelevare il qrcode");
 							QRCode qrcode = QRCode.getQRCodeFromMagick(qrcodes.get(i));
 							String qrcode_info = qrcode.readQRCode().getText();
 							System.out.println("qrcode_info= " + qrcode_info);
-							byte[] b_qrcode_info = CryptoUtility.fromBase64(signature);
-							String b_qrcode_info_string= new String(b_qrcode_info);
-							//System.out.println("b_qrcode_info_string= " + b_qrcode_info_string);
 							if (isSingleUser()) {
 								//decripto con rsa
-								String tmpPrivKey= actualUser.getPrivateKey();
-								PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(tmpPrivKey)));
+								byte[] b_qrcode_info = CryptoUtility.fromBase64(qrcode_info);
+								PrivateKey privateKey = KeyFactory.getInstance("RSA").
+										generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(decode_key)));
 								byte[] qrcode_dec = CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, b_qrcode_info, privateKey);
 								String tmp_dec= new String(qrcode_dec);
 								System.out.println("tmp_dec= " + tmp_dec);
+								String[] dec_split= tmp_dec.split("_");
+								int num= Integer.valueOf(dec_split[0]);
+								int pos= Integer.valueOf(dec_split[1]);
+								String plain_text= dec_split[2];
+
+								String first_part= text.substring(0, pos -1 );
+								String second_part= text.substring(pos + 9);
+								text= first_part + plain_text + second_part;
 							} else {
 								// get dal control della chiave, se null errore
-								//decripto con aes
+								String s_qrcode_info = qrcode_info;
+								int level_key= control.getLevelForEncryptDecrypt();
+								System.out.println("level_key= " + level_key);
+								boolean cont= true;
+								for(int k=level_key; k >0; k--){
+									System.out.println("actual key= " + k);
+									String key= control.getKeyByLevel(k);
+									if(key.equals("")){
+										//errore non si ha il livello per decriptare
+										System.out.println("Errore, livello non sufficiente");
+										cont= false;
+										break;
+									}
+									s_qrcode_info= CryptoUtility.decrypt(CryptoUtility.CRYPTO_ALGO.AES, s_qrcode_info.getBytes(), key);
+								}
+								if(cont){
+									System.out.println("s_qrcode_info= " + s_qrcode_info);
+									String[] dec_split= s_qrcode_info.split("_");
+									int num= Integer.valueOf(dec_split[0]);
+									int pos= Integer.valueOf(dec_split[1]);
+									String plain_text= dec_split[2];
+									String first_part= text.substring(0, pos -1 );
+									String second_part= text.substring(pos + 9);
+									text= first_part + plain_text + second_part;
+								}
 							}
 						} catch (Exception e) {
 							System.out.println("QRCode not found");
-							// e.printStackTrace();
+							e.printStackTrace();
 						}
 					}
 				}

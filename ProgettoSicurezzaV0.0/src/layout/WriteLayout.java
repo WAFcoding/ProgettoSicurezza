@@ -420,11 +420,11 @@ public class WriteLayout implements GeneralLayout{
 			//if(true){
 				String selected_text= area.getSelectedText();
 				int cursor_position= area.getCaretPosition() - selected_text.length();
-				System.out.println(selected_text);
+				//System.out.println(selected_text);
 				//format for text in qrcode= progressiveNumber_cursorPosition_text
 				selected_text= current_qrcode + "_" + cursor_position + "_" + selected_text;
-				System.out.println(selected_text);
-				System.out.println("La posizione del cursore nel testo è: " + cursor_position);
+				//System.out.println(selected_text);
+				//System.out.println("La posizione del cursore nel testo è: " + cursor_position);
 				if(selected_text != null){
 					int start= area.getSelectionStart();
 					int end= area.getSelectionEnd();
@@ -451,15 +451,15 @@ public class WriteLayout implements GeneralLayout{
 							String tmp_level_key="";
 							byte[] encripted= selected_text.getBytes();
 							for(int i=1; i<= level_receiver;i++){
-								tmp_level_key= control.getKeyByLevel(level_receiver);
+								tmp_level_key= control.getKeyByLevel(i);
 								System.out.println("tmp_level_key = " + tmp_level_key);
 								encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, encripted, tmp_level_key);
 							}
-							enc= new String(CryptoUtility.toBase64(encripted));
+							enc= new String(encripted);
 						}
 						//enc.replace("\n", "");
-						System.out.println("lunghezza criptata = " + enc.length());
-						System.out.println("Selezione criptata: " + enc);
+						//System.out.println("lunghezza criptata = " + enc.length());
+						//System.out.println("Selezione criptata: " + enc);
 
 						QRCode qr = new QRCode();
 						qr.writeQRCode(enc, QRCode.DEFAULT_WIDTH, QRCode.DEFAULT_HEIGHT);

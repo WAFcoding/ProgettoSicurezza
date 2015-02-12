@@ -88,6 +88,7 @@ public class ReceiverSettingsLayout implements GeneralLayout, ListSelectionListe
 			}
 			else{
 				Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
+				//System.out.println("map in receiver settings " + levelKey.toString());
 				//TODO ordinare le chiavi della mappa
 				control.setKeyLevelMap(levelKey);
 				list_items.clear();
