@@ -60,14 +60,20 @@ Il primo dei due database si occupa di gestire le chiavi di livello necessarie p
 
 All'applicazione stand-alone lato client compete invece tutta la gestione dei documenti, ossia la cifratura, la firma e la decifrazione delle immagini. Dal diagramma dell'architettura si vede come anche questo componente presenti una connessione ad un KeyStore e a diversi database di tipo SQLite. Per quanto riguarda il KeyStore, questo assolve alla stessa funzione di quello del server, ossia mantiene il certificato pubblico del server e la chiave privata di ciascun utente insieme al suo rispettivo certificato. Ogni entry del KeyStore (che nella pratica non è altro che una mappa indicizzata per una stringa chiamata \emph{alias}) è cifrata con la password personale di ciascun utente. In più anche il file del KeyStore stesso è cifrato con una master key.
 I database SQLite, invece, servono a memorizzare i dati locali di ciascun utente compresa anche la coppia di chiavi asimmetriche RSA. Ogni utente ha il proprio database personale cifrato con la sua password.
-Il motivo di questa scelta riguarda soprattutto il fatto che i database SQLite non sono altro che file binari che sono gestiti da un software molto leggero (dimensioni nell'ordine delle centinaia di KByte). Quindi possono essere manipolati molto meglio rispetto per esempio ad un file di configurazione personalizzato per cui si sarebbe dovuta implementare una logica di gestione.
+Il motivo di questa scelta riguarda soprattutto il fatto che i database SQLite non sono altro che file binari che sono gestiti da un software molto leggero (dimensioni nell'ordine delle centinaia di KiloByte). Quindi possono essere manipolati molto meglio rispetto per esempio ad un file di configurazione personalizzato per cui si sarebbe dovuta implementare una logica di gestione.
 Quindi la facilità di gestione e la leggerezza sono stati i principali responsabili di questa scelta.
 
-\section{Gestione della sicurezza}
+\section{Focus sulla sicurezza}
 	\label{sec:sicurezza}
-Dopo aver trattato in dettaglio dell'architettura del sistema, si può passare a descrivere tutte le procedure che sono state implementate per gestire la sicurezza del sistema e dei documenti cartacei.
+Dopo aver trattato in dettaglio l'architettura del sistema, si può passare a descrivere tutte le procedure che sono state implementate per gestire la sicurezza del sistema e dei documenti cartacei. Di seguito i dettagli riguardanti la sicurezza.
+
+\subsection{Autenticazione}
+	\label{subsec:autenticazione}
 	%login - autenticazione forte
-	%come si cripta: singolo/molti utenti
-	%come si descripta
 	%connessione al server
 	%connessioni SSL - gestione certificati/keystore/mutua autenticazione	
+	
+\subsection{Cifratura e Decifratura dei documenti}
+	\label{subsec:documenti}
+	%come si cripta: singolo/molti utenti
+	%come si descripta

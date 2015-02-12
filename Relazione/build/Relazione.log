@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.8.10)  12 FEB 2015 13:39
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.8.10)  12 FEB 2015 15:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -729,7 +729,7 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 61.
 (/usr/local/texlive/2014/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-<Immagini/logo_tor_vergata.png, id=82, 1003.75pt x 1156.32pt>
+<Immagini/logo_tor_vergata.png, id=90, 1003.75pt x 1156.32pt>
 File: Immagini/logo_tor_vergata.png Graphic file (type png)
 
 <use Immagini/logo_tor_vergata.png>
@@ -803,7 +803,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[4] <Immagini/qrcode.png, id=159, 401.5pt x 401.5pt>
+[4] <Immagini/qrcode.png, id=170, 401.5pt x 401.5pt>
 File: Immagini/qrcode.png Graphic file (type png)
  <use Immagini/qrcode.png>
 Package pdftex.def Info: Immagini/qrcode.png used on input line 94.
@@ -823,7 +823,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 l.108 	\item
              caratteri stampati, per i quali gli algoritmi noti hanno un tas...
  <./Immagini/qrcode.png>]
-<Immagini/ocr.png, id=166, 330.48468pt x 214.55156pt>
+<Immagini/ocr.png, id=176, 330.48468pt x 214.55156pt>
 File: Immagini/ocr.png Graphic file (type png)
  <use Immagini/ocr.png>
 Package pdftex.def Info: Immagini/ocr.png used on input line 116.
@@ -846,7 +846,7 @@ l.85 	\include{Capitolo_1}
 
  (./Capitolo_2.tex
 Capitolo 2.
-<Immagini/usecase.png, id=171, 469.755pt x 400.6167pt>
+<Immagini/usecase.png, id=181, 469.755pt x 400.6167pt>
 File: Immagini/usecase.png Graphic file (type png)
 
 <use Immagini/usecase.png>
@@ -875,7 +875,7 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
                                                   \fi \fi 
 l.28 
       <./Immagini/usecase.png>]
-<Immagini/architettura.png, id=189, 528.5346pt x 240.4182pt>
+<Immagini/architettura.png, id=199, 528.5346pt x 240.4182pt>
 File: Immagini/architettura.png Graphic file (type png)
 
 <use Immagini/architettura.png>
@@ -905,14 +905,14 @@ Package Fancyhdr Warning: \headheight is too small (12.0pt):
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.60 
-      <./Immagini/architettura.png>])
+      <./Immagini/architettura.png>]
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 14.49998pt.
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[11]
+[11])
 
 Package Fancyhdr Warning: \headheight is too small (12.0pt): 
  Make it at least 14.49998pt.
@@ -962,10 +962,10 @@ LaTeX Font Warning: Size substitutions with differences
 
  ) 
 Here is how much of TeX's memory you used:
- 10463 strings out of 493108
- 148496 string characters out of 6134853
- 252277 words of memory out of 5000000
- 13644 multiletter control sequences out of 15000+600000
+ 10469 strings out of 493108
+ 148605 string characters out of 6134853
+ 252398 words of memory out of 5000000
+ 13648 multiletter control sequences out of 15000+600000
  17751 words of font info for 68 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  32i,12n,43p,985b,451s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -982,10 +982,10 @@ xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/tex
 live/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texl
 ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texli
 ve/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on build/Relazione.pdf (18 pages, 616567 bytes).
+Output written on build/Relazione.pdf (18 pages, 617219 bytes).
 PDF statistics:
- 281 PDF objects out of 1000 (max. 8388607)
- 236 compressed objects within 3 object streams
- 47 named destinations out of 1000 (max. 500000)
- 178 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 292 PDF objects out of 1000 (max. 8388607)
+ 247 compressed objects within 3 object streams
+ 49 named destinations out of 1000 (max. 500000)
+ 194 words of extra memory for PDF output out of 10000 (max. 10000000)
 
