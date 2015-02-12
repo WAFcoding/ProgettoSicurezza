@@ -444,7 +444,7 @@ public class WriteLayout implements GeneralLayout{
 							user_receiver= control.getUserForEncryptOrDecrypt();
 							PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(CryptoUtility.fromBase64(user_receiver.getPublicKey())));
 							byte[] encripted= CryptoUtility.asymm_encrypt(ASYMMCRYPTO_ALGO.RSA, selected_text.getBytes(), publicKey);
-							enc= new String(encripted);
+							enc= new String(CryptoUtility.toBase64(encripted));
 						}
 						else{
 							level_receiver= control.getLevelForEncryptDecrypt();
@@ -455,8 +455,9 @@ public class WriteLayout implements GeneralLayout{
 								System.out.println("tmp_level_key = " + tmp_level_key);
 								encripted= CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, encripted, tmp_level_key);
 							}
-							enc= new String(encripted);
+							enc= new String(CryptoUtility.toBase64(encripted));
 						}
+						//enc.replace("\n", "");
 						System.out.println("lunghezza criptata = " + enc.length());
 						System.out.println("Selezione criptata: " + enc);
 

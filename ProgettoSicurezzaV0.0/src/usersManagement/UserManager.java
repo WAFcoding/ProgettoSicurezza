@@ -94,7 +94,7 @@ public class UserManager {
 			
 			if(control.IsSettingsPathNull()){
 				JFileChooser chooser= new JFileChooser();
-				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				chooser.showOpenDialog(null);
 				dbPath= chooser.getSelectedFile().getAbsolutePath();
 				control.setActualDbPath(dbPath);

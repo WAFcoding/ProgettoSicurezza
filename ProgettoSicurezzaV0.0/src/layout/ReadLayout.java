@@ -15,7 +15,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyFactory;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -47,9 +49,10 @@ import exceptions.MagickImageNullException;
  *
  */
 public class ReadLayout implements GeneralLayout {
-	
-	public final static String keystore_pwd= "progettoSII";
-	public final static String url= "localhost";//TODO UserManager: inserire il url nei settings
+
+	public final static String keystore_pwd = "progettoSII";
+	public final static String url = "localhost";// TODO UserManager: inserire
+													// il url nei settings
 
 	private LayoutControl control;
 	private Container pane;
@@ -67,7 +70,7 @@ public class ReadLayout implements GeneralLayout {
 	private ArrayList<String> qrcodes_path;
 	private int current_qrcode = 0;
 	private ArrayList<MagickImage> filePart;
-	
+
 	private String title, author, info, receiver;
 	private boolean isSingleUser, error;
 
@@ -79,19 +82,19 @@ public class ReadLayout implements GeneralLayout {
 		this.pane = pane;
 
 		filePart = new ArrayList<MagickImage>();
-		title= "";
-		author= "";
-		info= "";
-		text= "";
-		receiver= "";
-		sender_uid= "";
-		isSingleUser= true;
-		
-		actualUser= control.getUser_manager().getActualUser();
-		error= false;
-		
-		decode_key= "";
-		level_key= new ArrayList<String>();
+		title = "";
+		author = "";
+		info = "";
+		text = "";
+		receiver = "";
+		sender_uid = "";
+		isSingleUser = true;
+
+		actualUser = control.getUser_manager().getActualUser();
+		error = false;
+
+		decode_key = "";
+		level_key = new ArrayList<String>();
 
 	}
 
@@ -101,10 +104,10 @@ public class ReadLayout implements GeneralLayout {
 		setCurrentFile(new File(control.getRead_layout_current_file()));
 
 		decrypt();
-		
-		if(!isError()){
+
+		if (!isError()) {
 			String tmp_user = "";
-			area= new JTextArea(text);
+			area = new JTextArea(text);
 			area.setMargin(new Insets(5, 5, 5, 5));
 			area.setWrapStyleWord(true);
 			area.setLineWrap(true);
@@ -148,7 +151,7 @@ public class ReadLayout implements GeneralLayout {
 			pane.add(field_author, c);
 			// 0.2 - receiver
 			posy++;
-			field_receiver= new JTextField(receiver);
+			field_receiver = new JTextField(receiver);
 			field_receiver.setEditable(false);
 			c.gridx = posx;
 			c.gridy = posy;
@@ -210,9 +213,10 @@ public class ReadLayout implements GeneralLayout {
 			button.setForeground(Color.WHITE);
 			// button.addActionListener(new SaveAction());
 			pane.add(button, c);
-		}
-		else{
-			control.setErrorLayout("Le firme combaciano meno del 90%\npossibili manomissioni.", "READ");
+		} else {
+			control.setErrorLayout(
+					"Le firme combaciano meno del 90%\npossibili manomissioni.",
+					"READ");
 		}
 	}
 
@@ -469,7 +473,8 @@ public class ReadLayout implements GeneralLayout {
 	}
 
 	/**
-	 * @param isSingleUser the isSingleUser to set
+	 * @param isSingleUser
+	 *            the isSingleUser to set
 	 */
 	public void setSingleUser(boolean isSingleUser) {
 		this.isSingleUser = isSingleUser;
@@ -483,122 +488,138 @@ public class ReadLayout implements GeneralLayout {
 	}
 
 	/**
-	 * @param error the error to set
+	 * @param error
+	 *            the error to set
 	 */
 	public void setError(boolean error) {
 		this.error = error;
 	}
 
-	public void decrypt(){
-		
+	public void decrypt() {
+
 		filePart.clear();
-		filePart= MagickUtility.getDataToDecrypt(currentFile.getAbsolutePath());
+		filePart = MagickUtility
+				.getDataToDecrypt(currentFile.getAbsolutePath());
 		MagickImage tmp_img = filePart.get(0);
-		text= MagickUtility.getTextFromMagickImage(tmp_img);
-		try {
-			MagickUtility.saveImage(tmp_img, "/home/pasquale/ProgettoSicurezza/pasquale/output/img_text.png");
-		} catch (MagickImageNullException | MagickException e1) {
-			e1.printStackTrace();
-		}
-		
-		//codification info
+		text = MagickUtility.getTextFromMagickImage(tmp_img);
+		/*
+		 * try { MagickUtility.saveImage(tmp_img,
+		 * "/home/pasquale/ProgettoSicurezza/pasquale/output/img_text.png"); }
+		 * catch (MagickImageNullException | MagickException e1) {
+		 * e1.printStackTrace(); }
+		 */
+
+		// codification info
 		tmp_img = filePart.get(1);
 		try {
-			QRCode cod_info= QRCode.getQRCodeFromMagick(tmp_img);
-			String tmp= cod_info.readQRCode().getText();
-			String[] info_split= tmp.split("\n");
-			title= info_split[0].substring(7);
-			author= info_split[1].substring(8);
+			QRCode cod_info = QRCode.getQRCodeFromMagick(tmp_img);
+			String tmp = cod_info.readQRCode().getText();
+			String[] info_split = tmp.split("\n");
+			title = info_split[0].substring(7);
+			author = info_split[1].substring(8);
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date date = new Date();
-			info= dateFormat.format(date);
-			receiver= info_split[3].substring(10);
-			if(receiver.startsWith("Level ")){
+			info = dateFormat.format(date);
+			receiver = info_split[3].substring(10);
+			if (receiver.startsWith("Level ")) {
 				setSingleUser(false);
-			}
-			else{
+			} else {
 				setSingleUser(true);
 			}
-			
-			sender_uid= info_split[2].substring(12);
+
+			sender_uid = info_split[2].substring(12);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//signature
+		// signature
 		tmp_img = filePart.get(2);
-		try{
-			QRCode cod_signature= QRCode.getQRCodeFromMagick(tmp_img);
-			String signature= cod_signature.readQRCode().getText();
-			System.out.println("signature " + signature);
-			byte[] b_signature= CryptoUtility.fromBase64(signature);
-			System.out.println("signature2 " + signature);
-			String username= actualUser.getName() + "_" + actualUser.getID();
-			String pwd= actualUser.getPassword();
+		try {
+			QRCode cod_signature = QRCode.getQRCodeFromMagick(tmp_img);
+			String signature = cod_signature.readQRCode().getText();
+			byte[] b_signature = CryptoUtility.fromBase64(signature);
+			String username = actualUser.getName() + "_" + actualUser.getID();
+			String pwd = actualUser.getPassword();
 			try (KeyDistributionClient cli = ConnectionFactory.getKeyDistributionServerConnection(url, username, keystore_pwd, pwd)) {
-				String public_key= cli.getUserPublicKey(sender_uid).replace("\n", "");
+				String public_key = cli.getUserPublicKey(sender_uid).replace("\n", "");
 				PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(CryptoUtility.fromBase64(public_key)));
-				
-				byte[] dec= CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, b_signature, publicKey);
-				
-				String signature_decrypted= new String(dec);
-				
-				tmp_img= filePart.get(3);
-				String tmp_path= getOutput_folder()+"tmp_img.png";
+
+				byte[] dec = CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA,b_signature, publicKey);
+
+				String signature_decrypted = new String(dec);
+
+				tmp_img = filePart.get(3);
+				String tmp_path = getOutput_folder() + "tmp_img.png";
 				MagickUtility.saveImage(tmp_img, tmp_path);
 				ImagePHash hash = new ImagePHash(42, 5);
-				
-				String signature_calculated= hash.getHash(new FileInputStream(tmp_path));
-				
-				File tmp_f= new File(tmp_path);
+
+				String signature_calculated = hash.getHash(new FileInputStream(tmp_path));
+
+				File tmp_f = new File(tmp_path);
 				tmp_f.delete();
-				
-				double match= hash.matchPercentage(signature_decrypted, signature_calculated);
-				System.out.println("signature= "+signature+"\nsignature_decrypted= " + signature_decrypted + "\ncalculated= " + signature_calculated);
-				if(match < 90.0){
-					//System.out.println("match < 90");
+
+				double match = hash.matchPercentage(signature_decrypted,
+						signature_calculated);
+				System.out.println("signature= " + signature
+						+ "\nsignature_decrypted= " + signature_decrypted
+						+ "\ncalculated= " + signature_calculated);
+				if (match < 90.0) {
+					// System.out.println("match < 90");
 					System.out.println("signature not match");
-					if(!isError())
+					if (!isError())
 						setError(true);
 					else
 						setError(false);
-				}
-				else{
+				} else {
 					System.out.println("signature match");
-				
-					//decodifica del testo
-					if(isSingleUser()){
-						decode_key= actualUser.getPrivateKey();
-					}
-					else{
-						Map<Integer, String> levelKey = cli.getAllAuthorizedLevelKey();
-						//TODO ordinare le chiavi della mappa
+
+					// decodifica del testo
+					if (isSingleUser()) {
+						decode_key = actualUser.getPrivateKey();
+					} else {
+						Map<Integer, String> levelKey = cli
+								.getAllAuthorizedLevelKey();
 						control.setKeyLevelMap(levelKey);
 					}
-					ArrayList<MagickImage> qrcodes= new ArrayList<MagickImage>();
-					for(int i=4; i<14; i++){
+					ArrayList<MagickImage> qrcodes = new ArrayList<MagickImage>();
+					for (int i = 4; i < 14; i++) {
 						qrcodes.add(filePart.get(i));
 					}
-					//prenderli al contrario
-					int size= qrcodes.size();
-					for(int i= size-1; i>=0; i--){
-						QRCode qrcode= QRCode.getQRCodeFromMagick(qrcodes.get(i));
-						if(isSingleUser()){
-							
-						}
-						else{
-							//get dal control della chiave, se null errore
+					// prenderli al contrario
+					int size = qrcodes.size();
+					for (int i = size - 1; i >= 0; i--) {
+						try {
+							QRCode qrcode = QRCode.getQRCodeFromMagick(qrcodes.get(i));
+							String qrcode_info = qrcode.readQRCode().getText();
+							System.out.println("qrcode_info= " + qrcode_info);
+							byte[] b_qrcode_info = CryptoUtility.fromBase64(signature);
+							String b_qrcode_info_string= new String(b_qrcode_info);
+							//System.out.println("b_qrcode_info_string= " + b_qrcode_info_string);
+							if (isSingleUser()) {
+								//decripto con rsa
+								String tmpPrivKey= actualUser.getPrivateKey();
+								PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(CryptoUtility.fromBase64(tmpPrivKey)));
+								byte[] qrcode_dec = CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, b_qrcode_info, privateKey);
+								String tmp_dec= new String(qrcode_dec);
+								System.out.println("tmp_dec= " + tmp_dec);
+							} else {
+								// get dal control della chiave, se null errore
+								//decripto con aes
+							}
+						} catch (Exception e) {
+							System.out.println("QRCode not found");
+							// e.printStackTrace();
 						}
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//tmp_img = filePart.get(2);
-		//qrcodes
-		
+		// tmp_img = filePart.get(2);
+		// qrcodes
+
 	}
 }
