@@ -615,12 +615,14 @@ public class WriteLayout implements GeneralLayout{
 					tmp= new File(s);
 					tmp.delete();
 				}
+				qrcodes_path.clear();
 				tmp= new File(pat_pdf);
 				tmp.delete();
 				tmp= new File(img_cropped);
 				tmp.delete();
 				tmp= new File(qrcode_tosave);
 				tmp.delete();
+				
 				
 			}
 			setReceiverSetted(false);
