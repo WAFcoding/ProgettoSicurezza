@@ -69,11 +69,66 @@ Dopo aver trattato in dettaglio l'architettura del sistema, si può passare a de
 
 \subsection{Autenticazione}
 	\label{subsec:autenticazione}
-	%login - autenticazione forte
-	%connessione al server
-	%connessioni SSL - gestione certificati/keystore/mutua autenticazione	
+Come già detto nei paragrafi precedenti, per funzionare in modo sicuro, il sistema ha bisogno che gli utenti che lo utilizzano siano ben noti. Questo significa che ogni utente deve disporre di un certificato che comunichi la sua identità. Infatti, il requisito più importante per stabilire una comunicazione con il server per ottenere chiavi è l'autenticazione del client nella fase di handshake della connessione SSL.
+Affinché sussista la mutua autenticazione il server deve però conoscere già a priori il certificato del client. E allo stesso modo anche il client deve conoscere il certificato del server.
+Nel caso di questo progetto, si è deciso di mettere da subito a disposizione del client il certificato del server come configurazione di base. In questo modo si è sicuri che da subito l'applicazione client inizierà a parlare con il server certificato.
+Tuttavia lo stesso non può essere fatto dalla parte del server, in quanto questo non può conoscere a priori tutti i possibili utenti che entreranno nel sistema. Quindi si è deciso di prevedere una procedura di registrazione nella quale il risultato finale è il rilascio all'utente di un certificato autenticato dal server che a sua volta lo aggiungerà nel proprio KeyStore.
+Da osservare il fatto che nella fase di registrazione l'utente dialogherà col server senza comunicare la sua identità. \accg{E} per questo che si è resa necessaria la figura dell'\textbf{amministratore} che si occuperà di verificare la reale identità dell'utente durante questa fase critica, ed eventualmente lo abiliterà ad usare il sistema.
+	\begin{center}	
+		\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.7]{Immagini/signup}
+		\caption[Sequence Diagram: Registrazione al Sistema]{Diagramma di sequenza rappresentante le due fasi principali della registrazione al sistema}
+		\label{fig:registrazione}
+		\end{figure}
+	\end{center}
+La fase di registrazione, i cui passi principali sono illustrati nel diagramma di sequenza in figura~\ref{fig:registrazione}, è composta di due fasi. Nella prima fase il nuovo utente comunica al server autenticato le proprie credenziali (nome, cognome, chiave pubblica, organizzazione di appartenenza, città e paese di residenza) che vengono salvate nel database in attesa di elaborazione. Come risposta della presa in consegna della richiesta, il server genera un token univoco (\textbf{SecureID}) che successivamente il client può utilizzare per recuperare il proprio certificato e che deve essere tenuto segreto dall'utente. La fase di elaborazione viene eseguita dall'amministratore che si accerta che i dati sottomessi dall'utente siano corretti e veri. A questo punto, l'amministratore ha due possibilità: abilitare l'utente all'uso del sistema oppure respingere la sua domanda.
+Nel secondo caso non avverrà nulla e l'utente verrà informato al successivo accesso che la sua richiesta è stata respinta. Nel caso in cui invece la richiesta venga accolta, viene generato un certificato utilizzando le credenziali e la chiave pubblica dell'utente e firmato utilizzando la chiave privata del server. Questo farà sì che il server possa stabilire in un secondo momento l'autenticità del certificato e capire quindi se è stato emesso da lui oppure no (decisione importante per capire se l'utente può accedere alle varie funzionalità). Successivamente il certificato generato viene salvato nel KeyStore del server.
+Nella seconda fase (corrispondente al blocco in basso in figura~\ref{fig:registrazione}) l'utente utilizza il \textbf{SecureID} per recuperare il proprio certificato. Da quel momento in poi potrà utilizzare a pieno tutte le funzionalità del sistema compatibilmente con il \textbf{livello~di~fiducia} assegnato.
+
+%parte di pasquale (rivedila tu bene)
+Quello appena descritto è ciò che avviene dal punto di vista del server. Per quanto riguarda l'applicazione client, la procedura di registrazione prepara all'utente l'ambiente per l'utilizzo del sistema. In particolare vengono generate directory dedicate dove verranno posti i dati temporanei delle elaborazioni e soprattutto il database SQLite cifrato dove sono memorizzati i dati sensibili dell'utente. Durante la registrazione inoltre viene generato un codice (diverso dal precedente \textbf{SecureID}) che l'utente utilizzerà successivamente per eseguire il login al sistema. \accg{E} stato dunque messo in piedi un login con doppia autenticazione per ridurre al minimo le probabilità di furto di identità.
 	
-\subsection{Cifratura e Decifratura dei documenti}
+\subsection{Composizione e lettura dei documenti}
 	\label{subsec:documenti}
-	%come si cripta: singolo/molti utenti
-	%come si descripta
+Si tratterà adesso l'aspetto principale di questo progetto: l'elaborazione dei documenti. Si descriveranno in modo dettagliato le procedure che sono state implementate per costruire, cifrare e decifrare i contenuti.
+
+\subsubsection{Costruzione del documento}
+In questo paragrafo verrà analizzata l'impaginazione del documento cartaceo.
+	\begin{center}	
+		\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.7]{Immagini/template}
+		\caption[Template del documento]{Schema delle principali sezioni del documento.}
+		\label{fig:template}
+		\end{figure}
+	\end{center}
+La figura~\ref{fig:template} illustra le sezioni principali del documento. In alto si ha un'intestazione dove sono presenti un campo per il titolo, uno per l'autore e due QR-Code: in uno sarà impressa la firma dell'utente e nell'altro verranno trasportate informazioni utili a recuperare il contenuto cifrato tra cui:
+\begin{itemize}
+	\item titolo;
+	\item mittente;
+	\item UID del mittente (per consentire al destinatario di recuperare la chiave pubblica del mittente e verificare la firma);
+	\item destinatario.
+\end{itemize}
+Nella parte centrale c'è il corpo del documento dove l'utente può inserire il testo da inviare.
+Nella parte in basso vengono posizionati, infine, i QR-Code contenenti il testo cifrato e le informazioni per il posizionamento nel testo che sono anch'esse cifrate.
+
+\subsubsection{Cifratura del Documento}
+
+	\begin{center}	
+		\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.6]{Immagini/cifratura_vert}
+		\caption[Flusso cifratura documento]{Diagramma di flusso per l'operazione di cifratura del documento}
+		\label{fig:cifratura}
+		\end{figure}
+	\end{center}
+\subsubsection{Decifrazione del Documento}
+	\begin{center}	
+		\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.6]{Immagini/decifrazione_vert}
+		\caption[Flusso decifrazione documento]{Diagramma di flusso per l'operazione di decifrazione del documento}
+		\label{fig:decifrazione}
+		\end{figure}
+	\end{center}
