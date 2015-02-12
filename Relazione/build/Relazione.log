@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.8.10)  12 FEB 2015 19:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.8.10)  12 FEB 2015 20:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1071,10 +1071,10 @@ LaTeX Font Warning: Size substitutions with differences
 
  ) 
 Here is how much of TeX's memory you used:
- 10517 strings out of 493108
- 149421 string characters out of 6134853
- 254620 words of memory out of 5000000
- 13673 multiletter control sequences out of 15000+600000
+ 10518 strings out of 493108
+ 149437 string characters out of 6134853
+ 253636 words of memory out of 5000000
+ 13674 multiletter control sequences out of 15000+600000
  17751 words of font info for 68 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  32i,12n,43p,1031b,479s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1091,7 +1091,7 @@ xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/tex
 live/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texl
 ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texli
 ve/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on build/Relazione.pdf (26 pages, 1004754 bytes).
+Output written on build/Relazione.pdf (26 pages, 1006528 bytes).
 PDF statistics:
  357 PDF objects out of 1000 (max. 8388607)
  296 compressed objects within 3 object streams
