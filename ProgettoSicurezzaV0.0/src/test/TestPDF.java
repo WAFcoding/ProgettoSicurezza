@@ -3,11 +3,25 @@
  */
 package test;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import javax.imageio.ImageIO;
+
+import magick.MagickImage;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+
+import util.ImagePHash;
+import util.MagickUtility;
 import util.PDFUtil;
+import util.QRCode;
 
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.PageSize;
 
 /**
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -25,7 +39,7 @@ public class TestPDF {
 		String image_path= "/home/pasquale/Developing/WorkSpace/Java/ProgettoSiurezzaV0.0/files/logoroma_torvergata.jpg";
 		String path_test= "/home/pasquale/ProgettoSicurezza/test_pdf.pdf";
 		String path_registration_test= "/home/pasquale/ProgettoSicurezza/registration_test_pdf.pdf";
-		boolean created= PDFUtil.create(path_registration_test);
+		boolean created= PDFUtil.create(path_test);
 		//Document doc= new Document(PageSize.A4);
 		//PdfWriter pdfwr = PdfWriter.getInstance(doc, new FileOutputStream("/home/pasquale/ProgettoSicurezza/test_pdf.pdf"));
 		if(created){
@@ -33,8 +47,8 @@ public class TestPDF {
 
 			String title= "title";
 			String author= "author";
-			String text= "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nec malesuada enim, at elementum urna. Mauris bibendum massa nec tincidunt dapibus. Suspendisse malesuada sed risus auctor vestibulum. Cras rutrum, dui sed tristique ullamcorper, tortor felis pulvinar mi, pretium suscipit libero purus non urna. Phasellus congue venenatis libero, eget feugiat ipsum commodo eget. Sed elementum, nulla eu gravida vehicula, nunc enim iaculis enim, eget mattis enim mi at risus. Vestibulum vulputate quam fringilla, sollicitudin elit et, pharetra tortor. Sed elementum, quam a dignissim tempus, lectus justo aliquet augue, nec convallis est metus ac lectus.Donec gravida lorem elit, eu tempus eros aliquet in. Nulla facilisi. Aenean sed dictum urna. Aenean vehicula purus vitae lacus egestas, et dignissim libero egestas. Nunc nec rhoncus est. Duis tempus nisi nec est elementum sodales. Fusce vitae nisl id justo porta facilisis id non tortor. Vivamus eleifend eleifend neque, ut ultrices justo dictum non. Integer nec eros condimentum, mattis ipsum id, dignissim nibh. Pellentesque non ante nisi. Curabitur pellentesque turpis dignissim massa pretium malesuada. Curabitur fringilla felis vitae laoreet pharetra. Pellentesque ut libero hendrerit tellus sagittis dictum.Morbi dictum aliquam lobortis. Suspendisse scelerisque quam sit amet sem gravida malesuada. Phasellus eu enim sagittis, adipiscing magna a, condimentum risus. Quisque vitae mi sed turpis ultricies fringilla. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer placerat dui ut facilisis rutrum. Donec a nibh vitae ipsum eleifend cursus in pellentesque nunc. Integer placerat ipsum vel risus facilisis rhoncus. Duis augue dolor, imperdiet sed sollicitudin quis, feugiat tempor nulla. Integer commodo auctor elit, nec consequat est auctor vel. Ut a ante mi. ";
-			String[] subtitleInfo= {"date", "pagenumber", "info", "receiver"};
+			String text="… è cosi bizzarramente improbabile che una cosa straordinariamente utile come il pesce Babele si sia evoluta per puro caso, che alcuni pensatori sono arrivati a vedere in ciò la prova finale e lampante della non-esistenza di Dio. “Le loro argomentazioni seguono pressapoco questo schema: ‘Mi rifiuto di dimostrare che esisto’ dice Dio ‘perchè la dimostrazione è una negazione della fede, e senza la fede io non sono niente’. “‘Ma’ dice l’Uomo ‘il pesce Babele è una chiara dimostrazione involontaria della Tua esistenza, no? Non avrebbe mai potuto evolversi per puro caso. Esso dimostra che Tu esisti, e dunque, grazie a questa dimostrazione, Tu, per via di quanto Tu stesso asserisci a proposito delle dimostrazioni, non esisti. Q. E. D., Quot Erat Demonstrandum’. “‘Povero me!’, dice Dio. ‘Non ci avevo pensato!’ e sparisce immediatamente in una nuvoletta di logica. “‘Oh, com’è stato facile!’ dice l’Uomo, e, per fare il bis, passa a dimostrare che il nero è bianco, per poi finire ucciso sul primo attraversamento pedonale che successivamente incontra”.";
+			String[] subtitleInfo= {"receiver", "date"};
 			String[] qrCodes= {"/home/pasquale/ProgettoSicurezza/test_0.jpg", 
 					"/home/pasquale/ProgettoSicurezza/test_1.jpg", 
 					"/home/pasquale/ProgettoSicurezza/test_0.jpg",
@@ -46,19 +60,10 @@ public class TestPDF {
 					"/home/pasquale/ProgettoSicurezza/test_0.jpg",
 					"/home/pasquale/ProgettoSicurezza/test_0.jpg"};
 			String signaturePath= "/home/pasquale/ProgettoSicurezza/test_1.jpg";
-			/*PDFUtil.addLogo(PDFUtil.LOGO_PATH);
-			PDFUtil.addTitle(title);
-			PDFUtil.addAuthor("author");
-			PDFUtil.addSubtitleInfo("date", "1/1", "info", "receiver");
-			PDFUtil.addLineHorizontal(10, 150, 0);
-			PDFUtil.addLineHorizontal(10, 600, 0);
-			PDFUtil.addRectangle(10, 710, 100, 100);*/
-			//PDFUtil.addQRCodeImage("/home/pasquale/ProgettoSicurezza/test_0_101.jpg", 10, 610);
-			//PDFUtil.addQRCodeImage("/home/pasquale/ProgettoSicurezza/test_0_200.jpg", 120, 610);
-			//PDFUtil.addQRCodeImage("/home/pasquale/ProgettoSicurezza/test_0_297.jpg", 230, 610);
-			//PDFUtil.addQRCodeImage("/home/pasquale/ProgettoSicurezza/test_0_393.jpg", 340, 610);
-			//PDFUtil.addQRCodeImage("/home/pasquale/ProgettoSicurezza/test_0_484.jpg", 450, 610);
-			PDFUtil.createDocument(title, author, text, signaturePath, subtitleInfo, qrCodes);
+			String infoQrCodePath= "/home/pasquale/ProgettoSicurezza/test_1.jpg";
+			PDFUtil.createDocument(title, author, text, infoQrCodePath, subtitleInfo, qrCodes);
+			
+			
 			
 			
 			//PDFUtil.addLineVertical(40, 30, 400);
@@ -66,9 +71,48 @@ public class TestPDF {
 				//					  "test8", "test9", "test10", "test11", "test12", "test13", "test14");
 			PDFUtil.close();
 			
-			/*PDFUtil.create("/home/pasquale/ProgettoSicurezza/test_pdf.pdf");
-			PDFUtil.extractImages(path, "/home/pasquale/ProgettoSicurezza/Img%s.%s");
-			PDFUtil.close();*/
+			//prendo il documento
+			PDDocument document= PDDocument.load(path_test);
+			PDPage page= (PDPage) document.getDocumentCatalog().getAllPages().get(0);
+			//converto in immagine
+			BufferedImage img = page.convertToImage(BufferedImage.TYPE_BYTE_BINARY, 400);
+			int resx= img.getWidth();
+			int resy= img.getHeight();
+			//salvo l'immagine
+			//TODO eliminare l'immagine
+			File outputfile = new File("/home/pasquale/ProgettoSicurezza/tmp_mattata.png");
+			ImageIO.write(img, "jpg", outputfile);
+			//croppo l'immagine
+			//TODO eliminare immagini croppate
+			int pagesizex= new Double(PageSize.A4.getWidth()).intValue();
+			int pagesizey= new Double(PageSize.A4.getHeight()).intValue();
+			MagickImage magick= MagickUtility.getImage("/home/pasquale/ProgettoSicurezza/tmp_mattata.png");
+			int x = MagickUtility.resizeX(1, resx, pagesizex);
+			int y= MagickUtility.resizeY(160, resy, pagesizey);
+			int width= MagickUtility.resizeX(pagesizex, resx, pagesizex);
+			int height= MagickUtility.resizeY(pagesizey - 160, resy, pagesizey);
+			MagickImage crop= MagickUtility.cropImage(magick, x, y, height, width);
+			MagickUtility.saveImage(crop, "/home/pasquale/ProgettoSicurezza/tmp_crop_mattata.png");
+			//faccio hash
+			ImagePHash hash = new ImagePHash(42, 5);
+			String originale = hash.getHash(new FileInputStream("/home/pasquale/ProgettoSicurezza/tmp_crop_mattata.png"));
+			//TODO firma con chiave privata
+			//creo il qrcode
+			//TODO eliminare qrcode
+			QRCode qr= new QRCode();
+			int qr_width= MagickUtility.resizeX(QRCode.DEFAULT_WIDTH, resx, pagesizex);
+			int qr_height= MagickUtility.resizeY(QRCode.DEFAULT_HEIGHT, resy, pagesizey);
+			qr.writeQRCode(originale, qr_width , qr_height);
+			qr.saveQRCodeToFile("/home/pasquale/ProgettoSicurezza/tmp_qrcode_crop_hash.png");
+			//copro l'immagine
+			//TODO non cancellare l'immagine coperta
+			MagickImage qrimg= MagickUtility.getImage("/home/pasquale/ProgettoSicurezza/tmp_qrcode_crop_hash.png");
+			int coverx= MagickUtility.resizeX(pagesizex - 111, resx, pagesizex);
+			int covery= MagickUtility.resizeY(11, resy, pagesizey);
+			MagickImage buffImg= MagickUtility.getImage("/home/pasquale/ProgettoSicurezza/tmp_mattata.png");
+			MagickImage coveredimg= MagickUtility.coverWithImage(buffImg, qrimg, coverx, covery);
+			MagickUtility.saveImage(coveredimg, "/home/pasquale/ProgettoSicurezza/tmp_mattata.png");
+			
 		}
 		//PDFUtil.extractImages(path_test, "/home/pasquale/ProgettoSicurezza/img/Img%s.%s");
 		

@@ -61,9 +61,9 @@ public class SettingsControl {
 	public void setPathToSave(String path) {
 		pathToSave = path;
 		if(!exist(pathToSave) && !path.equals("")){
-			System.out.println(pathToSave);
+			//System.out.println(pathToSave);
 			String tmp_dir= pathToSave.substring(0, pathToSave.lastIndexOf("/"));
-			System.out.println(tmp_dir);
+			//System.out.println(tmp_dir);
 			File tmp= new File(tmp_dir);
 			tmp.mkdir();
 			File tmp2= new File(pathToSave);
@@ -171,7 +171,7 @@ public class SettingsControl {
 	 */
 	public void updateDb(){
 		
-		System.out.println("Update DB");
+		//System.out.println("Update DB");
 		
 		User actualUser= control.getUser_manager().getActualUser();
 		

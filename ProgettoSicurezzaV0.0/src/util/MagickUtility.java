@@ -2,15 +2,27 @@ package util;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
-import exceptions.MagickImageNullException;
+import javax.imageio.ImageIO;
+
+import net.sourceforge.tess4j.TessAPI;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.vietocr.ImageHelper;
 import magick.CompositeOperator;
 import magick.DrawInfo;
 import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
 import magick.PixelPacket;
+
+import com.itextpdf.text.PageSize;
+import com.recognition.software.jdeskew.ImageDeskew;
+
+import exceptions.MagickImageNullException;
 
 /**
  * Questa classe facilita ulteriormente l'utilizzo delle funzioni della libreria ImageMagick.
@@ -223,4 +235,140 @@ public class MagickUtility {
 		info.setMagick(img.getMagick());
 		return img.imageToBlob(info);
 	}
+	
+	public static String getTextFromMagickImage(MagickImage magickimage){
+		String toReturn= "";
+		
+		try {
+			BufferedImage img= QRCode.magickImageToBufferedImage(magickimage);
+
+			img= ImageHelper.convertImageToBinary(img);
+			
+			Tesseract ts = Tesseract.getInstance();
+			
+			ts.setPageSegMode(TessAPI.TessPageSegMode.PSM_SINGLE_BLOCK);
+			
+			//serve a vedere quanto è ruotato il testo: troppo angolato non lo legge.
+			ImageDeskew deskew = new ImageDeskew(img);
+			double angle = deskew.getSkewAngle();
+			
+			/*Valore soglia: da vedere l'angolazione max tollerabile per non ruotare ogni volta l'immagine*/
+			if(Math.abs(angle)>5) {
+				img = ImageHelper.rotateImage(img, -angle);
+			
+				deskew = new ImageDeskew(img);
+				angle = deskew.getSkewAngle();
+			}
+			
+			toReturn = ts.doOCR(img);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
+	}
+	/**
+	 * 0-text
+	 * 1-cod info
+	 * 2-signature
+	 * 3-signature to confront
+	 * 4..13-qrcodes
+	 * @param path
+	 * @return
+	 */
+	public static ArrayList<MagickImage> getDataToDecrypt(String path){
+		
+		ArrayList<MagickImage> toReturn= new ArrayList<MagickImage>();
+		try {
+			BufferedImage bimg = ImageIO.read(new File(path));
+			int width          = bimg.getWidth();
+			int height         = bimg.getHeight();
+			
+			MagickImage img= getImage(path);
+
+			int pagesizex= new Double(PageSize.A4.getWidth()).intValue();
+			int pagesizey= new Double(PageSize.A4.getHeight()).intValue();
+			int resizedPagesizex= resizeX(pagesizex, width, pagesizex);
+			
+			//title
+			int title_x= resizeX(129, width, pagesizex);
+			int title_y= resizeY(10, height, pagesizey);
+			int title_width= resizeX(200, width, pagesizex);
+			//MagickImage img_title= cropImage(img, title_x, title_y, resizeY(40, height, pagesizey), title_width);
+			//saveImage(img_title, "/home/pasquale/ProgettoSicurezza/crop/img_title.jpg");
+			//toReturn.add(img_title);
+			//author
+			int author_x= resizeX(129, width, pagesizex);
+			int author_y= resizeY(50, height, pagesizey);
+			int author_width= resizeX(230, width, pagesizex);
+			//MagickImage img_author= cropImage(img, author_x, author_y, resizeY(30, height, pagesizey), author_width);
+			//saveImage(img_author, "/home/pasquale/ProgettoSicurezza/crop/img_author.jpg");
+			//toReturn.add(img_author);
+			//info
+			int info_x= resizeX(129, width, pagesizex);
+			int info_y= resizeY(80, height, pagesizey);
+			//MagickImage img_info= cropImage(img, info_x, info_y, resizeY(20, height, pagesizey), title_width);
+			//saveImage(img_info, "/home/pasquale/ProgettoSicurezza/crop/img_info.jpg");
+			//toReturn.add(img_info);
+			//text
+			int text_x= resizeX(1, width, pagesizex);
+			int text_y= resizeY(160, height, pagesizey);
+			MagickImage img_text= cropImage(img, text_x, text_y, resizeY(400, height, pagesizey), resizedPagesizex);
+			//saveImage(img_text, "/home/pasquale/ProgettoSicurezza/pasquale/output/img_text.png");
+			toReturn.add(img_text);
+			//codification info
+			int codInfo_x= resizeX(pagesizex - 222, width, pagesizex);
+			int codInfo_y= resizeY(10, height, pagesizey);
+			int codeInfo_width= resizeX(101, width, pagesizex);
+			MagickImage img_codInfo= cropImage(img, codInfo_x, codInfo_y, resizeY(101, height, pagesizey), codeInfo_width);
+			//saveImage(img_codInfo, "/home/pasquale/ProgettoSicurezza/crop/img_codeInfo.jpg");
+			toReturn.add(img_codInfo);
+			//signature
+			int signature_x= resizeX(pagesizex - 111, width, pagesizex);
+			int signature_y= resizeY(10, height, pagesizey);
+			int signature_width= resizeX(101, width, pagesizex);
+			MagickImage img_signature= cropImage(img, signature_x, signature_y, resizeY(101, height, pagesizey), signature_width);
+			//saveImage(img_signature, "/home/pasquale/ProgettoSicurezza/crop/img_signature.jpg");
+			toReturn.add(img_signature);
+			int x = MagickUtility.resizeX(1, width, pagesizex);
+			int y= MagickUtility.resizeY(160, height, pagesizey);
+			int crop_width= MagickUtility.resizeX(pagesizex, width, pagesizex);
+			int crop_height= MagickUtility.resizeY(pagesizey - 160, height, pagesizey);
+			MagickImage img_crop= MagickUtility.cropImage(img, x, y, crop_height, crop_width);
+			//MagickUtility.saveImage(img_crop, "/home/pasquale/ProgettoSicurezza/tmp_crop_mattata.png");
+			toReturn.add(img_crop);
+			//qrcodes encripted
+			int qrcode_y= resizeY(609, height, pagesizey);
+			int qrcode_width= resizeX(101, width, pagesizex);
+			int qrcode_x= resizeX(20, width, pagesizex);
+			int j=0;
+			for(int i= qrcode_x; i< resizeX(466, width, pagesizex);i= i + resizeX(110, width, pagesizex)){
+				MagickImage img_qrcode= cropImage(img, i, qrcode_y, resizeY(101, height, pagesizey), qrcode_width);
+				//saveImage(img_qrcode, "/home/pasquale/ProgettoSicurezza/crop/img_qrcode_"+j+".jpg");
+				toReturn.add(img_qrcode);
+				j++;
+			}
+			qrcode_y= resizeY(719, height, pagesizey);
+			for(int i= qrcode_x; i< resizeX(466, width, pagesizex);i= i + resizeX(110, width, pagesizex)){
+				MagickImage img_qrcode= cropImage(img, i, qrcode_y, resizeY(101, height, pagesizey), qrcode_width);
+				//saveImage(img_qrcode, "/home/pasquale/ProgettoSicurezza/crop/img_qrcode_"+j+".jpg");
+				toReturn.add(img_qrcode);
+				j++;
+			}
+			
+		} catch (MagickException | MagickImageNullException | IOException e) {
+			e.printStackTrace();
+		}
+		
+		return toReturn;
+	}
+	
+	public static int resizeX(int xToResize, int resX, int pageSizeX){
+		return (xToResize * resX)/ pageSizeX;
+	}
+	
+	public static int resizeY(int yToResize, int resY, int pageSizeY){
+		return (yToResize * resY)/pageSizeY;
+	}
+
 }

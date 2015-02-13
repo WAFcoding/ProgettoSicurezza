@@ -1,12 +1,7 @@
 package layout;
 
-import java.awt.Dimension;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -14,18 +9,22 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 
+import usersManagement.User;
+import usersManagement.UserManager;
+import util.CertData;
+import util.CryptoUtility;
+import util.KeyTool;
 import connection.ClientConfig;
 import connection.ConnectionFactory;
 import connection.RegistrationClient;
 import entities.RegistrationBean;
 import entities.Settings;
 import entities.SettingsControl;
-import usersManagement.UserManager;
-import util.CryptoUtility;
-import util.KeyTool;
 /**
  * Questa classe e' il controllore del layout dell'applicazione
  * @author "Pasquale Verlotta - pasquale.verlotta@gmail.com"
@@ -43,28 +42,37 @@ public class LayoutControl {
 	private SettingsLayout s_layout;
 	private PrimaryLayout p_layout;
 	private EncodeLayout e_layout;
+	private DecodeLayout d_layout;
 	private WriteLayout w_layout;
 	private HomeLayout h_layout;
 	private RegistrationLayout r_layout;
 	private ErrorLayout err_layout;
 	private ReceiverSettingsLayout rec_layout;
-	private ArrayList<String> choosed_images;
+	private ReadLayout read_layout;
+	private ArrayList<String> choosed_file_decode;
 	private SettingsControl set_ctrl;
 
-	private ArrayList<String> choosed_files;
-	private String[] image_types= {"gif", "jpg", "png", "bmp"};
+	private ArrayList<String> choosed_files_encode;
+	private String[] image_types= {"gif", "jpg", "png", "bmp", "jpeg", "pdf"};
 	private String[] text_types= {"txt"};
+	private String w_layout_currentFilePath;
+	private boolean receiverSingleUser= true;
+	private String read_layout_current_file;
 	
 	private UserManager user_manager;
 	
+	private User userForEncryptOrDecrypt;
+	private int KeyLevelForEncryptDecryptPos;
+	private Map<Integer, String> keyLevelMap;
+	
 	private enum LAYOUT{
-		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER
+		PRIMARY, ENCODE, SETTINGS, HOME, WRITE, REGISTRATION, ERROR, RECEIVER, DECODE, READ
 	}
 	
 	public LayoutControl(){
 		
-		choosed_images= new ArrayList<String>();
-		choosed_files= new ArrayList<String>();
+		choosed_file_decode= new ArrayList<String>();
+		choosed_files_encode= new ArrayList<String>();
 		mainFrame= new JFrame("Progetto SII");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(WIDTH, HEIGHT);
@@ -76,6 +84,8 @@ public class LayoutControl {
 		
 		set_ctrl= new SettingsControl(this);
 		set_ctrl.readSettings();
+		
+		keyLevelMap= new HashMap<Integer, String>();
 	}
 	
 	public void createLayout(){
@@ -120,7 +130,15 @@ public class LayoutControl {
 		}
 		else if(layout == 7){
 			ReceiverLayout();
-			mainFrame.setSize(800, 700);
+			mainFrame.setSize(500, 500);
+		}
+		else if(layout == 8){
+			DecodeLayout();
+			mainFrame.setSize(500, 500);
+		}
+		else if(layout == 9){
+			ReadLayout();
+			mainFrame.setSize(800, 600);
 		}
 		
 		//mainFrame.pack();
@@ -148,6 +166,10 @@ public class LayoutControl {
 				return 6;
 			case RECEIVER:
 				return 7;
+			case DECODE:
+				return 8;
+			case READ:
+				return 9;
 		}
 		
 		return -1;
@@ -157,13 +179,12 @@ public class LayoutControl {
 
 		if(err_layout == null){
 			err_layout= new ErrorLayout(this, mainFrame.getContentPane(), error_message, backTo);
-			err_layout.addComponentsToPane();
 		}
 		else{
 			err_layout.setError_message(error_message);
 			err_layout.setBackTo(backTo);
-			err_layout.addComponentsToPane();
 		}
+		err_layout.addComponentsToPane();
 		
 		setLayout("ERROR");
 	}
@@ -180,12 +201,20 @@ public class LayoutControl {
 	
 	public void EncodeLayout(){
 		if(e_layout == null){
-			e_layout= new EncodeLayout(this, mainFrame.getContentPane(), this.choosed_files);
+			e_layout= new EncodeLayout(this, mainFrame.getContentPane(), this.choosed_files_encode);
 			e_layout.addComponentsToPane();
 		}
 		else{
 			e_layout.addComponentsToPane();
 		}
+	}
+	
+	public void DecodeLayout(){
+		if(d_layout == null){
+			d_layout= new DecodeLayout(this, mainFrame.getContentPane(), this.choosed_file_decode);
+		}
+		
+		d_layout.addComponentsToPane();
 	}
 
 	public void SettingsLayout(){
@@ -221,40 +250,49 @@ public class LayoutControl {
 	
 	public void ReceiverLayout(){
 		if(rec_layout == null){
-			rec_layout= new ReceiverSettingsLayout(this, mainFrame.getContentPane(), true);
+			rec_layout= new ReceiverSettingsLayout(this, mainFrame.getContentPane());
 		}
+		rec_layout.setSingleUser(receiverSingleUser);
 		rec_layout.addComponentsToPane();
 	}
 	
+	public void ReadLayout(){
+		if(read_layout == null){
+			System.out.println("new read layout");
+			read_layout= new ReadLayout(this, mainFrame.getContentPane());
+		}
+		read_layout.addComponentsToPane();
+	}
+	
 	public void setReceiverSingleUSer(boolean b){
-		rec_layout.setSingleUser(b);
+		this.receiverSingleUser= b;
 	}
 	
 	/**
 	 * @return the choosed_files
 	 */
 	public ArrayList<String> getChoosed_files() {
-		return choosed_files;
+		return choosed_files_encode;
 	}
 
 	/**
 	 * @param choosed_files the choosed_files to set
 	 */
 	public void setChoosed_files(ArrayList<String> choosed_files) {
-		this.choosed_files = choosed_files;
+		this.choosed_files_encode = choosed_files;
 	}
 	/**
 	 * @return the choosed_images
 	 */
 	public ArrayList<String> getChoosed_images() {
-		return choosed_images;
+		return choosed_file_decode;
 	}
 
 	/**
 	 * @param choosed_images the choosed_images to set
 	 */
 	public void setChoosed_images(ArrayList<String> choosed_images) {
-		this.choosed_images = choosed_images;
+		this.choosed_file_decode = choosed_images;
 	}
 	//============================================================================
 	/**
@@ -270,21 +308,21 @@ public class LayoutControl {
 		return null;
 	}
 	
-	public void addImageChoice(String path){
-		if(!this.choosed_images.contains(path) && isImage(path)){
-			this.choosed_images.add(path);
+	public void addDecodeChoice(String path){
+		if(!this.choosed_file_decode.contains(path) && isToDecode(path)){
+			this.choosed_file_decode.add(path);
 		}
 		else{
 			System.out.println("immagine gia presente e/o non supportata");
 		}
 		
-		if(e_layout != null)
-			e_layout.updateList();
+		if(d_layout != null)
+			d_layout.updateList();
 	}
 	
-	public void addFileChoice(String path){
-		if(!this.choosed_files.contains(path) && isText(path)){
-			this.choosed_files.add(path);
+	public void addEncodeChoice(String path){
+		if(!this.choosed_files_encode.contains(path) && isText(path)){
+			this.choosed_files_encode.add(path);
 		}
 		else{
 			System.out.println("file gia presente e/o non supportato");
@@ -295,7 +333,7 @@ public class LayoutControl {
 	}
 	
 	public void removeItem(int pos){
-		this.choosed_images.remove(pos);
+		this.choosed_file_decode.remove(pos);
 		
 		if(e_layout != null)
 			e_layout.updateList();
@@ -306,11 +344,11 @@ public class LayoutControl {
 	 * @param path String il percorso del file
 	 * @return false se non è un'immagine
 	 */
-	public boolean isImage(String path){
-		return isImage(new File(path));
+	public boolean isToDecode(String path){
+		return isToDecode(new File(path));
 	}
 	
-	public boolean isImage(File f){
+	public boolean isToDecode(File f){
 		for(String s : image_types){
 			if(f.getAbsolutePath().endsWith(s)){
 				return true;
@@ -339,40 +377,15 @@ public class LayoutControl {
 	 * Disegna l'immagine scelta nella finestra dell'applicazione
 	 * @param path String il percorso dell'imagine da disegnare
 	 */
-	public void drawImage(File f, String backTo){
+	public void drawDecode(String file, String backTo){
 
-		ImageLayout img_layout= new ImageLayout(this, mainFrame.getContentPane(), backTo);
-		try {
-			img_layout.setViewer(f.getAbsolutePath());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		img_layout.addComponentsToPane();
-		
-		mainFrame.setSize(new Dimension(900, 600));
-		mainFrame.repaint();
-		mainFrame.validate();
-		/*
-		if(img_layout.getImgWidth() >= 800 || img_layout.getImgHeight() >= 600){
-			mainFrame.setSize(new Dimension(1000, 700));
-			mainFrame.repaint();
-			mainFrame.validate();
-		}
-		else if(img_layout.getImgWidth() <= 400 || img_layout.getImgHeight() <= 400){
-
-			mainFrame.setSize(new Dimension(500, 400));
-			mainFrame.repaint();
-			mainFrame.validate();
-		}
-		else{
-			mainFrame.setSize(new Dimension(img_layout.getImgWidth()+100, img_layout.getImgHeight()+50));
-			mainFrame.repaint();
-			mainFrame.validate();
-		}*/
+		//TODO aprire decode layout
 	}
 	
-	public void drawFile(File f){
-
+	public void drawEncode(String f){
+		
+		setLayout("ENCODE");
+/*
 		if(w_layout == null){
 			w_layout= new WriteLayout(this, mainFrame.getContentPane());
 			w_layout.addComponentsToPane();
@@ -396,24 +409,26 @@ public class LayoutControl {
 			w_layout.setAreaText(text);
 			/*String path= f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf("/")+1);
 			w_layout.setOutput_folder(path);*/
-			buff.close();
+		/*	buff.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		*/
 	}
 	
 	public void draw(String path, String backTo){
 		File f = new File(path);
-		if(isImage(f)){
-			addImageChoice(path);
-			drawImage(f, backTo);
+		if(isToDecode(f)){
+			addDecodeChoice(path);
+			drawDecode(path, backTo);
+			setLayout("DECODE");
 		}
 		else if(isText(f)){
-			addFileChoice(path);
-			drawFile(f);
+			addEncodeChoice(path);
+			//drawEncode(path);
+			setLayout("ENCODE");
 		}
 	}
 
@@ -504,12 +519,16 @@ public class LayoutControl {
 
 			RegistrationBean bean = reg.retrieveRegistrationDetails(secureId);
 			int trustLevel= bean.getTrustLevel();
-			//getUser_manager().updateActualUserTrustLevel(trustLevel);
+			getUser_manager().updateActualUserTrustLevel(trustLevel);
 
 			System.out.println("trustLevel:" + bean.getTrustLevel());
 			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
 			X509Certificate cert = (X509Certificate)certFactory.generateCertificate(new ByteArrayInputStream(bean.getCertificateData()));
 
+			CertData certData= new CertData(cert);
+			String uid= certData.getIssuerParameter(CertData.TYPE.UID);
+			getUser_manager().updateActualUserServerUid(uid);
+			
 			KeyStore ks = KeyTool.loadKeystore(ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), keystore_pwd);
 			KeyTool.addNewPrivateKey(ks, privateKey, cert, username, keystore_pwd.toCharArray());
 
@@ -523,5 +542,97 @@ public class LayoutControl {
 		return toReturn;
 	}
 	
-	//
+	public void setWriteLayoutCurrentFile(String path){
+		this.w_layout_currentFilePath= path;
+	}
+	
+	public String getWLayoutCurrentFilePath(){
+		return this.w_layout_currentFilePath;
+	}
+
+	/**
+	 * @return the userForEncryptOrDecrypt
+	 */
+	public User getUserForEncryptOrDecrypt() {
+		return userForEncryptOrDecrypt;
+	}
+
+	/**
+	 * @param userForEncryptOrDecrypt the userForEncryptOrDecrypt to set
+	 */
+	public void setUserForEncryptOrDecrypt(User userForEncryptOrDecrypt) {
+		this.userForEncryptOrDecrypt = userForEncryptOrDecrypt;
+		w_layout.setUser_receiver(userForEncryptOrDecrypt);
+	}
+
+	/**
+	 * @return the keyLevelForEncryptDecrypt
+	 */
+	public int getLevelForEncryptDecrypt() {
+		return KeyLevelForEncryptDecryptPos;
+	}
+
+	/**
+	 * @param keyLevelForEncryptDecrypt the keyLevelForEncryptDecrypt to set
+	 */
+	public void setKeyLevelForEncryptDecrypt(int keyLevelForEncryptDecrypt) {
+		KeyLevelForEncryptDecryptPos = keyLevelForEncryptDecrypt;
+	}
+
+	/**
+	 * @return the receiverSingleUser
+	 */
+	public boolean isReceiverSingleUser() {
+		return receiverSingleUser;
+	}
+
+	/**
+	 * @param receiverSingleUser the receiverSingleUser to set
+	 */
+	public void setReceiverSingleUser(boolean receiverSingleUser) {
+		this.receiverSingleUser = receiverSingleUser;
+	}
+
+	/**
+	 * @return the keyLevelMap
+	 */
+	public Map<Integer, String> getKeyLevelMap() {
+		return keyLevelMap;
+	}
+
+	/**
+	 * @param keyLevelMap the keyLevelMap to set
+	 */
+	public void setKeyLevelMap(Map<Integer, String> keyLevelMap) {
+		this.keyLevelMap.clear();
+		this.keyLevelMap.putAll(keyLevelMap);
+		System.out.println("map= " + this.keyLevelMap.toString());
+	}
+	
+	public String getKeyByLevel(int level){
+		String toReturn="";
+		
+		toReturn= keyLevelMap.get(Integer.valueOf(level));
+		
+		if(toReturn != null)
+			return toReturn;
+		
+		return "";
+	}
+
+	/**
+	 * @return the read_layout_current_file
+	 */
+	public String getRead_layout_current_file() {
+		return read_layout_current_file;
+	}
+
+	/**
+	 * @param read_layout_current_file the read_layout_current_file to set
+	 */
+	public void setRead_layout_current_file(String read_layout_current_file) {
+		this.read_layout_current_file = read_layout_current_file;
+	}
+	
+	
 }

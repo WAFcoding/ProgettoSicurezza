@@ -15,7 +15,7 @@ public class TestCrypto {
 		String testData = "tanto era tanto antico";
 		String key = "pasqualino";//lol
 		
-		System.out.println("===TEST Crypto-Utility===\nDati:" + testData + "\nChiave:" + key);
+		System.out.println("===TEST Crypto- Utility===\nDati:" + testData + "\nChiave:" + key);
 		
 		System.out.println("\nAES-TEST");
 		byte[] enc = CryptoUtility.encrypt(CryptoUtility.CRYPTO_ALGO.AES, testData, key);
@@ -69,11 +69,12 @@ public class TestCrypto {
 		System.out.println("RSA");
 		System.out.println("Chiave pubblica:"+CryptoUtility.toBase64(keyps.getPublic().getEncoded()));
 		enc = CryptoUtility.asymm_encrypt(ASYMMCRYPTO_ALGO.RSA, testData.getBytes(), keyps.getPublic());
-		String b64 = CryptoUtility.toBase64(enc);
-		System.out.println("cifrato:" + b64);
 
-		System.out.println(new String(CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, CryptoUtility.fromBase64(b64), keyps.getPrivate())));
-		
+		String cifrato= new String(CryptoUtility.toBase64(enc));
+		System.out.println("cifrato:" + cifrato);
+		byte[] dec= CryptoUtility.fromBase64(cifrato);
+		KeyPair keys2 = CryptoUtility.genKeyPairRSA();
+		System.out.println(new String(CryptoUtility.asymm_decrypt(ASYMMCRYPTO_ALGO.RSA, dec, keys2.getPrivate())));		
 	}
 
 }

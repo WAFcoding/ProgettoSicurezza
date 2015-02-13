@@ -77,7 +77,7 @@ public class PrimaryLayout implements GeneralLayout{
 				control.setLayout("WRITE");
 			}
 		});
-		pane.add(button, c);
+		//pane.add(button, c);
 		
 		//0.1 - ENCODE
 		button = new JButton("ENCODE");
@@ -100,6 +100,15 @@ public class PrimaryLayout implements GeneralLayout{
 		c.gridx = 1;c.gridy = 1;c.weightx = 0.5;
 		button.setBackground(Color.BLUE);
 		button.setForeground(Color.WHITE);
+		button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				
+				getControl().setLayout("DECODE");
+				System.out.println("DECODE");		
+			}
+		});
 		pane.add(button, c);
 		
 		//0.2 - SETTINGS
@@ -196,12 +205,11 @@ public class PrimaryLayout implements GeneralLayout{
 			int choose= file_chooser.showDialog(null, "apri");
 			
 			if(choose == JFileChooser.APPROVE_OPTION){
-				File file= file_chooser.getSelectedFile();
-				setFile_choosed(file.getAbsolutePath());
+				String file= file_chooser.getSelectedFile().getAbsolutePath();
+				setFile_choosed(file);
 				System.out.println("Il file scelto è: " + getFile_choosed());
 				
-				//control.addImageChoice(getFile_choosed());
-				control.draw(getFile_choosed(), "PRIMARY");
+				control.draw(getFile_choosed(), "PRIMARY");	
 			}
 		}
     }	

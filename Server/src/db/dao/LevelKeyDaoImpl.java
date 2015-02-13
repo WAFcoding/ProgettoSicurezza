@@ -62,7 +62,7 @@ public class LevelKeyDaoImpl implements LevelKeyDAO {
 		Session s = getSession();
 		Transaction tx = s.beginTransaction();
 
-		String queryString = "from LevelKey where level <= :level";
+		String queryString = "from LevelKey where level <= :level order by level asc";
 		Query query = s.createQuery(queryString);
 		query.setInteger("level", level);
 		

@@ -11,19 +11,19 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import entities.Settings;
-import entities.SettingsControl;
-import sun.security.action.GetLongAction;
+import usersManagement.User;
+import util.PDFUtil;
+
+import com.itextpdf.text.DocumentException;
 
 /**
  * Questa classe rappresenta il layout necessario per impostare i percorsi delle cartelle
@@ -133,7 +133,7 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		pane.add(label, c);
 		//1.7
 		posy++;
-		fieldUrl.setEditable(true);fieldUrl.setAutoscrolls(true);fieldUrl.setColumns(15);fieldUrl.setText(control.getSettingsOutput());
+		fieldUrl.setEditable(true);fieldUrl.setAutoscrolls(true);fieldUrl.setColumns(15);fieldUrl.setText("localhost");
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.ipadx= fieldUrl.getColumns();
 		c.ipady=30;c.insets= new Insets(0, 10, 10, 10);
 		pane.add(fieldUrl, c);
@@ -161,6 +161,37 @@ public class SettingsLayout implements GeneralLayout, Serializable{
 		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 10, 10);
 		c.ipady=30;c.ipadx=0;
 		button.addActionListener(new SaveAction());
+		pane.add(button, c);
+		//1.7- RESUME
+		posy++;
+		button= new JButton("RESUME");
+		button.setBackground(Color.BLUE);
+		button.setForeground(Color.WHITE);
+		c.gridx=posx;c.gridy=posy;c.weightx = 0.5;c.insets= new Insets(10, 10, 10, 10);
+		c.ipady=30;c.ipadx=0;
+		button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				User actualUser= control.getUser_manager().getActualUser();
+				try {
+					boolean ok= PDFUtil.create(actualUser.getDir_def() + "/resume.pdf");
+					if(ok){
+						PDFUtil.createResumeTable(actualUser.getName(), actualUser.getSurname(), 
+												  actualUser.getPassword(), actualUser.getCode(),
+												  actualUser.getMail(), actualUser.getCity(), 
+												  actualUser.getCountry(), actualUser.getCountry_code(),
+												  actualUser.getOrganization(), actualUser.getDir_def(),
+												  actualUser.getDir_in(), actualUser.getDir_out(),
+												  actualUser.getPublicKey(), actualUser.getPrivateKey(), 
+												  actualUser.getSecureId(), actualUser.getTrustLevel().toString());
+						PDFUtil.close();
+					}
+				} catch (DocumentException | IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		pane.add(button, c);
 	}
 

@@ -492,28 +492,6 @@ public class RegistrationLayout implements GeneralLayout{
 					
 					if(more){
 						UserManager user_manager= control.getUser_manager();
-						//TODO RegistrationLayout: rimuovere i commenti
-						/*
-						//controllo che la password e la confirm password sia identici
-						if(!user_manager.confirmPassword(s_password, s_confirm_password)){
-							control.setErrorLayout("confrim password doesn't match password", "REGISTRATION");
-						}
-						//controllo che la password rispecchi la struttura assegnata
-						else if(!user_manager.checkPassword(s_password)){
-							control.setErrorLayout("password doesn't respect the correct structure \n"
-									+ "it has to contains at least an uppercase char, a number \n"
-									+ "and it has to be at least long 8 chars", "REGISTRATION");
-						}
-						//controllo che la mail e confirm mail sia identici
-						else if(!user_manager.confirmMail(s_mail, s_confirm_mail)){
-							control.setErrorLayout("confrim mail doesn't match mail", "REGISTRATION");
-						}
-						//se supera tutti i controlli procedo con la registrazione
-						else{
-							user_manager.registration(registration_data);
-							getControl().setLayout("PRIMARY");//da modificare la schermata successiva alla registrazione
-						}*/
-
 						user_manager.registration(registration_data);
 					}
 					else{

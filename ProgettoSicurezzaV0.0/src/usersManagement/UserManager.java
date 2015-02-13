@@ -78,11 +78,7 @@ public class UserManager {
 		String surname= arg[1];
 		String password= arg[2];
 		String code= arg[3];
-		for(String t : arg){
 
-			System.out.print(t + " ");
-		}
-		System.out.println("");
 		if(checkForLogin(arg)){
 			
 			String dbPath= "";
@@ -98,7 +94,7 @@ public class UserManager {
 			
 			if(control.IsSettingsPathNull()){
 				JFileChooser chooser= new JFileChooser();
-				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				chooser.showOpenDialog(null);
 				dbPath= chooser.getSelectedFile().getAbsolutePath();
 				control.setActualDbPath(dbPath);
@@ -134,7 +130,7 @@ public class UserManager {
 						System.out.println("check user code " + u.getCode() + " equal insert code " + hash_code );
 						if(u.getCode().equals(hash_code)){
 							//controllo password
-							System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
+							//System.out.println("check user pwd " + u.getPassword() + " equal insert pwd " + hash_password );
 							if(u.getPassword().equals(hash_password)){
 								System.out.println(name + " " + surname + " is logging in.");
 								control.setActualSettings(u.getDir_def(), u.getDir_in(), u.getDir_out(), u.getDir_def(), url);
@@ -186,7 +182,7 @@ public class UserManager {
 		String private_key= "";
 		String secid= "";
 		try {
-			key = getKey();
+			key = CryptoUtility.genKeyPairRSA();
 			public_key= CryptoUtility.toBase64(key.getPublic().getEncoded()).replace("\n", "");
 			private_key= CryptoUtility.toBase64(key.getPrivate().getEncoded()).replace("\n", "");
 		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
@@ -202,7 +198,6 @@ public class UserManager {
 			e1.printStackTrace();
 		}
 		
-		//TODO UserManager: cambiare il nome del DB?
 		if(!HibernateUtil.isCreated()){
 			HibernateUtil.setDbPath(dir_def);
 			HibernateUtil.createSession();
@@ -211,6 +206,7 @@ public class UserManager {
 		Session session= HibernateUtil.getSessionFactory().openSession();
 		//genero il codice
 		String code= generateCode(session, public_key);
+		code= code.replace("/", "0");
 		Transaction tx= null;
 		try{
 			//hash del code per autenticazione forte
@@ -233,7 +229,10 @@ public class UserManager {
 			user.setPublicKey(public_key);
 			user.setPrivateKey(private_key);
 			user.setPassword(hash_password);
-			user.setTrustLevel(-1);
+			int trustLevel= -1;
+			user.setTrustLevel(trustLevel);
+			String server_uid= "-1";
+			user.setServer_uid(server_uid);
 
 			try(RegistrationClient reg = ConnectionFactory.getRegistrationServerConnection(url, keystore_pwd)) {
 				secid = reg.submitRegistration(user);
@@ -260,27 +259,15 @@ public class UserManager {
 			KeyTool.storeKeystore(ks, ClientConfig.getInstance().getProperty(ClientConfig.KEYSTORE_PATH), password);
 			*/
 			
-			//TODO UserManager: encode del file serializzato
 			
 			createPdfResume(name, surname, password, code, mail, city, country, country_code, organization, 
-							dir_def, dir_out, dir_in, public_key, private_key, secid);
+							dir_def, dir_out, dir_in, public_key, private_key, secid, String.valueOf(trustLevel));
 			
 			String registration_summary= "E' stato creato un pdf contenente i dati inseriti in " + dir_def + "/" + code + ".pdf";
 			
 			//stampa del contenuto del PDF a schermo
 			control.setErrorLayout("Registration summary:\n" + registration_summary, "HOME");
 
-			System.out.println("Stai registrando l'utente: " + registration_summary);
-			
-			//TODO UserMAnager: questo si fa quando si prelevano le informazioni di un utente per
-			//criptare un documento
-			/*UserPublicKeyKnown user_pbck= new UserPublicKeyKnown();
-			user_pbck.setID_user("3");
-			user_pbck.setPbc_key("yuuuuuuuuuuuuuuu");
-			user_pbck.setUser(user);
-			user.getPublicKeyKnown().add(user_pbck);
-			session.save(user_pbck);
-			*/
 		}
 		catch(Exception e){
 			if(tx != null) tx.rollback();
@@ -428,7 +415,7 @@ public class UserManager {
 	
 	public void createPdfResume(String name, String surname, String password, String code, String mail, String city, 
 			String country, String country_code, String organization, String dir_def, String dir_out, 
-			String dir_in, String public_key, String private_key, String secid){
+			String dir_in, String public_key, String private_key, String secid, String trustLevel){
 		
 		try {
 			PDFUtil.create(dir_def + "/" + code + ".pdf");
@@ -436,7 +423,9 @@ public class UserManager {
 				PDFUtil.addCredentials(code, "Credentials", "Registration", 
 										"ProgettoSicurezza", "ProgettoSicurezza");
 				try {
-					PDFUtil.createResumeTable(name, surname, password, code, mail, city, country, country_code, organization, dir_def, dir_out, dir_in, public_key, private_key, secid);
+					PDFUtil.createResumeTable(name, surname, password, code, mail, city, 
+											  country, country_code, organization, dir_def, 
+											  dir_out, dir_in, public_key, private_key, secid,trustLevel );
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -449,44 +438,70 @@ public class UserManager {
 	
 	public void updateActualUserTrustLevel(int trustLevel){
 		
+		System.out.println("Update DB");
+		
+		User actualUser= control.getUser_manager().getActualUser();
+		
 		if(!HibernateUtil.isCreated()){
-			HibernateUtil.setDbPath(getActualUser().getDir_def());
-			HibernateUtil.decryptDb(getActualUser().getPassword());
+			HibernateUtil.setDbPath(control.getActualDbPath());
+			HibernateUtil.decryptDb(actualUser.getPassword());
 			HibernateUtil.createSession();
 		}
 		
 		Session session= HibernateUtil.getSessionFactory().openSession();
-		
 		Transaction tx= null;
 		try{
-			
 			tx= session.beginTransaction();
-			String hql= "from User where iD = :id";
-			Query query= session.createQuery(hql);
-			query.setParameter("id", getActualUser().getID());
-			List<User> result= query.list();
 			
-			if(result != null){
-				User tmp_user= result.get(0);
-				System.out.println("result not null");
-				tmp_user.setTrustLevel(trustLevel);
-				session.update(tmp_user);
-			}
-			else{
-				System.out.println("result is null");
-			}
+			//control.getUser_manager().printActualUser();
+			actualUser.setTrustLevel(trustLevel);
+			
+			session.update(actualUser);
 			
 			tx.commit();
 			
-		}
-		catch(Exception e){
+		}catch (Exception e) {
 			if(tx != null) tx.rollback();
 			e.printStackTrace();
 		}
 		finally{
 			session.close();
 			HibernateUtil.shutdown();
-			HibernateUtil.encryptDb(getActualUser().getPassword());
+			HibernateUtil.encryptDb(actualUser.getPassword());
+		}
+		
+	}
+	
+	public void updateActualUserServerUid(String server_uid){
+		
+		User actualUser= control.getUser_manager().getActualUser();
+		
+		if(!HibernateUtil.isCreated()){
+			HibernateUtil.setDbPath(control.getActualDbPath());
+			HibernateUtil.decryptDb(actualUser.getPassword());
+			HibernateUtil.createSession();
+		}
+		
+		Session session= HibernateUtil.getSessionFactory().openSession();
+		Transaction tx= null;
+		try{
+			tx= session.beginTransaction();
+			
+			//control.getUser_manager().printActualUser();
+			actualUser.setServer_uid(server_uid);
+			
+			session.update(actualUser);
+			
+			tx.commit();
+			
+		}catch (Exception e) {
+			if(tx != null) tx.rollback();
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+			HibernateUtil.shutdown();
+			HibernateUtil.encryptDb(actualUser.getPassword());
 		}
 		
 	}

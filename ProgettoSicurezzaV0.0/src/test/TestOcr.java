@@ -5,6 +5,7 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
+import net.sourceforge.tess4j.TessAPI;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.vietocr.ImageHelper;
 
@@ -60,10 +61,14 @@ public class TestOcr {
 		 * FIXME
 		 * Il percorso del file immagine va cambiato (mando anche queste immagini per email)
 		 */
-		File f = new File("/home/giovanni/Scrivania/prova3Disturbata1.png");
+		File f = new File("/home/pasquale/ProgettoSicurezza/pasquale/output/img_text.png");
 		BufferedImage img = ImageIO.read(f);
 		
+		img= ImageHelper.convertImageToBinary(img);
+		
 		Tesseract ts = Tesseract.getInstance();
+		ts.setPageSegMode(TessAPI.TessPageSegMode.PSM_SINGLE_BLOCK);
+		//ts.setOcrEngineMode(TessAPI.TessOcrEngineMode.OEM_TESSERACT_CUBE_COMBINED);
 		
 		//serve a vedere quanto è ruotato il testo: troppo angolato non lo legge.
 		ImageDeskew deskew = new ImageDeskew(img);

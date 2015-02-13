@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import com.itextpdf.text.Anchor;
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -52,7 +53,7 @@ public class PDFUtil {
 	private static final float TITLEY= PAGESIZE.getHeight() - 30 - 10;
 	private static final float AUTHORX= TITLEX;
 	private static final float AUTHORY= TITLEY - 20 - 10;
-	private static final float INFOX= TITLEX + 50;
+	private static final float INFOX= TITLEX;
 	private static final float INFOY= AUTHORY - 10 - 10;
 	private static final float DEFSIZETEXT= 11;
 	private static final float DEFSIZELINE= 0.05f;
@@ -60,9 +61,11 @@ public class PDFUtil {
 	private static final float RECTHEIGHT= 101;
 	private static final float SIGNATUREX= PAGESIZE.getWidth() - 10 - RECTWIDTH;
 	private static final float SIGNATUREY= 10 + RECTWIDTH;
+	private static final float INFOQRCODEX= SIGNATUREX - 10 - RECTWIDTH;
+	private static final float INFOQRCODEY= 10 + RECTHEIGHT;
 	
 
-	public static final String LOGO_PATH= "/home/giovanni/workspaceSII/ProgettoSicurezza/ProgettoSicurezzaV0.0/files/logoroma_torvergata.jpg";
+	public static final String LOGO_PATH= "./files/logoroma_torvergata.jpg";
 	
 	private static PdfWriter pdfwr;
 	private static Document doc;
@@ -85,7 +88,7 @@ public class PDFUtil {
 		pdfwr= PdfWriter.getInstance(doc, new FileOutputStream(file_path));
 		if(open()){
 			pdfcb= pdfwr.getDirectContent();
-			font= new Font(FontFamily.HELVETICA, 12);
+			font= new Font(FontFamily.TIMES_ROMAN);
 			bf_helv = font.getCalculatedBaseFont(false);
 			return true;
 		}
@@ -152,12 +155,27 @@ public class PDFUtil {
 		/*pdfcb.beginText();
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, text, x, PAGESIZE.getHeight() - y, 0);
 		pdfcb.endText();*/
-		if(textSize == 0) textSize= DEFSIZETEXT;
+		if(textSize == 0) textSize= 40;//textSize= DEFSIZETEXT;
 		ColumnText ct= new ColumnText(pdfcb);
-		Phrase p= new Phrase(text);
-		p.setFont(new Font(bf_helv, textSize));
-		ct.setSimpleColumn(p, x, PAGESIZE.getHeight() - y, PAGESIZE.getWidth() - 20, PAGESIZE.getHeight() - y - 450, 20, Element.ALIGN_LEFT);
-		ct.go();
+		Paragraph paragraph = new Paragraph();
+		Chunk chunk= new Chunk(text);
+		chunk.setFont(new Font(bf_helv, 15));
+        paragraph.add(chunk);
+
+        // Set paragraph's left side indent
+        paragraph.setIndentationLeft(5);
+
+        // Set paragraph's right side indent
+        paragraph.setIndentationRight(5);
+        addEmptyLine(8);
+        doc.add(paragraph);
+		/*Phrase p= new Phrase(text);
+		p.setFont(new Font(bf_helv, 50));
+		p.setLeading(60);
+		ct.setText(p);
+		ct.setSimpleColumn(x, PAGESIZE.getHeight() - y, PAGESIZE.getWidth() - 20, PAGESIZE.getHeight() - y - 450);
+		//ct.setSimpleColumn(p, x, PAGESIZE.getHeight() - y, PAGESIZE.getWidth() - 20, PAGESIZE.getHeight() - y - 450, 25, Element.ALIGN_LEFT);
+		ct.go();*/
 		//pdfcb.saveState();
 	}
 	/**
@@ -191,7 +209,11 @@ public class PDFUtil {
 			par.add(" ");
 		}
 		if(doc.isOpen()){
-			doc.add(par);
+			//doc.add(par);
+			for(int i=0;i<nline;i++){
+				par.add(" ");
+				doc.add(par);
+			}
 		}
 		else
 			System.out.println("Aprire prima il file");
@@ -256,7 +278,6 @@ public class PDFUtil {
 
 		pdfcb.beginText();
 		pdfcb.setFontAndSize(bf_helv, 30);
-		//TODO PDFUtil: cambiare i valori della posizione del titolo
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, title, TITLEX, TITLEY, 0);
 		pdfcb.endText();
 	}
@@ -265,16 +286,15 @@ public class PDFUtil {
 
 		pdfcb.beginText();
 		pdfcb.setFontAndSize(bf_helv, 20);
-		//TODO PDFUtil: cambiare i valori della posizione del titolo
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, author, AUTHORX, AUTHORY, 0);
 		pdfcb.endText();
 	}
 	
-	public static void addSubtitleInfo(String date, String pagenumber, String info, String receiver){
+	public static void addSubtitleInfo(String date, String receiver){
 
 		pdfcb.beginText();
 		pdfcb.setFontAndSize(bf_helv, 10);
-		String allInfo= date + " - " + pagenumber + " - " + info + " - " + receiver;
+		String allInfo= receiver + "-" + date;
 		pdfcb.showTextAligned(Element.ALIGN_LEFT, allInfo, INFOX, INFOY, 0);
 		pdfcb.endText();
 	}
@@ -320,16 +340,17 @@ public class PDFUtil {
         reader.close();
 	}
 	
-	public static void createDocument(String title, String author, String text, String signaturePath, String[] subtitleInfo, String[] qrCodes){
+	public static void createDocument(String title, String author, String text, String infoQrCodePath, String[] subtitleInfo, String[] qrCodes){
 		try {
 			addLogo(LOGO_PATH);
 			addTitle(title);
 			addAuthor(author);
-			addSubtitleInfo(subtitleInfo[0], subtitleInfo[1], subtitleInfo[2], subtitleInfo[3]);
+			addSubtitleInfo(subtitleInfo[0], subtitleInfo[1]);
 			addRectangle(SIGNATUREX, SIGNATUREY, RECTWIDTH, RECTHEIGHT);
-			if(signaturePath != null && !signaturePath.equals("")){
-				addQRCodeImage(signaturePath, SIGNATUREX + 1, SIGNATUREY + 1 - RECTHEIGHT);
-			}
+			
+			addRectangle(INFOQRCODEX, INFOQRCODEY, RECTWIDTH, RECTHEIGHT);
+			if(infoQrCodePath != null)
+				addQRCodeImage(infoQrCodePath, INFOQRCODEX + 1, INFOQRCODEY + 1 - RECTHEIGHT); 
 			addLineHorizontal(10, 150, 0);
 			addText(text, 10, 170, 0);
 			addLineHorizontal(10, 600, 0);
@@ -340,18 +361,20 @@ public class PDFUtil {
 				addRectangle(i, 820, RECTWIDTH, RECTHEIGHT);
 			}
 			int j=0;
-			for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
-				String tmp_qrcodePath= qrCodes[j];
-				if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
-					addQRCodeImage(tmp_qrcodePath, i, 611);
-					j++;
+			if(qrCodes != null){
+				for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
+					String tmp_qrcodePath= qrCodes[j];
+					if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
+						addQRCodeImage(tmp_qrcodePath, i, 611);
+						j++;
+					}
 				}
-			}
-			for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
-				String tmp_qrcodePath= qrCodes[j];
-				if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
-					addQRCodeImage(tmp_qrcodePath, i, 721);
-					j++;
+				for(float i=20; i<500; i= i + DEFSIZELINE + 100 + DEFSIZELINE + 10){
+					String tmp_qrcodePath= qrCodes[j];
+					if(tmp_qrcodePath != null && !tmp_qrcodePath.equals("")){
+						addQRCodeImage(tmp_qrcodePath, i, 721);
+						j++;
+					}
 				}
 			}
 			
@@ -383,7 +406,8 @@ public class PDFUtil {
 	 */
 	public static void createResumeTable(String text1, String text2, String text3, String text4, String text5,
 										 String text6, String text7, String text8, String text9, String text10,
-										 String text11, String text12, String text13, String text14, String text15) throws DocumentException, MalformedURLException, IOException{
+										 String text11, String text12, String text13, String text14, 
+										 String text15, String text16) throws DocumentException, MalformedURLException, IOException{
 		addLogo(LOGO_PATH);
 		addTitle("Registration resume");
 		PDFUtil.addLineHorizontal(10, 150, 0);
@@ -421,10 +445,14 @@ public class PDFUtil {
 		table.addCell(text14);
 		table.addCell("Secure ID");
 		table.addCell(text15);
-		table.writeSelectedRows(0, 15, 20, PAGESIZE.getHeight() - 170, pdfcb);
+		table.addCell("Trust Level");
+		table.addCell(text16);
+		table.writeSelectedRows(0, 16, 20, PAGESIZE.getHeight() - 170, pdfcb);
 		
 		//doc.add(table);
 	}
+	
+	//TODO funzione per leggere il testo
 	
 	private static class ImageRenderListener implements RenderListener{
 		
